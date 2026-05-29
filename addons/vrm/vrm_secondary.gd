@@ -6,7 +6,6 @@ const spring_bone_class = preload("./vrm_spring_bone.gd")
 const collider_class = preload("./vrm_collider.gd")
 const collider_group_class = preload("./vrm_collider_group.gd")
 
-
 @export_category("Springbone Settings")
 @export var update_secondary_fixed: bool = false:
 	set(value):
@@ -108,13 +107,17 @@ var secondary_gizmo: SecondaryGizmo
 var is_child_of_vrm: bool = false
 var colliders_changed: bool = false
 var modify_gravity: bool = false
+var _has_skeleton_modifier: bool = false
+var _parent_ref: Node = null
 
-@export var collider_groups: Array[collider_group_class] # Unused, but this way we don't break script compatibility.
-@export var collider_library: Array[collider_class] # Unused, intended to make inspecting easier
+@export var collider_groups: Array[collider_group_class]  # Unused, but this way we don't break script compatibility.
+@export var collider_library: Array[collider_class]  # Unused, intended to make inspecting easier
 var spring_bones_cached: Array[spring_bone_class]
+
 
 func _on_recreate_collider():
 	colliders_changed = true
+
 
 # Collider state
 # TODO: explore packed data to make processing optimization such as c++ easier.
@@ -124,14 +127,23 @@ func _on_recreate_collider():
 #const springbone_runtime = preload("./runtime/springbone_runtime.gd")
 #var spring_logic: Array[springbone_runtime]
 
+var _has_spring_bone_simulator: bool = false
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	_has_skeleton_modifier = ClassDB.class_exists(&"SkeletonModifier3D")
+	_has_spring_bone_simulator = ClassDB.class_exists(&"SpringBoneSimulator3D")
+	_parent_ref = get_parent()
 	skel = get_node(skeleton)
 	if skel == null:
 		return  # Not supported.
 
-	if ClassDB.class_exists(&"SkeletonModifier3D"):
+	if _has_spring_bone_simulator:
+		_setup_spring_bone_simulator()
+		return
+
+	if _has_skeleton_modifier:
 		if internal_modifier_node != null:
 			if internal_modifier_node.get_parent() != null:
 				internal_modifier_node.get_parent().remove_child(internal_modifier_node)
@@ -139,19 +151,25 @@ func _ready() -> void:
 		internal_modifier_node = ClassDB.instantiate("SkeletonModifier3D")
 		internal_modifier_node.name = "VRM_internal_skeleton_modifier"
 		skel.add_child(internal_modifier_node, false, Node.INTERNAL_MODE_BACK)
-		internal_modifier_node.connect(&"modification_processed", self._on_secondary_process_modification_processed)
+		internal_modifier_node.connect(
+			&"modification_processed", self._on_secondary_process_modification_processed
+		)
 
 	spring_bones_cached = spring_bones
 	var gizmo_spring_bone: bool = false
-	if get_parent() != null and get_parent().script != null and get_parent().script.resource_path.get_file() == "vrm_toplevel.gd":
+	if (
+		_parent_ref != null
+		and _parent_ref.script != null
+		and _parent_ref.script.resource_path.get_file() == "vrm_toplevel.gd"
+	):
 		is_child_of_vrm = true
 	if is_child_of_vrm:
-		get_parent().spring_bones = spring_bones
-		get_parent().collider_groups = collider_groups
-		get_parent().collider_library = collider_library
-		update_secondary_fixed = get_parent().get("update_secondary_fixed")
-		gizmo_spring_bone = get_parent().get("gizmo_spring_bone")
-		disable_colliders = get_parent().get("disable_colliders")
+		_parent_ref.spring_bones = spring_bones
+		_parent_ref.collider_groups = collider_groups
+		_parent_ref.collider_library = collider_library
+		update_secondary_fixed = _parent_ref.get("update_secondary_fixed")
+		gizmo_spring_bone = _parent_ref.get("gizmo_spring_bone")
+		disable_colliders = _parent_ref.get("disable_colliders")
 
 	if secondary_gizmo == null and (Engine.is_editor_hint() or gizmo_spring_bone):
 		secondary_gizmo = SecondaryGizmo.new(self)
@@ -209,7 +227,7 @@ func _ready() -> void:
 					seen_colliders[collider] = true
 					collider_library.append(collider)
 				if not collider.recreate_collider.is_connected(self._on_recreate_collider):
-					collider.recreate_collider.connect(self._on_recreate_collider) # Rebuild everything if anything changes.
+					collider.recreate_collider.connect(self._on_recreate_collider)  # Rebuild everything if anything changes.
 				var collider_runtime: collider_class.VrmRuntimeCollider
 				if center_key not in center_to_collider_to_internal:
 					center_to_collider_to_internal[center_key] = {}
@@ -230,13 +248,239 @@ func _ready() -> void:
 		springs_centers.append(center_idx)
 
 
+func _setup_spring_bone_simulator() -> void:
+	if internal_modifier_node != null:
+		if internal_modifier_node.get_parent() != null:
+			internal_modifier_node.get_parent().remove_child(internal_modifier_node)
+		internal_modifier_node.queue_free()
+
+	internal_modifier_node = ClassDB.instantiate("SpringBoneSimulator3D")
+	internal_modifier_node.name = "VRM_SpringBoneSimulator3D"
+	skel.add_child(internal_modifier_node, false, Node.INTERNAL_MODE_BACK)
+
+	# 1. Gather all unique colliders
+	var all_colliders_map: Dictionary = {}
+	for spring_bone in spring_bones:
+		if not spring_bone:
+			continue
+		for cg in spring_bone.collider_groups:
+			if not cg:
+				continue
+			for c in cg.colliders:
+				if c:
+					all_colliders_map[c] = true
+
+	# 2. Instantiate Godot collision nodes as children of the simulator
+	var godot_colliders: Dictionary = {}
+	for c in all_colliders_map:
+		var col_node: Node3D
+		if c.is_capsule:
+			var cap = SpringBoneCollisionCapsule3D.new()
+			cap.radius = c.radius
+			var diff = c.tail - c.offset
+			var length = diff.length()
+			cap.mid_height = length
+			cap.position_offset = (c.offset + c.tail) / 2.0
+			if length > 0.00001:
+				cap.rotation_offset = Quaternion(Vector3(0, 1, 0), diff / length)
+			else:
+				cap.rotation_offset = Quaternion.IDENTITY
+			col_node = cap
+		else:
+			var sph = SpringBoneCollisionSphere3D.new()
+			sph.radius = c.radius
+			sph.position_offset = c.offset
+			col_node = sph
+
+		col_node.name = "Collider_" + str(c.get_instance_id())
+		if c.bone != "":
+			col_node.set("bone_name", c.bone)
+		elif c.node_path != NodePath():
+			# If attached to a node, we will add it to that node instead
+			var target_node = get_node_or_null(c.node_path)
+			if target_node:
+				target_node.add_child(col_node)
+				godot_colliders[c] = col_node
+				continue
+
+		internal_modifier_node.add_child(col_node)
+		godot_colliders[c] = col_node
+
+	# 3. Configure settings
+	var valid_spring_bones: Array[spring_bone_class] = []
+	for sb in spring_bones:
+		if sb:
+			valid_spring_bones.append(sb)
+
+	internal_modifier_node.set_setting_count(len(valid_spring_bones))
+
+	for idx in range(len(valid_spring_bones)):
+		var sb = valid_spring_bones[idx]
+		var active_joints: PackedStringArray = []
+		for node_name in sb.joint_nodes:
+			if not node_name.is_empty():
+				active_joints.append(node_name)
+
+		if active_joints.is_empty():
+			continue
+
+		internal_modifier_node.set_root_bone_name(idx, active_joints[0])
+		internal_modifier_node.set_end_bone_name(idx, active_joints[-1])
+
+		# Check if we should extend end bone
+		if sb.joint_nodes[-1] == "":
+			internal_modifier_node.set_extend_end_bone(idx, true)
+			internal_modifier_node.set_end_bone_length(idx, 0.07)
+			var last_bone_name = active_joints[-1]
+			var last_bone_idx = skel.find_bone(last_bone_name)
+			if last_bone_idx != -1:
+				var rest_pos = skel.get_bone_rest(last_bone_idx).origin
+				if rest_pos.length_squared() > 0.00001:
+					internal_modifier_node.set_end_bone_direction(idx, rest_pos.normalized())
+		else:
+			internal_modifier_node.set_extend_end_bone(idx, false)
+
+		# Center bone/node
+		if sb.center_bone != "":
+			internal_modifier_node.set_center_bone_name(idx, sb.center_bone)
+		elif sb.center_node != NodePath():
+			var target_node = get_node_or_null(sb.center_node)
+			if target_node:
+				var rel_path = internal_modifier_node.get_path_to(target_node)
+				internal_modifier_node.set_center_node(idx, rel_path)
+
+		# Configure base settings
+		internal_modifier_node.set_stiffness(idx, sb.stiffness_scale)
+		internal_modifier_node.set_drag(idx, sb.drag_force_scale)
+		internal_modifier_node.set_radius(idx, sb.hit_radius_scale)
+		internal_modifier_node.set_gravity(idx, sb.gravity_scale)
+		internal_modifier_node.set_gravity_direction(idx, sb.gravity_dir_default)
+		internal_modifier_node.set_external_force(springbone_add_force)
+
+		# Configure per-joint individual configs
+		internal_modifier_node.set_individual_config(idx, true)
+
+		for joint_idx in range(len(active_joints)):
+			var stiffness_val = sb.stiffness_scale
+			if not sb.stiffness_force.is_empty():
+				stiffness_val *= (
+					sb.stiffness_force[joint_idx]
+					if joint_idx < len(sb.stiffness_force)
+					else sb.stiffness_force[-1]
+				)
+			internal_modifier_node.set_joint_stiffness(idx, joint_idx, stiffness_val)
+
+			var drag_val = sb.drag_force_scale
+			if not sb.drag_force.is_empty():
+				drag_val *= (
+					sb.drag_force[joint_idx]
+					if joint_idx < len(sb.drag_force)
+					else sb.drag_force[-1]
+				)
+			internal_modifier_node.set_joint_drag(idx, joint_idx, drag_val)
+
+			var radius_val = sb.hit_radius_scale
+			if not sb.hit_radius.is_empty():
+				radius_val *= (
+					sb.hit_radius[joint_idx]
+					if joint_idx < len(sb.hit_radius)
+					else sb.hit_radius[-1]
+				)
+			internal_modifier_node.set_joint_radius(idx, joint_idx, radius_val)
+
+			var grav_val = sb.gravity_scale
+			if not sb.gravity_power.is_empty():
+				grav_val *= (
+					sb.gravity_power[joint_idx]
+					if joint_idx < len(sb.gravity_power)
+					else sb.gravity_power[-1]
+				)
+			internal_modifier_node.set_joint_gravity(idx, joint_idx, grav_val)
+
+			var grav_dir = sb.gravity_dir_default
+			if not sb.gravity_dir.is_empty():
+				grav_dir = (
+					sb.gravity_dir[joint_idx]
+					if joint_idx < len(sb.gravity_dir)
+					else sb.gravity_dir[-1]
+				)
+			internal_modifier_node.set_joint_gravity_direction(idx, joint_idx, grav_dir)
+
+		# Configure allowed collisions using exclude list
+		internal_modifier_node.set("settings/%d/enable_all_child_collisions" % idx, true)
+
+		var allowed_nodes: Array[Node3D] = []
+		for cg in sb.collider_groups:
+			if cg:
+				for c in cg.colliders:
+					if c in godot_colliders:
+						allowed_nodes.append(godot_colliders[c])
+
+		var to_exclude: Array[Node3D] = []
+		for c in godot_colliders.values():
+			if not c in allowed_nodes:
+				to_exclude.append(c)
+
+		internal_modifier_node.set_exclude_collision_count(idx, len(to_exclude))
+		for j in range(len(to_exclude)):
+			var path = internal_modifier_node.get_path_to(to_exclude[j])
+			internal_modifier_node.set_exclude_collision_path(idx, j, path)
+
+	internal_modifier_node.active = true
+	internal_modifier_node.reset()
+
+
+func update_simulator_gravity() -> void:
+	if not internal_modifier_node or not _has_spring_bone_simulator:
+		return
+
+	internal_modifier_node.set_external_force(springbone_add_force)
+
+	var valid_spring_bones: Array[spring_bone_class] = []
+	for sb in spring_bones:
+		if sb:
+			valid_spring_bones.append(sb)
+
+	for idx in range(len(valid_spring_bones)):
+		var sb = valid_spring_bones[idx]
+		var active_joints: PackedStringArray = []
+		for node_name in sb.joint_nodes:
+			if not node_name.is_empty():
+				active_joints.append(node_name)
+
+		for joint_idx in range(len(active_joints)):
+			var grav_val = sb.gravity_scale
+			if not sb.gravity_power.is_empty():
+				grav_val *= (
+					sb.gravity_power[joint_idx]
+					if joint_idx < len(sb.gravity_power)
+					else sb.gravity_power[-1]
+				)
+
+			var grav_dir = sb.gravity_dir_default
+			if not sb.gravity_dir.is_empty():
+				grav_dir = (
+					sb.gravity_dir[joint_idx]
+					if joint_idx < len(sb.gravity_dir)
+					else sb.gravity_dir[-1]
+				)
+
+			var total_gravity_vec = (
+				springbone_gravity_rotation * (grav_val * grav_dir) * springbone_gravity_multiplier
+			)
+			internal_modifier_node.set_joint_gravity(idx, joint_idx, total_gravity_vec.length())
+			if total_gravity_vec.length_squared() > 0.00001:
+				internal_modifier_node.set_joint_gravity_direction(
+					idx, joint_idx, total_gravity_vec.normalized()
+				)
+
+
 func check_for_editor_update() -> bool:
 	if not Engine.is_editor_hint():
 		return false
-	if is_child_of_vrm:
-		var parent: Node = get_parent()
-		if parent.update_in_editor != update_in_editor:
-			update_in_editor = parent.update_in_editor
+	if is_child_of_vrm and _parent_ref != null:
+		if _parent_ref.update_in_editor != update_in_editor:
+			update_in_editor = _parent_ref.update_in_editor
 	return update_in_editor
 
 
@@ -257,7 +501,9 @@ func update_centers(skel_transform: Transform3D):
 				center_transforms[center_i] = center_xform_inv * center_transforms[center_i]
 				center_transforms_inv[center_i] = center_transforms_inv[center_i] * center_xform
 		elif center_bones[center_i] == -1 and center_node != null:
-			center_transforms[center_i] = center_node.global_transform.affine_inverse() * skel_transform
+			center_transforms[center_i] = (
+				center_node.global_transform.affine_inverse() * skel_transform
+			)
 			center_transforms_inv[center_i] = skel_transform_inv * center_node.global_transform
 		else:
 			center_transforms[center_i] = skel.get_bone_global_pose(center_bones[center_i])
@@ -265,31 +511,56 @@ func update_centers(skel_transform: Transform3D):
 
 
 func tick_spring_bones(delta: float) -> void:
-	# force update skeleton
-
 	if skel == null:
 		return
-	var skel_transform: Transform3D = skel.global_transform
 
+	if _has_spring_bone_simulator:
+		if is_child_of_vrm and _parent_ref != null:
+			if (
+				_parent_ref.springbone_gravity_rotation != springbone_gravity_rotation
+				or _parent_ref.springbone_gravity_multiplier != springbone_gravity_multiplier
+				or _parent_ref.springbone_add_force != springbone_add_force
+			):
+				springbone_add_force = _parent_ref.springbone_add_force
+				springbone_gravity_rotation = _parent_ref.springbone_gravity_rotation
+				springbone_gravity_multiplier = _parent_ref.springbone_gravity_multiplier
+				modify_gravity = true
+			if _parent_ref.disable_colliders != disable_colliders:
+				disable_colliders = _parent_ref.disable_colliders
+				# If we want to disable colliders on simulator:
+				internal_modifier_node.active = !disable_colliders
+			if spring_bones != _parent_ref.spring_bones:
+				spring_bones = _parent_ref.spring_bones
+				_setup_spring_bone_simulator()
+
+		if modify_gravity:
+			modify_gravity = false
+			update_simulator_gravity()
+		return
+
+	var skel_transform: Transform3D = skel.global_transform
 	update_centers(skel_transform)
 
 	var needs_reintialize: bool = false
 	# our setter syncs it the other direction.
-	if is_child_of_vrm:
-		var parent: Node = get_parent()
-		if parent.springbone_gravity_rotation != springbone_gravity_rotation or parent.springbone_gravity_multiplier != springbone_gravity_multiplier or parent.springbone_add_force != springbone_add_force:
-			springbone_add_force = parent.springbone_add_force
-			springbone_gravity_rotation = parent.springbone_gravity_rotation
-			springbone_gravity_multiplier = parent.springbone_gravity_multiplier
+	if is_child_of_vrm and _parent_ref != null:
+		if (
+			_parent_ref.springbone_gravity_rotation != springbone_gravity_rotation
+			or _parent_ref.springbone_gravity_multiplier != springbone_gravity_multiplier
+			or _parent_ref.springbone_add_force != springbone_add_force
+		):
+			springbone_add_force = _parent_ref.springbone_add_force
+			springbone_gravity_rotation = _parent_ref.springbone_gravity_rotation
+			springbone_gravity_multiplier = _parent_ref.springbone_gravity_multiplier
 			modify_gravity = true
-		if parent.disable_colliders != disable_colliders:
-			disable_colliders = parent.disable_colliders
+		if _parent_ref.disable_colliders != disable_colliders:
+			disable_colliders = _parent_ref.disable_colliders
 			for sb in spring_bones_internal:
 				sb.disable_colliders = disable_colliders
-		override_springbone_center = parent.override_springbone_center
-		default_springbone_center = parent.default_springbone_center
-		if spring_bones != parent.spring_bones:
-			spring_bones = parent.spring_bones
+		override_springbone_center = _parent_ref.override_springbone_center
+		default_springbone_center = _parent_ref.default_springbone_center
+		if spring_bones != _parent_ref.spring_bones:
+			spring_bones = _parent_ref.spring_bones
 			needs_reintialize = true
 	if modify_gravity:
 		for sb in spring_bones_internal:
@@ -307,9 +578,15 @@ func tick_spring_bones(delta: float) -> void:
 			spring_bones_internal[spring_i].pre_update()
 
 	for collider_i in range(len(colliders_internal)):
-		colliders_internal[collider_i].update(skel_transform, center_transforms[colliders_centers[collider_i]], skel)
+		colliders_internal[collider_i].update(
+			skel_transform, center_transforms[colliders_centers[collider_i]], skel
+		)
 	for spring_i in range(len(spring_bones_internal)):
-		spring_bones_internal[spring_i].update(delta, center_transforms[springs_centers[spring_i]], center_transforms_inv[springs_centers[spring_i]])
+		spring_bones_internal[spring_i].update(
+			delta,
+			center_transforms[springs_centers[spring_i]],
+			center_transforms_inv[springs_centers[spring_i]]
+		)
 
 	if secondary_gizmo != null:
 		if Engine.is_editor_hint():
@@ -319,13 +596,13 @@ func tick_spring_bones(delta: float) -> void:
 
 
 func _process(delta: float):
-	if not ClassDB.class_exists(&"SkeletonModifier3D"):
+	if not _has_skeleton_modifier:
 		if not update_secondary_fixed:
 			do_process(delta)
 
 
 func _physics_process(delta: float) -> void:
-	if not ClassDB.class_exists(&"SkeletonModifier3D"):
+	if not _has_skeleton_modifier:
 		if update_secondary_fixed:
 			do_process(delta)
 
@@ -350,7 +627,9 @@ func do_process(delta: float) -> void:
 				var skel_transform: Transform3D = skel.global_transform
 				update_centers(skel_transform)
 				for collider_i in range(len(colliders_internal)):
-					colliders_internal[collider_i].update(skel_transform, center_transforms[colliders_centers[collider_i]], skel)
+					colliders_internal[collider_i].update(
+						skel_transform, center_transforms[colliders_centers[collider_i]], skel
+					)
 				secondary_gizmo.draw_in_editor()
 
 
@@ -389,7 +668,9 @@ class SecondaryGizmo:
 		# Spring bones
 		mesh.surface_begin(Mesh.PRIMITIVE_LINES)
 		for spring_bone in secondary_node.spring_bones_internal:
-			var center_transform_inv: Transform3D = secondary_node.center_transforms_inv[secondary_node.springs_centers[i]]
+			var center_transform_inv: Transform3D = secondary_node.center_transforms_inv[
+				secondary_node.springs_centers[i]
+			]
 			for v in spring_bone.verlets:
 				var s_tr: Transform3D = Transform3D.IDENTITY
 				if v.bone_idx != -1:
@@ -399,7 +680,12 @@ class SecondaryGizmo:
 				var s_tr: Transform3D = Transform3D.IDENTITY
 				if v.bone_idx != -1:
 					s_tr = s_sk.get_bone_global_pose(v.bone_idx)
-				draw_sphere((center_transform_inv.basis * s_tr.basis).orthonormalized(), center_transform_inv * v.current_tail, v.radius, color)
+				draw_sphere(
+					(center_transform_inv.basis * s_tr.basis).orthonormalized(),
+					center_transform_inv * v.current_tail,
+					v.radius,
+					color
+				)
 			i += 1
 		mesh.surface_end()
 
@@ -410,7 +696,9 @@ class SecondaryGizmo:
 		var i: int = 0
 		mesh.surface_begin(Mesh.PRIMITIVE_LINES)
 		for collider in secondary_node.colliders_internal:
-			var center_transform_inv: Transform3D = secondary_node.center_transforms_inv[secondary_node.colliders_centers[i]]
+			var center_transform_inv: Transform3D = secondary_node.center_transforms_inv[
+				secondary_node.colliders_centers[i]
+			]
 			collider.draw_debug(mesh, center_transform_inv)
 			i += 1
 		mesh.surface_end()
@@ -420,19 +708,59 @@ class SecondaryGizmo:
 		var sppi: float = 2 * PI / step
 		for i in range(1, step + 1):
 			mesh.surface_set_color(color)
-			mesh.surface_add_vertex(center + ((bas * Vector3.UP * radius).rotated(bas * Vector3.RIGHT, sppi * (i - 1 % step))))
+			mesh.surface_add_vertex(
+				(
+					center
+					+ ((bas * Vector3.UP * radius).rotated(
+						bas * Vector3.RIGHT, sppi * (i - 1 % step)
+					))
+				)
+			)
 			mesh.surface_set_color(color)
-			mesh.surface_add_vertex(center + ((bas * Vector3.UP * radius).rotated(bas * Vector3.RIGHT, sppi * (i % step))))
+			mesh.surface_add_vertex(
+				(
+					center
+					+ ((bas * Vector3.UP * radius).rotated(bas * Vector3.RIGHT, sppi * (i % step)))
+				)
+			)
 		for i in range(1, step + 1):
 			mesh.surface_set_color(color)
-			mesh.surface_add_vertex(center + ((bas * Vector3.RIGHT * radius).rotated(bas * Vector3.FORWARD, sppi * ((i - 1) % step))))
+			mesh.surface_add_vertex(
+				(
+					center
+					+ ((bas * Vector3.RIGHT * radius).rotated(
+						bas * Vector3.FORWARD, sppi * ((i - 1) % step)
+					))
+				)
+			)
 			mesh.surface_set_color(color)
-			mesh.surface_add_vertex(center + ((bas * Vector3.RIGHT * radius).rotated(bas * Vector3.FORWARD, sppi * (i % step))))
+			mesh.surface_add_vertex(
+				(
+					center
+					+ ((bas * Vector3.RIGHT * radius).rotated(
+						bas * Vector3.FORWARD, sppi * (i % step)
+					))
+				)
+			)
 		for i in range(1, step + 1):
 			mesh.surface_set_color(color)
-			mesh.surface_add_vertex(center + ((bas * Vector3.FORWARD * radius).rotated(bas * Vector3.UP, sppi * ((i - 1) % step))))
+			mesh.surface_add_vertex(
+				(
+					center
+					+ ((bas * Vector3.FORWARD * radius).rotated(
+						bas * Vector3.UP, sppi * ((i - 1) % step)
+					))
+				)
+			)
 			mesh.surface_set_color(color)
-			mesh.surface_add_vertex(center + ((bas * Vector3.FORWARD * radius).rotated(bas * Vector3.UP, sppi * (i % step))))
+			mesh.surface_add_vertex(
+				(
+					center
+					+ ((bas * Vector3.FORWARD * radius).rotated(
+						bas * Vector3.UP, sppi * (i % step)
+					))
+				)
+			)
 
 	func draw_line(begin_pos: Vector3, end_pos: Vector3, color: Color) -> void:
 		mesh.surface_set_color(color)

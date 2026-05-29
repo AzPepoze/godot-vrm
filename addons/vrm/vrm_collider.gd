@@ -49,7 +49,9 @@ func create_runtime(secondary_node: Node3D, skeleton: Skeleton3D) -> VrmRuntimeC
 	if node == null and bone != "":
 		bone_idx = skeleton.find_bone(bone)
 	if node == null and bone_idx == -1:
-		push_warning("spring collider: Unable to locate bone " + str(bone) + " or node " + str(node_path))
+		push_warning(
+			"spring collider: Unable to locate bone " + str(bone) + " or node " + str(node_path)
+		)
 		node = secondary_node
 	if is_capsule:
 		return CapsuleCollider.new(self, bone_idx, node)
@@ -80,18 +82,19 @@ class VrmRuntimeCollider:
 	var gizmo_color: Color
 
 	func _init(p_collider: VRMCollider, p_bone_idx: int, p_node: Node3D):
-		bone_idx = bone_idx
+		bone_idx = p_bone_idx
 		node = p_node
 		collider = p_collider
 		collider.changed.connect(init)
 		init()
 
 	func init():
-		bone_idx = -1
 		offset = collider.offset
 		radius = collider.radius
 
-	func update(skel_global_xform_inv: Transform3D, center_transform: Transform3D, skel: Skeleton3D):
+	func update(
+		skel_global_xform_inv: Transform3D, center_transform: Transform3D, skel: Skeleton3D
+	):
 		if node == null and bone_idx == -1:
 			bone_idx = skel.find_bone(collider.bone)
 		if bone_idx != -1:
@@ -99,7 +102,13 @@ class VrmRuntimeCollider:
 		else:  # if node != null:
 			position = center_transform * skel_global_xform_inv * node.global_transform * offset
 
-	func collision(bone_position: Vector3, bone_radius: float, bone_length: float, out: Vector3, position_offset: Vector3 = Vector3.ZERO) -> Vector3:
+	func collision(
+		bone_position: Vector3,
+		bone_radius: float,
+		bone_length: float,
+		out: Vector3,
+		position_offset: Vector3 = Vector3.ZERO
+	) -> Vector3:
 		var this_position = self.position + position_offset
 		var r = bone_radius + self.radius
 		if r <= 0:
@@ -126,19 +135,61 @@ class SphereCollider:
 		var bas: Basis = p_center_transform_inv.basis
 		for i in range(1, step + 1):
 			p_mesh.surface_set_color(self.gizmo_color)
-			p_mesh.surface_add_vertex(center + ((bas * Vector3.UP * self.radius).rotated(bas * Vector3.RIGHT, sppi * ((i - 1) % step))))
+			p_mesh.surface_add_vertex(
+				(
+					center
+					+ ((bas * Vector3.UP * self.radius).rotated(
+						bas * Vector3.RIGHT, sppi * ((i - 1) % step)
+					))
+				)
+			)
 			p_mesh.surface_set_color(self.gizmo_color)
-			p_mesh.surface_add_vertex(center + ((bas * Vector3.UP * self.radius).rotated(bas * Vector3.RIGHT, sppi * (i % step))))
+			p_mesh.surface_add_vertex(
+				(
+					center
+					+ ((bas * Vector3.UP * self.radius).rotated(
+						bas * Vector3.RIGHT, sppi * (i % step)
+					))
+				)
+			)
 		for i in range(1, step + 1):
 			p_mesh.surface_set_color(self.gizmo_color)
-			p_mesh.surface_add_vertex(center + ((bas * Vector3.RIGHT * self.radius).rotated(bas * Vector3.FORWARD, sppi * ((i - 1) % step))))
+			p_mesh.surface_add_vertex(
+				(
+					center
+					+ ((bas * Vector3.RIGHT * self.radius).rotated(
+						bas * Vector3.FORWARD, sppi * ((i - 1) % step)
+					))
+				)
+			)
 			p_mesh.surface_set_color(self.gizmo_color)
-			p_mesh.surface_add_vertex(center + ((bas * Vector3.RIGHT * self.radius).rotated(bas * Vector3.FORWARD, sppi * (i % step))))
+			p_mesh.surface_add_vertex(
+				(
+					center
+					+ ((bas * Vector3.RIGHT * self.radius).rotated(
+						bas * Vector3.FORWARD, sppi * (i % step)
+					))
+				)
+			)
 		for i in range(1, step + 1):
 			p_mesh.surface_set_color(self.gizmo_color)
-			p_mesh.surface_add_vertex(center + ((bas * Vector3.FORWARD * self.radius).rotated(bas * Vector3.UP, sppi * ((i - 1) % step))))
+			p_mesh.surface_add_vertex(
+				(
+					center
+					+ ((bas * Vector3.FORWARD * self.radius).rotated(
+						bas * Vector3.UP, sppi * ((i - 1) % step)
+					))
+				)
+			)
 			p_mesh.surface_set_color(self.gizmo_color)
-			p_mesh.surface_add_vertex(center + ((bas * Vector3.FORWARD * self.radius).rotated(bas * Vector3.UP, sppi * (i % step))))
+			p_mesh.surface_add_vertex(
+				(
+					center
+					+ ((bas * Vector3.FORWARD * self.radius).rotated(
+						bas * Vector3.UP, sppi * (i % step)
+					))
+				)
+			)
 
 
 class CapsuleCollider:
@@ -150,28 +201,52 @@ class CapsuleCollider:
 		super.init()
 		tail_offset = collider.tail
 
-	func update(p_skel_global_xform_inv: Transform3D, p_center_transform: Transform3D, p_skel: Skeleton3D):
+	func update(
+		p_skel_global_xform_inv: Transform3D, p_center_transform: Transform3D, p_skel: Skeleton3D
+	):
 		if node == null and bone_idx == -1:
 			bone_idx = p_skel.find_bone(collider.bone)
 		if bone_idx != -1:
 			position = p_center_transform * (p_skel.get_bone_global_pose(bone_idx) * offset)
-			tail_position = p_center_transform * (p_skel.get_bone_global_pose(bone_idx) * tail_offset)
+			tail_position = (
+				p_center_transform * (p_skel.get_bone_global_pose(bone_idx) * tail_offset)
+			)
 		else:  # if node != null
 			position = p_center_transform * p_skel_global_xform_inv * node.global_transform * offset
-			tail_position = p_center_transform * p_skel_global_xform_inv * node.global_transform * tail_offset
+			tail_position = (
+				p_center_transform * p_skel_global_xform_inv * node.global_transform * tail_offset
+			)
 
-	func collision(p_bone_position: Vector3, p_bone_radius: float, p_bone_length: float, p_out: Vector3, p_position_offset: Vector3 = Vector3.ZERO) -> Vector3:
+	func collision(
+		p_bone_position: Vector3,
+		p_bone_radius: float,
+		p_bone_length: float,
+		p_out: Vector3,
+		p_position_offset: Vector3 = Vector3.ZERO
+	) -> Vector3:
 		var P: Vector3 = tail_position - position
 		var Q: Vector3 = p_bone_position - position - p_position_offset
 		var dot = P.dot(Q)
 		if dot <= 0:
-			return super.collision(p_bone_position, p_bone_radius, p_bone_length, p_out, p_position_offset)
+			return super.collision(
+				p_bone_position, p_bone_radius, p_bone_length, p_out, p_position_offset
+			)
 
-		var t: float = dot / P.length()
+		var p_len_sq = P.length_squared()
+		if p_len_sq <= 0.00001:
+			return super.collision(
+				p_bone_position, p_bone_radius, p_bone_length, p_out, p_position_offset
+			)
+
+		var t: float = dot / p_len_sq
 		if t >= 1.0:
-			return super.collision(p_bone_position, p_bone_radius, p_bone_length, p_out, p_position_offset + P)
+			return super.collision(
+				p_bone_position, p_bone_radius, p_bone_length, p_out, p_position_offset + P
+			)
 
-		return super.collision(p_bone_position, p_bone_radius, p_bone_length, p_out, p_position_offset + P * t)
+		return super.collision(
+			p_bone_position, p_bone_radius, p_bone_length, p_out, p_position_offset + P * t
+		)
 
 	func draw_debug(mesh: ImmediateMesh, center_transform_inv: Transform3D) -> void:
 		var step: int = 15
@@ -194,21 +269,73 @@ class CapsuleCollider:
 		right_axis = forward_axis.cross(up_axis).normalized()
 		for i in range(1, step + 1):
 			mesh.surface_set_color(self.gizmo_color)
-			mesh.surface_add_vertex((center if i - 1 < step / 2 else tail) + ((bas * up_axis * self.radius).rotated(bas * right_axis, PI / 2 + sppi * ((i - 1) % step))))
+			mesh.surface_add_vertex(
+				(
+					(center if i - 1 < step / 2 else tail)
+					+ ((bas * up_axis * self.radius).rotated(
+						bas * right_axis, PI / 2 + sppi * ((i - 1) % step)
+					))
+				)
+			)
 			mesh.surface_set_color(self.gizmo_color)
-			mesh.surface_add_vertex((center if i < step / 2 or i == step else tail) + ((bas * up_axis * self.radius).rotated(bas * right_axis, PI / 2 + sppi * (i % step))))
+			mesh.surface_add_vertex(
+				(
+					(center if i < step / 2 or i == step else tail)
+					+ ((bas * up_axis * self.radius).rotated(
+						bas * right_axis, PI / 2 + sppi * (i % step)
+					))
+				)
+			)
 		for i in range(1, step + 1):
 			mesh.surface_set_color(self.gizmo_color)
-			mesh.surface_add_vertex((center if i - 1 < step / 2 else tail) + ((bas * right_axis * self.radius).rotated(bas * forward_axis, PI / 2 + sppi * ((i - 1) % step))))
+			mesh.surface_add_vertex(
+				(
+					(center if i - 1 < step / 2 else tail)
+					+ ((bas * right_axis * self.radius).rotated(
+						bas * forward_axis, PI / 2 + sppi * ((i - 1) % step)
+					))
+				)
+			)
 			mesh.surface_set_color(self.gizmo_color)
-			mesh.surface_add_vertex((center if i < step / 2 or i == step else tail) + ((bas * right_axis * self.radius).rotated(bas * forward_axis, PI / 2 + sppi * (i % step))))
+			mesh.surface_add_vertex(
+				(
+					(center if i < step / 2 or i == step else tail)
+					+ ((bas * right_axis * self.radius).rotated(
+						bas * forward_axis, PI / 2 + sppi * (i % step)
+					))
+				)
+			)
 		for i in range(1, step + 1):
 			mesh.surface_set_color(self.gizmo_color)
-			mesh.surface_add_vertex(center + ((bas * forward_axis * self.radius).rotated(bas * up_axis, sppi * ((i - 1) % step))))
+			mesh.surface_add_vertex(
+				(
+					center
+					+ ((bas * forward_axis * self.radius).rotated(
+						bas * up_axis, sppi * ((i - 1) % step)
+					))
+				)
+			)
 			mesh.surface_set_color(self.gizmo_color)
-			mesh.surface_add_vertex(center + ((bas * forward_axis * self.radius).rotated(bas * up_axis, sppi * (i % step))))
+			mesh.surface_add_vertex(
+				(
+					center
+					+ ((bas * forward_axis * self.radius).rotated(bas * up_axis, sppi * (i % step)))
+				)
+			)
 		for i in range(1, step + 1):
 			mesh.surface_set_color(self.gizmo_color)
-			mesh.surface_add_vertex(tail + ((bas * forward_axis * self.radius).rotated(bas * up_axis, sppi * ((i - 1) % step))))
+			mesh.surface_add_vertex(
+				(
+					tail
+					+ ((bas * forward_axis * self.radius).rotated(
+						bas * up_axis, sppi * ((i - 1) % step)
+					))
+				)
+			)
 			mesh.surface_set_color(self.gizmo_color)
-			mesh.surface_add_vertex(tail + ((bas * forward_axis * self.radius).rotated(bas * up_axis, sppi * (i % step))))
+			mesh.surface_add_vertex(
+				(
+					tail
+					+ ((bas * forward_axis * self.radius).rotated(bas * up_axis, sppi * (i % step)))
+				)
+			)
