@@ -1,11 +1,14 @@
 @tool
 extends MeshInstance3D
 
-var secondary_node
+const VRMLogger = preload("../core/logger.gd")
+
+var secondary_node: Node3D
 var m: StandardMaterial3D = StandardMaterial3D.new()
+var _logged_missing_condition: bool = false
 
 
-func _init(parent) -> void:
+func _init(parent: Node3D) -> void:
 	mesh = ImmediateMesh.new()
 	secondary_node = parent
 	m.no_depth_test = true
@@ -16,67 +19,151 @@ func _init(parent) -> void:
 
 func draw_in_editor(_do_draw_spring_bones: bool = false) -> void:
 	mesh.clear_surfaces()
-	if secondary_node.is_child_of_vrm && secondary_node.get_parent().gizmo_spring_bone:
-		draw_spring_bones(secondary_node.get_parent().gizmo_spring_bone_color)
-		draw_collider_groups()
+	if not secondary_node.is_child_of_vrm:
+		if not _logged_missing_condition:
+			VRMLogger.warning(
+				"vrm_secondary_gizmo.gd", "gizmo: parent is not VRM toplevel, no gizmo drawn"
+			)
+			_logged_missing_condition = true
+		return
+	if not secondary_node.get_parent().gizmo_spring_bone:
+		return
+	draw_spring_bones(secondary_node.get_parent().gizmo_spring_bone_color)
+	draw_collider_groups()
 
 
 func draw_in_game() -> void:
 	mesh.clear_surfaces()
-	if secondary_node.is_child_of_vrm && secondary_node.get_parent().gizmo_spring_bone:
-		draw_spring_bones(secondary_node.get_parent().gizmo_spring_bone_color)
-		draw_collider_groups()
+	if not secondary_node.is_child_of_vrm:
+		if not _logged_missing_condition:
+			VRMLogger.warning(
+				"vrm_secondary_gizmo.gd", "gizmo: parent is not VRM toplevel, no gizmo drawn"
+			)
+			_logged_missing_condition = true
+		return
+	if not secondary_node.get_parent().gizmo_spring_bone:
+		return
+	draw_spring_bones(secondary_node.get_parent().gizmo_spring_bone_color)
+	draw_collider_groups()
+
+
+func _get_bone_global_position(bone_name: String) -> Vector3:
+	var skel: Skeleton3D = secondary_node.skel
+	if skel == null or bone_name.is_empty():
+		return Vector3.ZERO
+	var bone_idx: int = skel.find_bone(bone_name)
+	if bone_idx == -1:
+		return Vector3.ZERO
+	return skel.global_transform * skel.get_bone_global_pose(bone_idx).origin
+
+
+func _get_collider_world_position(collider: Resource, skel: Skeleton3D) -> Vector3:
+	if collider.node_path and not collider.node_path.is_empty():
+		var node := secondary_node.get_node_or_null(collider.node_path)
+		if node is Node3D:
+			return (node as Node3D).global_transform * collider.offset
+	if not collider.bone.is_empty() and skel != null:
+		return (
+			skel.global_transform * skel.get_bone_global_pose(skel.find_bone(collider.bone)).origin
+			+ collider.offset
+		)
+	return collider.offset
 
 
 func draw_spring_bones(color: Color) -> void:
-	if secondary_node.spring_bones_internal.is_empty():
+	var skel: Skeleton3D = secondary_node.skel
+	if skel == null:
+		return
+	var spring_bones: Array = secondary_node.spring_bones
+	if spring_bones.is_empty():
 		return
 	set_material_override(m)
-	var i: int = 0
-	var s_sk: Skeleton3D = secondary_node.skel
-	# Spring bones
 	mesh.surface_begin(Mesh.PRIMITIVE_LINES)
-	for spring_bone in secondary_node.spring_bones_internal:
-		var center_transform_inv: Transform3D = secondary_node.center_transforms_inv[
-			secondary_node.springs_centers[i]
-		]
-		for v in spring_bone.verlets:
-			var s_tr: Transform3D = Transform3D.IDENTITY
-			if v.bone_idx != -1:
-				s_tr = s_sk.get_bone_global_pose(v.bone_idx)
-			draw_line(s_tr.origin, center_transform_inv * v.current_tail, color)
-		for v in spring_bone.verlets:
-			var s_tr: Transform3D = Transform3D.IDENTITY
-			if v.bone_idx != -1:
-				s_tr = s_sk.get_bone_global_pose(v.bone_idx)
-			draw_sphere(
-				(center_transform_inv.basis * s_tr.basis).orthonormalized(),
-				center_transform_inv * v.current_tail,
-				v.radius,
-				color
-			)
-		i += 1
+	for sb in spring_bones:
+		if sb == null:
+			continue
+		var joints: PackedStringArray = sb.joint_nodes
+		if joints.is_empty():
+			continue
+		var prev_pos: Vector3
+		var first: bool = true
+		for bone_name in joints:
+			if bone_name.is_empty():
+				continue
+			var pos: Vector3 = secondary_node.to_local(_get_bone_global_position(bone_name))
+			if first:
+				first = false
+			else:
+				draw_line(prev_pos, pos, color)
+			prev_pos = pos
+	mesh.surface_end()
+	# Draw hit-radius spheres in a second surface
+	mesh.surface_begin(Mesh.PRIMITIVE_LINES)
+	for sb in spring_bones:
+		if sb == null:
+			continue
+		var joints: PackedStringArray = sb.joint_nodes
+		if joints.is_empty():
+			continue
+		var hit_radius_scale: float = sb.hit_radius_scale
+		for bone_name in joints:
+			if bone_name.is_empty():
+				continue
+			var pos: Vector3 = secondary_node.to_local(_get_bone_global_position(bone_name))
+			draw_sphere(Basis.IDENTITY, pos, hit_radius_scale * 0.05, color)
+	mesh.surface_end()
+	# Draw small joint indicator spheres at every joint
+	mesh.surface_begin(Mesh.PRIMITIVE_LINES)
+	for sb in spring_bones:
+		if sb == null:
+			continue
+		var joints: PackedStringArray = sb.joint_nodes
+		if joints.is_empty():
+			continue
+		for bone_name in joints:
+			if bone_name.is_empty():
+				continue
+			var joint_pos: Vector3 = secondary_node.to_local(_get_bone_global_position(bone_name))
+			draw_sphere(Basis.IDENTITY, joint_pos, 0.003, color)
 	mesh.surface_end()
 
 
 func draw_collider_groups() -> void:
-	if secondary_node.colliders_internal.is_empty():
+	var skel: Skeleton3D = secondary_node.skel
+	var collider_groups: Array = secondary_node.collider_groups
+	if collider_groups.is_empty():
+		return
+	var all_colliders: Array = []
+	for cg in collider_groups:
+		if cg == null:
+			continue
+		for c in cg.colliders:
+			if c != null:
+				all_colliders.append(c)
+	if all_colliders.is_empty():
 		return
 	set_material_override(m)
-	var i: int = 0
 	mesh.surface_begin(Mesh.PRIMITIVE_LINES)
-	for collider in secondary_node.colliders_internal:
-		var center_transform_inv: Transform3D = secondary_node.center_transforms_inv[
-			secondary_node.colliders_centers[i]
-		]
-		collider.draw_debug(mesh, center_transform_inv)
-		i += 1
+	for collider in all_colliders:
+		var pos: Vector3 = secondary_node.to_local(_get_collider_world_position(collider, skel))
+		var col: Color = collider.gizmo_color if collider.gizmo_color else Color.MAGENTA
+		if collider.is_capsule:
+			var tail_pos: Vector3 = (
+				pos + (skel.global_transform.basis * collider.tail if skel else collider.tail)
+			)
+			draw_line(pos, tail_pos, col)
+			draw_sphere(Basis.IDENTITY, pos, collider.radius, col)
+			draw_sphere(Basis.IDENTITY, tail_pos, collider.radius, col)
+		else:
+			draw_sphere(Basis.IDENTITY, pos, collider.radius, col)
 	mesh.surface_end()
 
 
 func draw_sphere(bas: Basis, center: Vector3, radius: float, color: Color) -> void:
+	if radius <= 0.0:
+		return
 	var step: int = 15
-	var sppi: float = 2 * PI / step
+	var sppi: float = 2.0 * PI / step
 	for i in range(1, step + 1):
 		mesh.surface_set_color(color)
 		mesh.surface_add_vertex(

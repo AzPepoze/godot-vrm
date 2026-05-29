@@ -1,6 +1,7 @@
 @tool
 extends RefCounted
 
+const VRMLogger = preload("../../core/logger.gd")
 const vrm_secondary = preload("../../runtime/vrm_secondary.gd")
 const vrm_spring_bone = preload("../../runtime/vrm_spring_bone.gd")
 const vrm_collider_group = preload("../../runtime/vrm_collider_group.gd")
@@ -53,6 +54,13 @@ static func parse_secondary_node(
 	pose_diffs: Array[Basis],
 	is_vrm_0: bool
 ) -> void:
+	VRMLogger.debug(
+		"vrm_secondary_service.gd",
+		(
+			"parse_secondary_node: parsing secondary animation (VRM %s)"
+			% ("0.0" if is_vrm_0 else "1.0")
+		)
+	)
 	var nodes = gstate.get_nodes()
 	var skeletons = gstate.get_skeletons()
 
@@ -174,6 +182,13 @@ static func parse_secondary_node(
 
 			spring_bones.append(spring_bone)
 
+	VRMLogger.debug(
+		"vrm_secondary_service.gd",
+		(
+			"parse_secondary_node: parsed %d collider groups, %d spring bones"
+			% [collider_groups.size(), spring_bones.size()]
+		)
+	)
 	secondary_node.set_script(vrm_secondary)
 	secondary_node.set("skeleton", skeleton_path)
 	secondary_node.set("spring_bones", spring_bones)

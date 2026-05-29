@@ -30,7 +30,7 @@ func _ready():
 
 func _load_model(path: String) -> Node3D:
 	var gltf: GLTFDocument = GLTFDocument.new()
-	var vrm_extension: GLTFDocumentExtension = preload("res://addons/vrm/importer/0.0/vrm_extension.gd").new()
+	var vrm_extension: GLTFDocumentExtension = preload("res://addons/vrm/importer/v0/vrm_extension.gd").new()
 	gltf.register_gltf_document_extension(vrm_extension, true)
 	
 	var state: GLTFState = GLTFState.new()

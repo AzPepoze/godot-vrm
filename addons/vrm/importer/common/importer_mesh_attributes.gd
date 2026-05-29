@@ -1,6 +1,8 @@
 @tool
 extends ImporterMeshInstance3D
 
+const VRMLogger = preload("../../core/logger.gd")
+
 @export var orig_layers: int:
 	get:
 		if typeof(get(&"layer_mask")) != TYPE_NIL:
@@ -14,13 +16,16 @@ extends ImporterMeshInstance3D
 		return GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 
 @export var shadow: int = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-@export var layers: int
+@export var layers: int = 1
 @export var first_person_flag: String
 
 
 func _on_replacing_by(p_node: Node):
 	if not (p_node is MeshInstance3D):
-		push_error("ImporterMeshInstance3D was not replaced with MeshInstance3D")
+		VRMLogger.error(
+			"importer_mesh_attributes.gd",
+			"ImporterMeshInstance3D was not replaced with MeshInstance3D"
+		)
 	var mi: MeshInstance3D = p_node as MeshInstance3D
 	mi.layers = layers
 	mi.cast_shadow = shadow

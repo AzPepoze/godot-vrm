@@ -99,3 +99,7 @@ func fail_test(test_name: String, message: String):
 
 func pass_assertion():
 	assertions_passed += 1
+
+
+func wait_frame():
+	await process_frame

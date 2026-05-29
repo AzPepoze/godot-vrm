@@ -3,7 +3,7 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://d0cffjok5buw2"
+uid="uid://bnfv1j076kirx"
 path="res://.godot/imported/AliciaSolid_vrm-0.51.vrm-c9e900691069ab8ef0f12ff91e9425da.scn"
 
 [deps]
@@ -13,8 +13,8 @@ dest_files=["res://.godot/imported/AliciaSolid_vrm-0.51.vrm-c9e900691069ab8ef0f1
 
 [params]
 
-nodes/root_type="Node3D"
-nodes/root_name="Scene Root"
+nodes/root_type=""
+nodes/root_name=""
 nodes/root_script=null
 nodes/apply_root_scale=true
 nodes/root_scale=1.0
@@ -24,12 +24,12 @@ nodes/use_node_type_suffixes=true
 meshes/ensure_tangents=true
 meshes/generate_lods=true
 meshes/create_shadow_meshes=true
-meshes/light_baking=0
-meshes/lightmap_texel_size=0.1
+meshes/light_baking=1
+meshes/lightmap_texel_size=0.2
 meshes/force_disable_compression=false
 skins/use_named_skins=true
 animation/import=true
-animation/fps=15
+animation/fps=30
 animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false

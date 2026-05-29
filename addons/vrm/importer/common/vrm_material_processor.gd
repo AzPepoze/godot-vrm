@@ -1,6 +1,8 @@
 @tool
 extends RefCounted
 
+const VRMLogger = preload("../../core/logger.gd")
+
 const mtoon_shader_base_path: String = "res://addons/mtoon/mtoon"
 
 
@@ -47,6 +49,10 @@ static func process_vrm_material_v1(
 	mat_props: Dictionary,
 	vrm_mat_props: Dictionary
 ) -> Material:
+	VRMLogger.debug(
+		"vrm_material_processor.gd",
+		"process_vrm_material_v1: processing material %s" % orig_mat.resource_name
+	)
 	var blend_extension: String = ""
 	var alpha_mode: String = mat_props.get("alphaMode", "OPAQUE")
 	if alpha_mode == "MASK":
@@ -276,7 +282,8 @@ static func process_vrm_material_v0(
 		return orig_mat
 
 	if vrm_shader_name != "VRM/MToon":
-		printerr(
+		VRMLogger.error(
+			"vrm_material_processor.gd",
 			"Unknown VRM shader " + vrm_shader_name + " on material " + str(orig_mat.resource_name)
 		)
 		return orig_mat

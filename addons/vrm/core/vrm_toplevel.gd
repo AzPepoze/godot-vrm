@@ -1,7 +1,7 @@
 @tool
-extends RefCounted
+extends Node
 
-const vrm_meta_class = preload("../core/vrm_meta.gd")
+const vrm_meta_class = preload("./vrm_meta.gd")
 const spring_bone_class = preload("../runtime/vrm_spring_bone.gd")
 const collider_class = preload("../runtime/vrm_collider.gd")
 const collider_group_class = preload("../runtime/vrm_collider_group.gd")

@@ -43,15 +43,6 @@ Import and export of VRM through version 1.0 is supported. Here is a feature bre
 	* `humanoid`: ✅I️mplemented (uses `%GeneralSkeleton` `SkeletonProfileHumanoid` compatible retargeting.)
 	* Metadata: ✅I️mplemented, including License information and screenshot
 
-## Maintenance Status
-
-This fork by **AzPepoze** includes the following improvements:
-- **Linting & Standards**: Resolved `gdlint` warnings (naming conventions, unused arguments).
-- **Project Structure**: Updated internal organization (Core, Importer, Runtime).
-- **Build System**: Fixed GDExtension compilation and library issues.
-- **Git Optimization**: Modernized `.gitignore` and removed legacy Japanese documentation.
-- **Branching**: Main development branch renamed to `main`.
-
 ## How to use
 
 Install the vrm addon folder into `addons/vrm`. **MUST NOT BE RENAMED**: This path will be referenced by generated VRM meta scripts.
