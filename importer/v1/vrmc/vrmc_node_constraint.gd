@@ -1,9 +1,9 @@
 @tool
 extends GLTFDocumentExtension
 
-const bone_node_constraint = preload("../../node_constraint/bone_node_constraint.gd")
+const bone_node_constraint = preload("../../../node_constraint/bone_node_constraint.gd")
 const bone_node_constraint_applier = preload(
-	"../../node_constraint/bone_node_constraint_applier.gd"
+	"../../../node_constraint/bone_node_constraint_applier.gd"
 )
 
 
@@ -21,7 +21,13 @@ func _parse_node_extensions(
 	var constraint_ext: Dictionary = node_extensions["VRMC_node_constraint"]
 	var constraint: bone_node_constraint = bone_node_constraint.from_dictionary(constraint_ext)
 
-	var scene_node = gltf_state.get_scene_node(gltf_state.get_node_index(gltf_node))
+	var node_index = -1
+	var nodes = gltf_state.get_nodes()
+	for i in range(nodes.size()):
+		if nodes[i] == gltf_node:
+			node_index = i
+			break
+	var scene_node = gltf_state.get_scene_node(node_index)
 	if scene_node:
 		var applier = bone_node_constraint_applier.new()
 		applier.name = "VRMC_node_constraint"

@@ -1,5 +1,7 @@
 extends GLTFDocumentExtension
 
+const VRMLogger = preload("../../../core/logger.gd")
+
 
 func _import_preflight(state: GLTFState, extensions = PackedStringArray()) -> Error:
 	if extensions.has("VRMC_materials_mtoon"):
@@ -199,7 +201,7 @@ func _cm_to_m(m: float) -> float:
 	return m / 100.0
 
 
-const vrm_material_processor = preload("../common/vrm_material_processor.gd")
+const vrm_material_processor = preload("../../common/vrm_material_processor.gd")
 
 
 func _process_vrm_material(
@@ -210,7 +212,8 @@ func _process_vrm_material(
 	vrm_mat_props: Dictionary
 ) -> Material:
 	if vrm_mat_props.get("specVersion", "") != "1.0":
-		push_warning(
+		VRMLogger.warning(
+			"vrmc_materials_mtoon.gd",
 			"Unsupported VRM MToon specVersion " + str(vrm_mat_props.get("specVersion", ""))
 		)
 	return vrm_material_processor.process_vrm_material_v1(
@@ -220,10 +223,27 @@ func _process_vrm_material(
 
 # Called when the node enters the scene tree for the first time.
 func _import_post(gstate, root):
+	# Guard: skip if there are no MToon materials to process.
+	var materials: Array[Material] = gstate.get_materials()
+	var has_mtoon := false
+	for i in range(materials.size()):
+		var json_material = gstate.json["materials"][i]
+		var extensions: Dictionary = json_material.get("extensions", {})
+		if extensions.has("VRMC_materials_mtoon"):
+			has_mtoon = true
+			break
+	if not has_mtoon:
+		VRMLogger.debug(
+			"vrmc_materials_mtoon.gd", "_import_post: no MToon materials found, skipping"
+		)
+		return
+
+	VRMLogger.info(
+		"vrmc_materials_mtoon.gd", "_import_post: processing %d materials" % materials.size()
+	)
 	var images: Array[Texture2D] = gstate.get_images()
 	var gltf_textures: Array[GLTFTexture] = gstate.get_textures()
-	#print(images)
-	var materials: Array[Material] = gstate.get_materials()
+	VRMLogger.debug("vrmc_materials_mtoon.gd", "_import_post: %d images available" % images.size())
 	var materials_json: Array[Dictionary] = []
 	var materials_vrm_json: Array[Dictionary] = []
 	var spatial_to_shader_mat: Dictionary = {}
@@ -240,7 +260,10 @@ func _import_post(gstate, root):
 		var oldmat: Material = materials[i]
 		if oldmat is ShaderMaterial:
 			# Indicates that the user asked to keep existing materials. Avoid changing them.
-			# print("Material " + str(i) + ": " + str(oldmat.resource_name) + " already is shader.")
+			VRMLogger.debug(
+				"vrmc_materials_mtoon.gd",
+				"Material %d (%s) is ShaderMaterial, skipping" % [i, oldmat.resource_name]
+			)
 			continue
 		var newmat: Material = oldmat
 		var mat_props: Dictionary = materials_json[i]
@@ -251,7 +274,10 @@ func _import_post(gstate, root):
 		newmat = _process_vrm_material(newmat, images, gltf_textures, mat_props, vrm_mat_props)
 		spatial_to_shader_mat[oldmat] = newmat
 		spatial_to_shader_mat[newmat] = newmat
-		# print("Replacing shader " + str(oldmat) + "/" + str(oldmat.resource_name) + " with " + str(newmat) + "/" + str(newmat.resource_name))
+		VRMLogger.debug(
+			"vrmc_materials_mtoon.gd",
+			"Material %d: %s -> %s" % [i, oldmat.resource_name, newmat.resource_name]
+		)
 		materials[i] = newmat
 		var oldpath = oldmat.resource_path
 		if oldpath.is_empty():
@@ -259,6 +285,9 @@ func _import_post(gstate, root):
 		newmat.take_over_path(oldpath)
 		ResourceSaver.save(newmat, oldpath)
 	gstate.set_materials(materials)
+	VRMLogger.debug(
+		"vrmc_materials_mtoon.gd", "_import_post: %d materials processed" % materials.size()
+	)
 
 	var meshes = gstate.get_meshes()
 	for i in range(meshes.size()):
@@ -270,15 +299,13 @@ func _import_post(gstate, root):
 			if spatial_to_shader_mat.has(surfmat):
 				mesh.set_surface_material(surf_idx, spatial_to_shader_mat[surfmat])
 			else:
-				printerr(
+				# Not an error: the surface material may have been set by a previous
+				# extension (e.g. VRM 0.0 importer) or is not part of MToon processing.
+				VRMLogger.debug(
+					"vrmc_materials_mtoon.gd",
 					(
-						"Mesh "
-						+ str(i)
-						+ " material "
-						+ str(surf_idx)
-						+ " name "
-						+ str(surfmat.resource_name)
-						+ " has no replacement material."
+						"Mesh %d material %d name %s has no mtoon replacement (already processed?)"
+						% [i, surf_idx, surfmat.resource_name]
 					)
 				)
 

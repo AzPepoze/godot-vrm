@@ -1,11 +1,12 @@
 extends GLTFDocumentExtension
 
-const vrm_constants_class = preload("../common/vrm_constants.gd")
-const vrm_meta_class = preload("../../core/vrm_meta.gd")
-const vrm_top_level = preload("../../core/vrm_toplevel.gd")
-const vrm_utils = preload("../common/vrm_utils.gd")
+const VRMLogger = preload("../../../core/logger.gd")
+const vrm_constants_class = preload("../../../core/vrm_constants.gd")
+const vrm_meta_class = preload("../../../core/vrm_meta.gd")
+const vrm_top_level = preload("../../../core/vrm_toplevel.gd")
+const vrm_utils = preload("../../../importer/common/vrm_utils.gd")
 
-const importer_mesh_attributes = preload("../common/importer_mesh_attributes.gd")
+const importer_mesh_attributes = preload("../../../importer/common/importer_mesh_attributes.gd")
 
 var vrm_meta: Resource = null
 
@@ -20,7 +21,7 @@ func _get_skel_godot_node(gstate: GLTFState, nodes: Array, skeletons: Array, ske
 	return gstate.get_scene_node(skel_node_idx)
 
 
-const vrm_resource_factory = preload("../common/vrm_resource_factory.gd")
+const vrm_resource_factory = preload("../../../importer/common/vrm_resource_factory.gd")
 
 
 func _create_meta(
@@ -64,7 +65,7 @@ func _export_meta(vrm_meta: Resource, vrm_extension: Dictionary, _gstate: GLTFSt
 	vrm_resource_factory.export_meta_v1(vrm_meta, vrm_extension)
 
 
-const vrm_animation_service = preload("../common/vrm_animation_service.gd")
+const vrm_animation_service = preload("../../../importer/common/vrm_animation_service.gd")
 
 
 func _create_animation_player(
@@ -115,8 +116,10 @@ func remove_null_owner(node: Node):
 
 
 func _export_preflight(state: GLTFState, root: Node) -> Error:
+	VRMLogger.info("vrmc_vrm.gd", "_export_preflight: starting VRM 1.0 export")
 	var vrm_meta_node = root.get("vrm_meta")
 	if vrm_meta_node == null:
+		VRMLogger.debug("vrmc_vrm.gd", "_export_preflight: no vrm_meta found, skipping")
 		return ERR_SKIP
 
 	# Duplicate root so we can modify it.
@@ -135,6 +138,7 @@ func _export_preflight(state: GLTFState, root: Node) -> Error:
 	state.json["extensions"]["VRMC_vrm"] = vrm_extension
 	state.add_used_extension("VRMC_vrm", false)
 
+	VRMLogger.info("vrmc_vrm.gd", "_export_preflight: VRM 1.0 export prepared OK")
 	return OK
 
 
@@ -149,12 +153,13 @@ func _import_preflight(
 func _import_post_parse(state: GLTFState) -> Error:
 	var gltf_json_parsed: Dictionary = state.json
 	if not _add_vrm_nodes_to_skin(gltf_json_parsed):
-		push_error("Failed to find required VRM keys in json")
+		VRMLogger.error("vrmc_vrm.gd", "Failed to find required VRM keys in json")
 		return ERR_INVALID_DATA
 	return OK
 
 
 func _import_post(gstate: GLTFState, node: Node) -> Error:
+	VRMLogger.info("vrmc_vrm.gd", "_import_post: starting VRM 1.0 import")
 	var root_node: Node = node
 
 	var vrm_extension: Dictionary = gstate.json["extensions"]["VRMC_vrm"]
@@ -163,6 +168,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 	var human_bone_to_idx: Dictionary = {}
 	for human_bone_name in humanBones_json:
 		human_bone_to_idx[human_bone_name] = int(humanBones_json[human_bone_name]["node"])
+	VRMLogger.debug("vrmc_vrm.gd", "_import_post: mapped %d human bones" % human_bone_to_idx.size())
 
 	var skeletons = gstate.get_skeletons()
 	var hipsNode: GLTFNode = gstate.nodes[human_bone_to_idx["hips"]]
@@ -184,7 +190,12 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 
 	var pose_diffs: Array[Basis]
 	if do_retarget:
+		VRMLogger.debug(
+			"vrmc_vrm.gd",
+			"_import_post: performing retarget for %d bones" % skeleton.get_bone_count()
+		)
 		pose_diffs = vrm_utils.perform_retarget(gstate, root_node, skeleton, humanBones)
+		VRMLogger.debug("vrmc_vrm.gd", "_import_post: retarget complete")
 	else:
 		# resize is busted for TypedArray and crashes Godot
 		for i in range(skeleton.get_bone_count()):
@@ -216,4 +227,5 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 	)
 	root_node.set("vrm_meta", vrm_meta)
 
+	VRMLogger.info("vrmc_vrm.gd", "_import_post: VRM 1.0 import complete OK")
 	return OK

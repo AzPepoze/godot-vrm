@@ -1,7 +1,8 @@
 @tool
 extends EditorSceneFormatImporter
 
-const gltf_document_extension_class = preload("./importer/0.0/vrm_extension.gd")
+const VRMLogger = preload("./core/logger.gd")
+const gltf_document_extension_class = preload("./importer/v0/vrm_extension.gd")
 const vrm_constants = preload("./core/vrm_constants.gd")
 
 const SAVE_DEBUG_GLTFSTATE_RES: bool = false
@@ -34,12 +35,18 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
 	)
 	# HANDLE_BINARY_EMBED_AS_BASISU crashes on some files in 4.0 and 4.1
 	state.handle_binary_image = GLTFState.HANDLE_BINARY_EMBED_AS_UNCOMPRESSED  # GLTFState.HANDLE_BINARY_EXTRACT_TEXTURES
+	VRMLogger.info("import_vrm.gd", "_import_scene: importing %s" % path)
 	var err = gltf.append_from_file(path, state, 8)
 	if err != OK:
+		VRMLogger.error(
+			"import_vrm.gd",
+			"_import_scene: append_from_file failed with error %d for %s" % [err, path]
+		)
 		gltf.unregister_gltf_document_extension(vrm_extension)
 		return null
 
 	var generated_scene = gltf.generate_scene(state)
+	VRMLogger.info("import_vrm.gd", "_import_scene: scene generated successfully for %s" % path)
 
 	if SAVE_DEBUG_GLTFSTATE_RES and path != "":
 		if !ResourceLoader.exists(path + ".res"):

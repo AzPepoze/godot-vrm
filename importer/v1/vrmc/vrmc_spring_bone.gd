@@ -1,32 +1,23 @@
 extends GLTFDocumentExtension
 
-const vrm_constants_class = preload("../../core/vrm_constants.gd")
-const vrm_meta_class = preload("../../core/vrm_meta.gd")
-const vrm_secondary = preload("../../runtime/vrm_secondary.gd")
-const vrm_top_level = preload("../../core/vrm_toplevel.gd")
+const vrm_constants_class = preload("../../../core/vrm_constants.gd")
+const vrm_meta_class = preload("../../../core/vrm_meta.gd")
+const vrm_secondary = preload("../../../runtime/vrm_secondary.gd")
+const vrm_top_level = preload("../../../core/vrm_toplevel.gd")
 
-const vrm_spring_bone = preload("../../runtime/vrm_spring_bone.gd")
-const vrm_collider_group = preload("../../runtime/vrm_collider_group.gd")
-const vrm_collider = preload("../../runtime/vrm_collider.gd")
+const vrm_spring_bone = preload("../../../runtime/vrm_spring_bone.gd")
+const vrm_collider_group = preload("../../../runtime/vrm_collider_group.gd")
+const vrm_collider = preload("../../../runtime/vrm_collider.gd")
+const vrm_secondary_service = preload("../../common/vrm_secondary_service.gd")
 
 
-func _get_skel_godot_node(gstate: GLTFState, nodes: Array, _skeletons: Array, skel_id: int) -> Node:
-	# There's no working direct way to convert from skeleton_id to node_id.
-	# Bugs:
-	# GLTFNode.parent is -1 if skeleton bone.
-	# skeleton_to_node is empty
-	# get_scene_node(skeleton bone) works though might maybe return an attachment.
-	# var skel_node_idx = nodes[gltfskel.roots[0]]
-	# return gstate.get_scene_node(skel_node_idx) # as Skeleton
-	if skel_id < 0:
+func _get_skel_godot_node(gstate: GLTFState, _nodes: Array, skeletons: Array, skel_id: int) -> Node:
+	if skel_id < 0 or skel_id >= skeletons.size():
 		return null
-	var skel_node_idx = -1
-	for i in range(len(nodes)):
-		if nodes[i].skeleton == skel_id:
-			skel_node_idx = i
-			break
-	if skel_node_idx == -1:
+	var gltfskel: GLTFSkeleton = skeletons[skel_id]
+	if gltfskel.roots.is_empty():
 		return null
+	var skel_node_idx = gltfskel.roots[0]
 	return gstate.get_scene_node(skel_node_idx)
 
 
@@ -40,12 +31,11 @@ func _import_preflight(
 
 func _import_post(gstate: GLTFState, node: Node) -> Error:
 	var vrm_extension: Dictionary = gstate.json["extensions"]["VRMC_springBone"]
-	var secondary_node: Node = node.get_node("secondary")
+	var secondary_node: Node = node.get_node_or_null("secondary")
 	if secondary_node == null:
 		secondary_node = Node3D.new()
 		secondary_node.name = "secondary"
 		node.add_child(secondary_node, true)
-		secondary_node.owner = node
 
 	var nodes = gstate.get_nodes()
 	var skeletons = gstate.get_skeletons()
@@ -74,9 +64,10 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 			)
 			bone = nodes[int(cgroup["node"])].resource_name
 			new_resource_name = bone
-			var pose_diffs = skeleton.get_meta("vrm_pose_diffs", [])
-			if not pose_diffs.is_empty():
-				pose_diff = pose_diffs[skeleton.find_bone(bone)]
+			if skeleton != null:
+				var pose_diffs = skeleton.get_meta("vrm_pose_diffs", [])
+				if not pose_diffs.is_empty():
+					pose_diff = pose_diffs[skeleton.find_bone(bone)]
 
 		var collider: vrm_collider = vrm_collider.new()
 		collider.node_path = node_path
@@ -128,13 +119,12 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 			var skeleton: Skeleton3D = _get_skel_godot_node(
 				gstate, nodes, skeletons, gltfnode.skeleton
 			)
-			# VRM 1.0 joints are individual bones, not necessarily full chains.
-			# But our spring bone logic expects chains.
-			# For now we'll just treat each joint as a potential root.
-			var chain = PackedStringArray(
-				[skeleton.get_bone_name(skeleton.find_bone(gltfnode.resource_name))]
+			if skeleton == null:
+				continue
+			# Build chains recursively by following bone hierarchy.
+			vrm_secondary_service.create_joints_recursive(
+				joint_chains, skeleton, skeleton.find_bone(gltfnode.resource_name), 1, -1
 			)
-			joint_chains.append(chain)
 
 		var center_node: NodePath = NodePath()
 		var center_bone: String = ""
@@ -148,7 +138,8 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 				gstate, nodes, skeletons, gltfnode.skeleton
 			)
 			if (
-				center_gltfnode.skeleton == gltfnode.skeleton
+				skeleton != null
+				and center_gltfnode.skeleton == gltfnode.skeleton
 				and skeleton.find_bone(bone_name) != -1
 			):
 				center_bone = bone_name
