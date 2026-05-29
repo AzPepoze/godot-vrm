@@ -1,11 +1,9 @@
-- [日本語](README.ja.md)
-
 # VRM addon for Godot Engine
 
 This Godot addon fully implements an importer and exporter for models with the [VRM specification](https://github.com/vrm-c/vrm-specification/tree/master/specification).
 Compatible with Godot Engine 4.0 stable or newer.
 
-Proudly brought to you by the [V-Sekai team](https://v-sekai.org/about).
+Originally created by the [V-Sekai team](https://v-sekai.org/about). This fork is maintained by [AzPepoze](https://github.com/AzPepoze).
 
 This package also includes a standalone full implementation of the MToon Shader for Godot Engine.
 
@@ -13,7 +11,7 @@ This package also includes a standalone full implementation of the MToon Shader 
 
 ## What is VRM?
 
-See [https://vrm.dev/en/](https://vrm.dev/en/) (English) or [https://vrm.dev/](https://vrm.dev/) (日本語)
+See [https://vrm.dev/en/](https://vrm.dev/en/)
 
 "VRM" is a file format for handling 3D humanoid avatar (3D model) data for VR applications.
 It is based on [glTF 2.0](https://www.khronos.org/gltf/). Anyone is free to use it.
@@ -45,49 +43,22 @@ Import and export of VRM through version 1.0 is supported. Here is a feature bre
 	* `humanoid`: ✅I️mplemented (uses `%GeneralSkeleton` `SkeletonProfileHumanoid` compatible retargeting.)
 	* Metadata: ✅I️mplemented, including License information and screenshot
 
-## Future work
+## Maintenance Status
 
-* Support VRMC_vrm_animation:
-	* Not yet implemented. Intended use: humanoid AnimationLibrary import/export.
-
-## A note about SkeletonModifier3D on Godot 4.3 and later.
-
-godot-vrm currently creates an internal node child of the Skeleton3D to facilitate processing the skeleton modifiers for
-VRM spring bones and node constraints.
-
-Due to the behavior of skeleton modifier, there may be some differences.
-For example, on Godot 4.3+, `update_secondary_fixed` is no longer supported: instead, the Skeleton node determines whether to use physics or idle processing.
-
-## Head hiding settings
-
-At import time, there are new scene import settings for .vrm files.
-
-For runtime usage, head hiding mode is determined by various additional data properties on the GLTFState object:
-`vrm/head_hiding_method` is an enum `vrm_constants.HeadHidingSetting` that determines the mode.
-
-For BothLayers and BothLayersWithShadow modes, the MeshInstance3D layers are determined by the
-`vrm/first_person_layers` and `vrm/third_person_layers` integers respectively.
-
-For FirstPersonOnlyWithShadow, FirstPersonOnly and ThirdPersonOnly, certain meshes are deleted or modified to make the character suitable for first person or third person usage.
-
-Shadow modes will create an additional mesh for hidden heads set to ShadowsOnly to allow the hidden head to still cast a shadow.
-Recommended if your game has a first person mode and uses lights with shadows enabled.
-
-Finally, there is an IgnoreHeadHiding mode which disables handling of the firstPerson flags and acts like an ordinary glTF import.
-
-## Note for users of Godot 3.x
-
-For VRM compatible with Godot Engine 3.2.2 or later, use the `godot3` branch of this repository.
-
-https://github.com/V-Sekai/godot-vrm
+This fork by **AzPepoze** includes the following improvements:
+- **Linting & Standards**: Resolved `gdlint` warnings (naming conventions, unused arguments).
+- **Project Structure**: Updated internal organization (Core, Importer, Runtime).
+- **Build System**: Fixed GDExtension compilation and library issues.
+- **Git Optimization**: Modernized `.gitignore` and removed legacy Japanese documentation.
+- **Branching**: Main development branch renamed to `main`.
 
 ## How to use
 
-Install the vrm addon folder into addons/vrm. MUST NOT BE RENAMED: This path will be referenced by generated VRM meta scripts.
+Install the vrm addon folder into `addons/vrm`. **MUST NOT BE RENAMED**: This path will be referenced by generated VRM meta scripts.
 
-Install mtoon into addons/mtoon. MUST NOT BE RENAMED: This path is referenced by generated materials.
+Install mtoon into `addons/mtoon`. **MUST NOT BE RENAMED**: This path is referenced by generated materials.
 
-Enable the VRM and MToon plugins in Project Settings -> Plugins -> VRM and mtoon.
+Enable the VRM and MToon plugins in **Project Settings -> Plugins -> VRM and mtoon**.
 
 ## Credits
 
@@ -98,13 +69,3 @@ Thanks to the [V-Sekai team](https://v-sekai.org/about) and contributors:
 - https://github.com/TokageItLab
 - https://github.com/lyuma
 - https://github.com/SaracenOne
-
-For their extensive help testing and contributing code to Godot-VRM.
-
-Special thanks to the authors of UniVRM, MToon and other VRM tooling
-
-- The VRM Consortium ( https://github.com/vrm-c )
-- https://github.com/Santarh
-- https://github.com/ousttrue
-- https://github.com/saturday06
-- https://github.com/FMS-Cat

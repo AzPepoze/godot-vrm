@@ -16,3 +16,19 @@ data_*/
 # System/tool-specific ignores
 .DS_Store
 *~
+
+# SCons and build artifacts
+.sconsign.dblite
+*.o
+*.os
+*.a
+*.lib
+
+# GDExtension binaries
+addons/*/bin/*.so
+addons/*/bin/*.dll
+addons/*/bin/*.dylib
+addons/*/bin/*.wasm
+
+# VS Code
+.vscode/

@@ -41,4 +41,4 @@ lint:
 	find src/ -name "*.cpp" -o -name "*.h" | xargs -r clang-format --dry-run --Werror
 	find addons/ tests/ -name "*.gd" | xargs -r gdformat --check
 
-check: format lint test
+check: format lint build-linux test
