@@ -85,9 +85,9 @@ https://github.com/V-Sekai/godot-vrm
 
 Install the vrm addon folder into addons/vrm. MUST NOT BE RENAMED: This path will be referenced by generated VRM meta scripts.
 
-Install Godot-MToon-Shader into addons/Godot-MToon-Shader. MUST NOT BE RENAMED: This path is referenced by generated materials.
+Install mtoon into addons/mtoon. MUST NOT BE RENAMED: This path is referenced by generated materials.
 
-Enable the VRM and MToon plugins in Project Settings -> Plugins -> VRM and Godot-MToon-Shader.
+Enable the VRM and MToon plugins in Project Settings -> Plugins -> VRM and mtoon.
 
 ## Credits
 

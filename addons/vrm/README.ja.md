@@ -61,9 +61,9 @@ https://github.com/V-Sekai/godot-vrm
 
 VRM Addon を addons/vrm にインストールします。**生成された VRM meta のスクリプトからパスを参照するので、決してリネームしないで下さい。**
 
-Godot-MToon-Shader を addons/Godot-MToon-Shader にインストールします。**マテリアルからパスを参照するので、決してリネームしないで下さい。**
+mtoon を addons/mtoon にインストールします。**マテリアルからパスを参照するので、決してリネームしないで下さい。**
 
-「プロジェクト設定」→「プラグイン」で、「VRM」と「Godot-MToon-Shader」を探し、VRM と MToon プラグインを有効にします。
+「プロジェクト設定」→「プラグイン」で、「VRM」と「mtoon」を探し、VRM と MToon プラグインを有効にします。
 
 ## 謝辞
 

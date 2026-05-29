@@ -431,7 +431,7 @@ func _process_vrm_material(
 
 	var outline_width_mode: String = vrm_mat_props.get("outlineWidthMode", "none")
 
-	var mtoon_shader_base_path: String = "res://addons/Godot-MToon-Shader/mtoon"
+	var mtoon_shader_base_path: String = "res://addons/mtoon/mtoon"
 
 	var godot_outline_shader_name: String = ""
 	if outline_width_mode != "none":
