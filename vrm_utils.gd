@@ -6,6 +6,7 @@ const ROTATE_180_TRANSFORM = Transform3D(ROTATE_180_BASIS, Vector3.ZERO)
 const vrm_constants_class = preload("./vrm_constants.gd")
 const importer_mesh_attributes = preload("./importer_mesh_attributes.gd")
 
+
 static func adjust_mesh_zforward(mesh: ImporterMesh, blendshapes: Array):
 	# MESH and SKIN data divide, to compensate for object position multiplying.
 	var surf_count: int = mesh.get_surface_count()
@@ -50,7 +51,17 @@ static func adjust_mesh_zforward(mesh: ImporterMesh, blendshapes: Array):
 					tangarr[i * 4 + 2] = -tangarr[i * 4 + 2]
 			bsarr[bsidx].resize(ArrayMesh.ARRAY_MAX)
 
-		surf_data_by_mesh.push_back({"prim": prim, "arr": arr, "bsarr": bsarr, "lods": lods, "fmt_compress_flags": fmt_compress_flags, "name": name, "mat": mat})
+		surf_data_by_mesh.push_back(
+			{
+				"prim": prim,
+				"arr": arr,
+				"bsarr": bsarr,
+				"lods": lods,
+				"fmt_compress_flags": fmt_compress_flags,
+				"name": name,
+				"mat": mat
+			}
+		)
 	if blendshapes.is_empty():
 		for bsidx in mesh.get_blend_shape_count():
 			blendshapes.append(mesh.get_blend_shape_name(bsidx))
@@ -67,12 +78,22 @@ static func adjust_mesh_zforward(mesh: ImporterMesh, blendshapes: Array):
 		var mat: Material = surf_data_by_mesh[surf_idx].get("mat")
 		mesh.add_surface(prim, arr, bsarr, lods, mat, name, fmt_compress_flags)
 
+
 static func rotate_scene_180_inner(p_node: Node3D, mesh_set: Dictionary, skin_set: Dictionary):
 	if p_node is Skeleton3D:
 		for bone_idx in range(p_node.get_bone_count()):
-			var rest: Transform3D = ROTATE_180_TRANSFORM * p_node.get_bone_rest(bone_idx) * ROTATE_180_TRANSFORM
+			var rest: Transform3D = (
+				ROTATE_180_TRANSFORM * p_node.get_bone_rest(bone_idx) * ROTATE_180_TRANSFORM
+			)
 			p_node.set_bone_rest(bone_idx, rest)
-			p_node.set_bone_pose_rotation(bone_idx, Quaternion(ROTATE_180_BASIS) * p_node.get_bone_pose_rotation(bone_idx) * Quaternion(ROTATE_180_BASIS))
+			p_node.set_bone_pose_rotation(
+				bone_idx,
+				(
+					Quaternion(ROTATE_180_BASIS)
+					* p_node.get_bone_pose_rotation(bone_idx)
+					* Quaternion(ROTATE_180_BASIS)
+				)
+			)
 			p_node.set_bone_pose_scale(bone_idx, Vector3.ONE)
 			p_node.set_bone_pose_position(bone_idx, rest.origin)
 	p_node.transform = ROTATE_180_TRANSFORM * p_node.transform * ROTATE_180_TRANSFORM
@@ -84,9 +105,10 @@ static func rotate_scene_180_inner(p_node: Node3D, mesh_set: Dictionary, skin_se
 		if child is Node3D:
 			rotate_scene_180_inner(child, mesh_set, skin_set)
 
-static func generate_mesh_index_to_meshinstance_mapping(gstate : GLTFState) -> Dictionary:
+
+static func generate_mesh_index_to_meshinstance_mapping(gstate: GLTFState) -> Dictionary:
 	var nodes = gstate.get_nodes()
-	var mesh_idx_to_meshinstance : Dictionary = {}
+	var mesh_idx_to_meshinstance: Dictionary = {}
 	for i in range(nodes.size()):
 		var gltfnode: GLTFNode = nodes[i]
 		var mesh_idx: int = gltfnode.mesh
@@ -97,12 +119,13 @@ static func generate_mesh_index_to_meshinstance_mapping(gstate : GLTFState) -> D
 			#print("insert " + str(mesh_idx) + " node name " + scenenode.name)
 	return mesh_idx_to_meshinstance
 
-static func rotate_scene_180(p_scene: Node3D, blend_shape_names: Dictionary, gstate : GLTFState):
+
+static func rotate_scene_180(p_scene: Node3D, blend_shape_names: Dictionary, gstate: GLTFState):
 	var mesh_set: Dictionary = {}
 	var skin_set: Dictionary = {}
 	rotate_scene_180_inner(p_scene, mesh_set, skin_set)
 
-	var mesh_idx_to_meshinstance : Dictionary = generate_mesh_index_to_meshinstance_mapping(gstate)
+	var mesh_idx_to_meshinstance: Dictionary = generate_mesh_index_to_meshinstance_mapping(gstate)
 
 	for mesh_index in mesh_idx_to_meshinstance.keys():
 		var mesh_node = mesh_idx_to_meshinstance[mesh_index]
@@ -114,7 +137,9 @@ static func rotate_scene_180(p_scene: Node3D, blend_shape_names: Dictionary, gst
 
 	for skin in skin_set:
 		for b in range(skin.get_bind_count()):
-			skin.set_bind_pose(b, ROTATE_180_TRANSFORM * skin.get_bind_pose(b) * ROTATE_180_TRANSFORM)
+			skin.set_bind_pose(
+				b, ROTATE_180_TRANSFORM * skin.get_bind_pose(b) * ROTATE_180_TRANSFORM
+			)
 
 
 static func apply_node_transforms(p_root_node: Node3D, p_skeleton: Skeleton3D) -> Vector3:
@@ -129,14 +154,24 @@ static func apply_node_transforms(p_root_node: Node3D, p_skeleton: Skeleton3D) -
 
 	# get_scale_local() not exposed to GDScript?
 	var sign_det: float = sign(global_transform.basis.determinant())
-	var rowx: Vector3 = Vector3(global_transform.basis.x.x, global_transform.basis.y.x, global_transform.basis.z.x)
-	var rowy: Vector3 = Vector3(global_transform.basis.x.y, global_transform.basis.y.y, global_transform.basis.z.y)
-	var rowz: Vector3 = Vector3(global_transform.basis.x.z, global_transform.basis.y.z, global_transform.basis.z.z)
+	var rowx: Vector3 = Vector3(
+		global_transform.basis.x.x, global_transform.basis.y.x, global_transform.basis.z.x
+	)
+	var rowy: Vector3 = Vector3(
+		global_transform.basis.x.y, global_transform.basis.y.y, global_transform.basis.z.y
+	)
+	var rowz: Vector3 = Vector3(
+		global_transform.basis.x.z, global_transform.basis.y.z, global_transform.basis.z.z
+	)
 
-	var global_transform_scale_local: Vector3 = sign_det * Vector3(rowx.length(), rowy.length(), rowz.length())
+	var global_transform_scale_local: Vector3 = (
+		sign_det * Vector3(rowx.length(), rowy.length(), rowz.length())
+	)
 
 	for bone_idx in p_skeleton.get_parentless_bones():
-		var new_rest: Transform3D = global_transform.orthonormalized() * p_skeleton.get_bone_rest(bone_idx)
+		var new_rest: Transform3D = (
+			global_transform.orthonormalized() * p_skeleton.get_bone_rest(bone_idx)
+		)
 		p_skeleton.set_bone_rest(bone_idx, new_rest)
 
 	var q: PackedInt32Array = p_skeleton.get_parentless_bones()
@@ -147,7 +182,9 @@ static func apply_node_transforms(p_root_node: Node3D, p_skeleton: Skeleton3D) -
 		var src_children: PackedInt32Array = p_skeleton.get_bone_children(src_idx)
 		q.append_array(src_children)
 		var bone_rest: Transform3D = p_skeleton.get_bone_rest(src_idx)
-		p_skeleton.set_bone_rest(src_idx, Transform3D(bone_rest.basis, bone_rest.origin * global_transform_scale_local))
+		p_skeleton.set_bone_rest(
+			src_idx, Transform3D(bone_rest.basis, bone_rest.origin * global_transform_scale_local)
+		)
 		p_skeleton.set_bone_pose_position(src_idx, bone_rest.origin * global_transform_scale_local)
 		p_skeleton.set_bone_pose_rotation(src_idx, bone_rest.basis.get_rotation_quaternion())
 		p_skeleton.set_bone_pose_scale(src_idx, bone_rest.basis.get_scale())
@@ -156,7 +193,9 @@ static func apply_node_transforms(p_root_node: Node3D, p_skeleton: Skeleton3D) -
 	return global_transform_scale_local
 
 
-static func skeleton_rename(gstate: GLTFState, p_base_scene: Node, p_skeleton: Skeleton3D, p_bone_map: BoneMap):
+static func skeleton_rename(
+	gstate: GLTFState, p_base_scene: Node, p_skeleton: Skeleton3D, p_bone_map: BoneMap
+):
 	var original_bone_names_to_indices = {}
 	var original_indices_to_bone_names = {}
 	var original_indices_to_new_bone_names = {}
@@ -201,7 +240,9 @@ static func skeleton_rename(gstate: GLTFState, p_base_scene: Node, p_skeleton: S
 						#bind_bone_name = node.get_bone_name(skin.get_bind_bone(i))
 						if skin.get_bind_bone(i) != -1:
 							break  # Not using named binds: no need to rename skin.
-					var bone_name_from_skel: StringName = p_bone_map.find_profile_bone_name(bind_bone_name)
+					var bone_name_from_skel: StringName = p_bone_map.find_profile_bone_name(
+						bind_bone_name
+					)
 					if not bone_name_from_skel.is_empty():
 						skin.set_bind_name(i, bone_name_from_skel)
 
@@ -216,7 +257,12 @@ static func skeleton_rename(gstate: GLTFState, p_base_scene: Node, p_skeleton: S
 			nd.call(&"_notify_skeleton_bones_renamed", p_base_scene, p_skeleton, p_bone_map)
 
 
-static func skeleton_rotate(p_base_scene: Node, src_skeleton: Skeleton3D, p_bone_map: BoneMap, old_skeleton_global_rest: Array[Transform3D]) -> Array[Basis]:
+static func skeleton_rotate(
+	p_base_scene: Node,
+	src_skeleton: Skeleton3D,
+	p_bone_map: BoneMap,
+	old_skeleton_global_rest: Array[Transform3D]
+) -> Array[Basis]:
 	# is_renamed: was skeleton_rename already invoked?
 	var is_renamed = true
 	var profile = p_bone_map.profile
@@ -256,7 +302,11 @@ static func skeleton_rotate(p_base_scene: Node, src_skeleton: Skeleton3D, p_bone
 			bones_to_process.push_back(bone_idx)
 
 		var tgt_rot: Basis
-		var src_bone_name: StringName = StringName(src_skeleton.get_bone_name(src_idx)) if is_renamed else p_bone_map.find_profile_bone_name(src_skeleton.get_bone_name(src_idx))
+		var src_bone_name: StringName = (
+			StringName(src_skeleton.get_bone_name(src_idx))
+			if is_renamed
+			else p_bone_map.find_profile_bone_name(src_skeleton.get_bone_name(src_idx))
+		)
 		if src_bone_name != StringName():
 			var src_pg: Basis
 			var src_parent_idx: int = src_skeleton.get_bone_parent(src_idx)
@@ -268,7 +318,11 @@ static func skeleton_rotate(p_base_scene: Node, src_skeleton: Skeleton3D, p_bone
 				tgt_rot = src_pg.inverse() * prof_skeleton.get_bone_global_rest(prof_idx).basis  # Mapped bone uses reference pose.
 
 		if src_skeleton.get_bone_parent(src_idx) >= 0:
-			diffs[src_idx] = (tgt_rot.inverse() * diffs[src_skeleton.get_bone_parent(src_idx)] * src_skeleton.get_bone_rest(src_idx).basis)
+			diffs[src_idx] = (
+				tgt_rot.inverse()
+				* diffs[src_skeleton.get_bone_parent(src_idx)]
+				* src_skeleton.get_bone_rest(src_idx).basis
+			)
 		else:
 			diffs[src_idx] = tgt_rot.inverse() * src_skeleton.get_bone_rest(src_idx).basis
 
@@ -276,15 +330,24 @@ static func skeleton_rotate(p_base_scene: Node, src_skeleton: Skeleton3D, p_bone
 		if src_skeleton.get_bone_parent(src_idx) >= 0:
 			diff = diffs[src_skeleton.get_bone_parent(src_idx)]
 
-		src_skeleton.set_bone_rest(src_idx, Transform3D(tgt_rot, diff * src_skeleton.get_bone_rest(src_idx).origin))
+		src_skeleton.set_bone_rest(
+			src_idx, Transform3D(tgt_rot, diff * src_skeleton.get_bone_rest(src_idx).origin)
+		)
 
 	prof_skeleton.queue_free()
 	return diffs
 
 
-static func apply_mesh_rotation(p_base_scene: Node, src_skeleton: Skeleton3D, old_skeleton_global_rest: Array[Transform3D], global_transform_scale_local: Vector3):
+static func apply_mesh_rotation(
+	p_base_scene: Node,
+	src_skeleton: Skeleton3D,
+	old_skeleton_global_rest: Array[Transform3D],
+	global_transform_scale_local: Vector3
+):
 	# Fix skin.
-	var scale_xform: Transform3D = Transform3D(Basis.from_scale(global_transform_scale_local), Vector3.ZERO)
+	var scale_xform: Transform3D = Transform3D(
+		Basis.from_scale(global_transform_scale_local), Vector3.ZERO
+	)
 	var nodes: Array[Node] = p_base_scene.find_children("*", "ImporterMeshInstance3D")
 	var mutated_skins: Dictionary
 	while not nodes.is_empty():
@@ -304,7 +367,10 @@ static func apply_mesh_rotation(p_base_scene: Node, src_skeleton: Skeleton3D, ol
 						bn = node.get_bone_name(skin.get_bind_bone(i))
 					var bone_idx: int = src_skeleton.find_bone(bn)
 					if bone_idx >= 0:
-						var adjust_transform: Transform3D = src_skeleton.get_bone_global_rest(bone_idx).affine_inverse() * old_skeleton_global_rest[bone_idx]
+						var adjust_transform: Transform3D = (
+							src_skeleton.get_bone_global_rest(bone_idx).affine_inverse()
+							* old_skeleton_global_rest[bone_idx]
+						)
 						adjust_transform = adjust_transform.scaled(global_transform_scale_local)
 						# silhouette_diff[i] is not used because VRM files must be in T-Pose before export.
 						skin.set_bind_pose(i, adjust_transform * skin.get_bind_pose(i))
@@ -317,7 +383,10 @@ static func apply_mesh_rotation(p_base_scene: Node, src_skeleton: Skeleton3D, ol
 		var bone_idx: int = attachment.bone_idx
 		if bone_idx == -1:
 			bone_idx = src_skeleton.find_bone(attachment.bone_name)
-		var adjust_transform: Transform3D = src_skeleton.get_bone_global_rest(bone_idx).affine_inverse() * old_skeleton_global_rest[bone_idx]
+		var adjust_transform: Transform3D = (
+			src_skeleton.get_bone_global_rest(bone_idx).affine_inverse()
+			* old_skeleton_global_rest[bone_idx]
+		)
 		adjust_transform = adjust_transform.scaled(global_transform_scale_local)
 
 		var child_nodes: Array[Node] = attachment.get_children()
@@ -335,7 +404,9 @@ static func apply_mesh_rotation(p_base_scene: Node, src_skeleton: Skeleton3D, ol
 		src_skeleton.set_bone_pose_scale(i, fixed_rest.basis.get_scale())
 
 
-static func perform_retarget(gstate: GLTFState, root_node: Node, skeleton: Skeleton3D, bone_map: BoneMap) -> Array[Basis]:
+static func perform_retarget(
+	gstate: GLTFState, root_node: Node, skeleton: Skeleton3D, bone_map: BoneMap
+) -> Array[Basis]:
 	var skeletonPath: NodePath = root_node.get_path_to(skeleton)
 	var global_transform_scale_local: Vector3 = apply_node_transforms(root_node, skeleton)
 
@@ -359,7 +430,9 @@ static func _recurse_bones(bones: Dictionary, skel: Skeleton3D, bone_idx: int):
 		_recurse_bones(bones, skel, child)
 
 
-static func _generate_hide_bone_mesh(mesh: ImporterMesh, skin: Skin, bone_names_to_hide: Dictionary, blendshapes: Array) -> ImporterMesh:
+static func _generate_hide_bone_mesh(
+	mesh: ImporterMesh, skin: Skin, bone_names_to_hide: Dictionary, blendshapes: Array
+) -> ImporterMesh:
 	var bind_indices_to_hide: Dictionary = {}
 
 	for i in range(skin.get_bind_count()):
@@ -390,7 +463,10 @@ static func _generate_hide_bone_mesh(mesh: ImporterMesh, skin: Skin, bone_names_
 		var hide_verts: PackedInt32Array
 		hide_verts.resize(vert_arr_len)
 		var did_hide_verts: bool = false
-		if typeof(arr[ArrayMesh.ARRAY_BONES]) == TYPE_PACKED_INT32_ARRAY and typeof(arr[ArrayMesh.ARRAY_WEIGHTS]) == TYPE_PACKED_FLOAT32_ARRAY:
+		if (
+			typeof(arr[ArrayMesh.ARRAY_BONES]) == TYPE_PACKED_INT32_ARRAY
+			and typeof(arr[ArrayMesh.ARRAY_WEIGHTS]) == TYPE_PACKED_FLOAT32_ARRAY
+		):
 			var bonearr: PackedInt32Array = arr[ArrayMesh.ARRAY_BONES]
 			var weightarr: PackedFloat32Array = arr[ArrayMesh.ARRAY_WEIGHTS]
 			var bones_per_vert = len(bonearr) / vert_arr_len
@@ -398,7 +474,10 @@ static func _generate_hide_bone_mesh(mesh: ImporterMesh, skin: Skin, bone_names_
 			for i in range(vert_arr_len):
 				var keepvert = true
 				for j in range(bones_per_vert):
-					if not is_zero_approx(weightarr[i * bones_per_vert + j]) and bind_indices_to_hide.has(bonearr[i * bones_per_vert + j]):
+					if (
+						not is_zero_approx(weightarr[i * bones_per_vert + j])
+						and bind_indices_to_hide.has(bonearr[i * bones_per_vert + j])
+					):
 						hide_verts[i] = 1
 						did_hide_verts = true
 						did_hide_any_surface_verts = true
@@ -408,21 +487,39 @@ static func _generate_hide_bone_mesh(mesh: ImporterMesh, skin: Skin, bone_names_
 			var new_indexarr: PackedInt32Array = PackedInt32Array()
 			var cnt: int = 0
 			for i in range(0, len(indexarr) - 2, 3):
-				if hide_verts[indexarr[i]] == 0 && hide_verts[indexarr[i + 1]] == 0 && hide_verts[indexarr[i + 2]] == 0:
+				if (
+					hide_verts[indexarr[i]] == 0
+					&& hide_verts[indexarr[i + 1]] == 0
+					&& hide_verts[indexarr[i + 2]] == 0
+				):
 					cnt += 3
 			if cnt == 0:
 				continue  # We skip this primitive entirely.
 			new_indexarr.resize(cnt)
 			cnt = 0
 			for i in range(0, len(indexarr) - 2, 3):
-				if hide_verts[indexarr[i]] == 0 && hide_verts[indexarr[i + 1]] == 0 && hide_verts[indexarr[i + 2]] == 0:
+				if (
+					hide_verts[indexarr[i]] == 0
+					&& hide_verts[indexarr[i + 1]] == 0
+					&& hide_verts[indexarr[i + 2]] == 0
+				):
 					new_indexarr[cnt] = indexarr[i]
 					new_indexarr[cnt + 1] = indexarr[i + 1]
 					new_indexarr[cnt + 2] = indexarr[i + 2]
 					cnt += 3
 			arr[ArrayMesh.ARRAY_INDEX] = new_indexarr
 
-		surf_data_by_mesh.push_back({"prim": prim, "arr": arr, "bsarr": bsarr, "lods": lods, "fmt_compress_flags": fmt_compress_flags, "name": name, "mat": mat})
+		surf_data_by_mesh.push_back(
+			{
+				"prim": prim,
+				"arr": arr,
+				"bsarr": bsarr,
+				"lods": lods,
+				"fmt_compress_flags": fmt_compress_flags,
+				"name": name,
+				"mat": mat
+			}
+		)
 
 	if len(surf_data_by_mesh) == 0:  # all primitives were gobbled up
 		return null
@@ -449,7 +546,13 @@ static func _generate_hide_bone_mesh(mesh: ImporterMesh, skin: Skin, bone_names_
 		new_mesh.add_surface(prim, arr, bsarr, lods, mat, name, fmt_compress_flags)
 	return new_mesh
 
-static func perform_head_hiding(gstate: GLTFState, mesh_annotations_by_node: Dictionary, head_relative_bones: Dictionary, node_to_head_hidden_node: Dictionary):
+
+static func perform_head_hiding(
+	gstate: GLTFState,
+	mesh_annotations_by_node: Dictionary,
+	head_relative_bones: Dictionary,
+	node_to_head_hidden_node: Dictionary
+):
 	var meshes = gstate.get_meshes()
 	var nodes = gstate.get_nodes()
 
@@ -479,7 +582,10 @@ static func perform_head_hiding(gstate: GLTFState, mesh_annotations_by_node: Dic
 			# Non-skinned meshes: use flag.
 			var mesh: ImporterMesh = node.mesh
 			var head_hidden_mesh: ImporterMesh = mesh
-			if flag == "auto" and head_hiding_method != vrm_constants_class.HeadHidingSetting.ThirdPersonOnly:
+			if (
+				flag == "auto"
+				and head_hiding_method != vrm_constants_class.HeadHidingSetting.ThirdPersonOnly
+			):
 				if node.skin == null:
 					var parent_node = node.get_parent()
 					if parent_node is BoneAttachment3D:
@@ -488,9 +594,13 @@ static func perform_head_hiding(gstate: GLTFState, mesh_annotations_by_node: Dic
 				else:
 					var blend_shape_names: Dictionary = _extract_blendshape_names(gstate.json)
 					if node_idx in blend_shape_names.keys():
-						head_hidden_mesh = _generate_hide_bone_mesh(mesh, node.skin, head_relative_bones, blend_shape_names[node_idx])
+						head_hidden_mesh = _generate_hide_bone_mesh(
+							mesh, node.skin, head_relative_bones, blend_shape_names[node_idx]
+						)
 					else:
-						head_hidden_mesh = _generate_hide_bone_mesh(mesh, node.skin, head_relative_bones, [])
+						head_hidden_mesh = _generate_hide_bone_mesh(
+							mesh, node.skin, head_relative_bones, []
+						)
 					if head_hidden_mesh == null:
 						flag = "thirdPersonOnly"
 					if head_hidden_mesh == mesh:
@@ -500,12 +610,12 @@ static func perform_head_hiding(gstate: GLTFState, mesh_annotations_by_node: Dic
 			if flag == "thirdPersonOnly":
 				layer_mask = layer_mask_third
 				if head_hiding_method == vrm_constants_class.HeadHidingSetting.FirstPersonOnly:
-					node.mesh = null # FIXME: How to exclude this node?
+					node.mesh = null  # FIXME: How to exclude this node?
 					continue
 			elif flag == "firstPersonOnly":
 				layer_mask = layer_mask_first
 				if head_hiding_method == vrm_constants_class.HeadHidingSetting.ThirdPersonOnly:
-					node.mesh = null # FIXME: How to exclude this node?
+					node.mesh = null  # FIXME: How to exclude this node?
 					continue
 
 			node.script = importer_mesh_attributes
@@ -515,7 +625,10 @@ static func perform_head_hiding(gstate: GLTFState, mesh_annotations_by_node: Dic
 			var head_hidden_node: ImporterMeshInstance3D = null
 			var duplicate_shadow_node: ImporterMeshInstance3D = null
 
-			if head_hiding_method == vrm_constants_class.HeadHidingSetting.FirstPersonOnlyWithShadow:
+			if (
+				head_hiding_method
+				== vrm_constants_class.HeadHidingSetting.FirstPersonOnlyWithShadow
+			):
 				if flag == "firstPersonOnly":
 					layer_mask = layer_mask_first
 					node.shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -523,9 +636,17 @@ static func perform_head_hiding(gstate: GLTFState, mesh_annotations_by_node: Dic
 					node.shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
 
 			if flag == "auto" and head_hidden_mesh != mesh:  # If it is still "auto", we have something to hide.
-				if (head_hiding_method == vrm_constants_class.HeadHidingSetting.BothLayers or
-						head_hiding_method == vrm_constants_class.HeadHidingSetting.BothLayersWithShadow or
-						head_hiding_method == vrm_constants_class.HeadHidingSetting.FirstPersonOnlyWithShadow):
+				if (
+					head_hiding_method == vrm_constants_class.HeadHidingSetting.BothLayers
+					or (
+						head_hiding_method
+						== vrm_constants_class.HeadHidingSetting.BothLayersWithShadow
+					)
+					or (
+						head_hiding_method
+						== vrm_constants_class.HeadHidingSetting.FirstPersonOnlyWithShadow
+					)
+				):
 					head_hidden_node = ImporterMeshInstance3D.new()
 					head_hidden_node.name = node.name + " (Headless)"
 					head_hidden_node.skin = node.skin
@@ -549,7 +670,10 @@ static func perform_head_hiding(gstate: GLTFState, mesh_annotations_by_node: Dic
 					node.mesh = head_hidden_mesh
 
 			if head_hidden_node != null:
-				if head_hiding_method == vrm_constants_class.HeadHidingSetting.FirstPersonOnlyWithShadow:
+				if (
+					head_hiding_method
+					== vrm_constants_class.HeadHidingSetting.FirstPersonOnlyWithShadow
+				):
 					node.shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
 			if head_hiding_method == vrm_constants_class.HeadHidingSetting.BothLayersWithShadow:
 				if flag == "thirdPersonOnly" or head_hidden_node != null:
@@ -560,7 +684,9 @@ static func perform_head_hiding(gstate: GLTFState, mesh_annotations_by_node: Dic
 					duplicate_shadow_node.skeleton_path = node.skeleton_path
 					duplicate_shadow_node.script = importer_mesh_attributes
 					duplicate_shadow_node.layers = node.layers
-					duplicate_shadow_node.shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+					duplicate_shadow_node.shadow = (
+						GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+					)
 					duplicate_shadow_node.first_person_flag = "head_removed"
 					node.add_sibling(duplicate_shadow_node)
 					duplicate_shadow_node.owner = node.owner
@@ -568,9 +694,17 @@ static func perform_head_hiding(gstate: GLTFState, mesh_annotations_by_node: Dic
 						node_to_head_hidden_node[duplicate_shadow_node] = head_hidden_node
 					node_to_head_hidden_node[node] = duplicate_shadow_node
 
-			if (layer_mask_first != 0 and layer_mask != 0 and
-					(head_hiding_method == vrm_constants_class.HeadHidingSetting.BothLayers or 
-					head_hiding_method == vrm_constants_class.HeadHidingSetting.BothLayersWithShadow)):
+			if (
+				layer_mask_first != 0
+				and layer_mask != 0
+				and (
+					head_hiding_method == vrm_constants_class.HeadHidingSetting.BothLayers
+					or (
+						head_hiding_method
+						== vrm_constants_class.HeadHidingSetting.BothLayersWithShadow
+					)
+				)
+			):
 				if node.layers & layer_mask_first == 0 or node.layers & layer_mask_third == 0:
 					if head_hidden_node != null:
 						head_hidden_node.layers = layer_mask_first
@@ -584,7 +718,6 @@ static func perform_head_hiding(gstate: GLTFState, mesh_annotations_by_node: Dic
 						duplicate_shadow_node.layers = node.layers & layer_mask_first
 					node.layers = node.layers & layer_mask
 
-
 			node.first_person_flag = flag
 	gstate.meshes = meshes
 
@@ -596,6 +729,8 @@ static func _extract_blendshape_names(gltf_json: Dictionary) -> Dictionary:
 	for node_json in gltf_json["nodes"]:
 		if node_json.has("mesh"):
 			if gltf_json["meshes"][node_json["mesh"]]["primitives"][0].has("extras"):
-				if gltf_json["meshes"][node_json["mesh"]]["primitives"][0]["extras"].has("targetNames"):
+				if gltf_json["meshes"][node_json["mesh"]]["primitives"][0]["extras"].has(
+					"targetNames"
+				):
 					blend_shape_names[int(node_json["mesh"])] = gltf_json["meshes"][node_json["mesh"]]["primitives"][0]["extras"]["targetNames"]
 	return blend_shape_names

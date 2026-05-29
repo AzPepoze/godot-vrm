@@ -19,6 +19,8 @@ const bone_node_constraint = preload("./bone_node_constraint.gd")
 
 var skel: Skeleton3D
 var internal_modifier_node: Node3D
+var _use_cpp_simulator: bool = false
+
 
 func _ready() -> void:
 	if skeleton != NodePath():
@@ -37,20 +39,37 @@ func _ready() -> void:
 	if skeleton == NodePath():
 		skeleton = get_path_to(skel)
 
-	if ClassDB.class_exists(&"SkeletonModifier3D"):
+	_use_cpp_simulator = ClassDB.class_exists(&"VRMConstraintSimulator")
+
+	if _use_cpp_simulator:
 		if internal_modifier_node != null:
 			if internal_modifier_node.get_parent() != null:
 				internal_modifier_node.get_parent().remove_child(internal_modifier_node)
 			internal_modifier_node.queue_free()
-		internal_modifier_node = ClassDB.instantiate("SkeletonModifier3D")
-		internal_modifier_node.name = "VRM_internal_skeleton_modifier"
+		internal_modifier_node = ClassDB.instantiate("VRMConstraintSimulator")
+		internal_modifier_node.name = "VRM_ConstraintSimulator"
 		skel.add_child(internal_modifier_node, false, Node.INTERNAL_MODE_BACK)
-		internal_modifier_node.connect(&"modification_processed", self.do_process)
+		internal_modifier_node.setup(constraints)
+	else:
+		if ClassDB.class_exists(&"SkeletonModifier3D"):
+			if internal_modifier_node != null:
+				if internal_modifier_node.get_parent() != null:
+					internal_modifier_node.get_parent().remove_child(internal_modifier_node)
+				internal_modifier_node.queue_free()
+			internal_modifier_node = ClassDB.instantiate("SkeletonModifier3D")
+			internal_modifier_node.name = "VRM_internal_skeleton_modifier"
+			skel.add_child(internal_modifier_node, false, Node.INTERNAL_MODE_BACK)
+			internal_modifier_node.connect(&"modification_processed", self.do_process)
+
 
 func _process(_delta: float):
-	#if not ClassDB.class_exists(&"SkeletonModifier3D"):
-		do_process()
+	if not _use_cpp_simulator:
+		if not ClassDB.class_exists(&"SkeletonModifier3D"):
+			do_process()
+
 
 func do_process() -> void:
+	if _use_cpp_simulator:
+		return
 	for constraint in constraints:
 		constraint.evaluate()
