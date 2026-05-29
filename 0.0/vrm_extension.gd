@@ -172,7 +172,7 @@ func _process_vrm_material(
 		)
 
 	var mtoon_shader_base_path: String = ProjectSettings.get_setting(
-		"vrm/mtoon_shader_base_path", "res://addons/Godot-MToon-Shader/mtoon"
+		"vrm/mtoon_shader_base_path", "res://addons/mtoon/mtoon"
 	)
 
 	var godot_outline_shader_name = null
