@@ -26,10 +26,7 @@ func _init(p_skeleton: Skeleton3D) -> void:
 
 
 func setup_simulator(
-	spring_bones: Array,
-	collider_groups: Array,
-	disable_colliders: bool,
-	update_in_editor: bool
+	spring_bones: Array, collider_groups: Array, disable_colliders: bool, update_in_editor: bool
 ) -> void:
 	if skeleton == null:
 		return
@@ -66,11 +63,17 @@ func _setup_cpp(
 
 
 func update_parameters(
-	p_gravity_multiplier: float, p_gravity_rotation: Quaternion, p_add_force: Vector3,
-	p_wind_direction: Vector3 = Vector3.ZERO, p_wind_strength: float = 0.0,
-	p_wind_turbulence: float = 0.2, p_wind_frequency: float = 1.0,
-	p_env_coll_enabled: bool = false, p_env_coll_mask: int = 1,
-	p_stiffness_multiplier: float = 1.0, p_drag_multiplier: float = 1.0,
+	p_gravity_multiplier: float,
+	p_gravity_rotation: Quaternion,
+	p_add_force: Vector3,
+	p_wind_direction: Vector3 = Vector3.ZERO,
+	p_wind_strength: float = 0.0,
+	p_wind_turbulence: float = 0.2,
+	p_wind_frequency: float = 1.0,
+	p_env_coll_enabled: bool = false,
+	p_env_coll_mask: int = 1,
+	p_stiffness_multiplier: float = 1.0,
+	p_drag_multiplier: float = 1.0,
 	p_hit_radius_multiplier: float = 1.0
 ) -> void:
 	gravity_multiplier = p_gravity_multiplier
@@ -82,8 +85,12 @@ func update_parameters(
 
 	if simulator:
 		simulator.update_parameters(
-			gravity_multiplier, gravity_rotation, add_force,
-			stiffness_multiplier, drag_multiplier, hit_radius_multiplier
+			gravity_multiplier,
+			gravity_rotation,
+			add_force,
+			stiffness_multiplier,
+			drag_multiplier,
+			hit_radius_multiplier
 		)
 		simulator.set_wind_direction(p_wind_direction)
 		simulator.set_wind_strength(p_wind_strength)

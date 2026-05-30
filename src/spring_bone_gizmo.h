@@ -14,11 +14,11 @@ namespace godot {
 namespace SpringBoneGizmo {
 
 // Draw joint chain lines and collider wireframe spheres.
-void draw_gizmo(ImmediateMesh *mesh, Skeleton3D *skel,
-                const Transform3D &skel_to_gizmo,
-                const std::vector<VRMSpringBoneSimulator::CPPSpringBoneChain> &chains,
-                const std::vector<VRMSpringBoneSimulator::CPPSpringBoneCollider> &colliders,
-                Color default_color, bool draw_spring_bones, bool draw_colliders);
+void draw_gizmo(
+    ImmediateMesh *mesh, Skeleton3D *skel, const Transform3D &skel_to_gizmo,
+    const std::vector<VRMSpringBoneSimulator::CPPSpringBoneChain> &chains,
+    const std::vector<VRMSpringBoneSimulator::CPPSpringBoneCollider> &colliders,
+    Color default_color, bool draw_spring_bones, bool draw_colliders);
 
 } // namespace SpringBoneGizmo
 

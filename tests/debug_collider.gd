@@ -2,6 +2,7 @@ extends MainLoop
 
 var frames = 0
 
+
 func _initialize():
 	# Load the AvatarSample_M VRM scene
 	var scene = load("res://vrm_samples/AvatarSample_M.vrm")
@@ -16,6 +17,7 @@ func _initialize():
 	viewport.add_child(instance)
 	# MainLoop doesn't have a tree root, but we can manually process
 	print("Instance loaded: ", instance.name)
+
 
 func _process(delta: float) -> bool:
 	frames += 1

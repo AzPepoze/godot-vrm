@@ -1,0 +1,55 @@
+class-definitions-order:
+- tools
+- classnames
+- extends
+- docstrings
+- signals
+- enums
+- consts
+- staticvars
+- exports
+- pubvars
+- prvvars
+- onreadypubvars
+- onreadyprvvars
+- others
+class-load-variable-name: ^(_?[a-zA-Z][a-zA-Z0-9_]*_?)$
+class-name: ^([A-Z][a-z0-9]*)+$
+class-variable-name: ^(_?[a-zA-Z][a-zA-Z0-9_]*_?)$
+comparison-with-itself: null
+constant-name: ^(_?[a-zA-Z0-9_]+)$
+disable:
+- class-definitions-order
+- duplicated-load
+- trailing-whitespace
+- unused-argument
+- no-elif-return
+- no-else-return
+duplicated-load: null
+enum-element-name: ^([a-zA-Z_][a-zA-Z0-9_]*)$
+enum-name: ^([A-Z][a-z0-9]*)+$
+excluded_directories: !!set
+  .git: null
+  .godot: null
+  .import: null
+expression-not-assigned: null
+function-argument-name: ^(_?[a-zA-Z][a-zA-Z0-9_]*_?)$
+function-arguments-number: 15
+function-name: ^(_on_([A-Z][a-z0-9]*)+(_[a-z0-9]+)*|_?[a-zA-Z][a-zA-Z0-9_]*_?)$
+function-preload-variable-name: ^([a-zA-Z0-9_]+)$
+function-variable-name: ^(_?[a-zA-Z][a-zA-Z0-9_]*_?)$
+load-constant-name: ^(_?[a-zA-Z][a-zA-Z0-9_]*_?)$
+loop-variable-name: ^(_?[a-zA-Z][a-zA-Z0-9_]*_?)$
+max-file-lines: 1500
+max-line-length: 300
+max-public-methods: 50
+max-returns: 15
+mixed-tabs-and-spaces: null
+no-elif-return: null
+no-else-return: null
+signal-name: ^[a-zA-Z][a-zA-Z0-9_]*_?$
+sub-class-name: ^_?([A-Z][a-z0-9]*)+$
+tab-characters: 1
+trailing-whitespace: null
+unnecessary-pass: null
+unused-argument: null

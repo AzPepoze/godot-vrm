@@ -126,11 +126,17 @@ public:
                   bool p_draw_colliders);
 
   // Getters/Setters for Multipliers
-  void set_stiffness_multiplier(float p_multiplier) { stiffness_multiplier = p_multiplier; }
+  void set_stiffness_multiplier(float p_multiplier) {
+    stiffness_multiplier = p_multiplier;
+  }
   float get_stiffness_multiplier() const { return stiffness_multiplier; }
-  void set_drag_multiplier(float p_multiplier) { drag_multiplier = p_multiplier; }
+  void set_drag_multiplier(float p_multiplier) {
+    drag_multiplier = p_multiplier;
+  }
   float get_drag_multiplier() const { return drag_multiplier; }
-  void set_hit_radius_multiplier(float p_multiplier) { hit_radius_multiplier = p_multiplier; }
+  void set_hit_radius_multiplier(float p_multiplier) {
+    hit_radius_multiplier = p_multiplier;
+  }
   float get_hit_radius_multiplier() const { return hit_radius_multiplier; }
 
   // Getters/Setters for Wind parameters
@@ -156,12 +162,11 @@ public:
 private:
   void _update_colliders(Skeleton3D *skel);
   void _reset_chains(Skeleton3D *skel, const Transform3D &skel_global_inv);
-  void _simulate_chains(Skeleton3D *skel, const Transform3D &skel_global_inv, float delta);
+  void _simulate_chains(Skeleton3D *skel, const Transform3D &skel_global_inv,
+                        float delta);
   void _query_game_object_collisions(Skeleton3D *skel,
-                                      const Vector3 &tail_world,
-                                      float radius,
-                                      uint32_t mask,
-                                      Vector3 &out_push);
+                                     const Vector3 &tail_world, float radius,
+                                     uint32_t mask, Vector3 &out_push);
 };
 
 } // namespace godot

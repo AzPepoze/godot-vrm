@@ -74,7 +74,9 @@ public:
   ~VRMConstraintSimulator();
 
   void setup(Array p_constraints);
-  void set_weight_multiplier(float p_multiplier) { weight_multiplier = p_multiplier; }
+  void set_weight_multiplier(float p_multiplier) {
+    weight_multiplier = p_multiplier;
+  }
   float get_weight_multiplier() const { return weight_multiplier; }
   void _process_modification() override;
 

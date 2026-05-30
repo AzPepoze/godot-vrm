@@ -12,7 +12,8 @@ void VRMConstraintSimulator::_bind_methods() {
                        &VRMConstraintSimulator::set_weight_multiplier);
   ClassDB::bind_method(D_METHOD("get_weight_multiplier"),
                        &VRMConstraintSimulator::get_weight_multiplier);
-  ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "weight_multiplier"), "set_weight_multiplier", "get_weight_multiplier");
+  ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "weight_multiplier"),
+               "set_weight_multiplier", "get_weight_multiplier");
 }
 
 VRMConstraintSimulator::VRMConstraintSimulator() {}

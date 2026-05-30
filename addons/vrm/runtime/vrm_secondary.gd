@@ -47,6 +47,7 @@ const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 		collider_groups = value
 		if skel != null:
 			_setup_spring_bone_adapter()
+
 @export var collider_library: Array[VRMCollider]
 
 var skel: Skeleton3D
@@ -61,7 +62,7 @@ func _enter_tree() -> void:
 	_parent_ref = get_parent()
 	if _parent_ref != null and _parent_ref.has_method("is_vrm_root"):
 		is_child_of_vrm = true
-		_parent_ref.set("secondary_node", self )
+		_parent_ref.set("secondary_node", self)
 		# Pull settings resource
 		var parent_settings = _parent_ref.get("settings")
 		if parent_settings is VRMSettings:
@@ -120,7 +121,7 @@ func _setup_spring_bone_adapter() -> void:
 
 func _setup_gizmo() -> void:
 	if _gizmo == null:
-		_gizmo = SecondaryGizmo.new(self )
+		_gizmo = SecondaryGizmo.new(self)
 		add_child(_gizmo, false, Node.INTERNAL_MODE_BACK)
 
 
@@ -154,10 +155,10 @@ func _process(_delta: float):
 			gizmo_spring_bone,
 			gizmo_show_colliders
 		)
-		
+
 		if gizmo_show_wind and _settings != null:
 			_draw_wind_arrow(_gizmo.mesh, _settings.wind_direction, gizmo_wind_color, skel_to_gizmo)
-	
+
 	if is_child_of_vrm and _parent_ref != null:
 		# Only sync non-physics flags that are not in VRMSettings
 		# Note: In a full cleanup, these should probably move to VRMSettings too
@@ -191,47 +192,49 @@ func _process(_delta: float):
 			gizmo_wind_color = val_gizmo_wind_color
 
 
-func _draw_wind_arrow(mesh: ImmediateMesh, direction: Vector3, color: Color, skel_to_gizmo: Transform3D) -> void:
+func _draw_wind_arrow(
+	mesh: ImmediateMesh, direction: Vector3, color: Color, skel_to_gizmo: Transform3D
+) -> void:
 	if direction.length() < 0.001:
 		return
 
 	mesh.surface_begin(Mesh.PRIMITIVE_LINES)
 	mesh.surface_set_color(color)
-	
+
 	# Gizmo is in skeleton space because of the skel_to_gizmo transform
 	# Find Head bone for positioning
 	var head_idx = skel.find_bone("Head")
-	var start_pos_skel = Vector3(0, 1.5, 0) # Fallback
+	var start_pos_skel = Vector3(0, 1.5, 0)  # Fallback
 	if head_idx != -1:
 		start_pos_skel = skel.get_bone_global_pose(head_idx).origin
-	
+
 	# The direction is already transformed to skeleton-local space by VRMWind
 	# But the gizmo line should show where it points in skeleton space
 	var end_pos_skel = start_pos_skel + direction.normalized() * 0.5
-	
+
 	# Transform points from skeleton local space to gizmo local space
 	# This ensures the arrow correctly represents the world direction
 	var start_pos = skel_to_gizmo * start_pos_skel
 	var end_pos = skel_to_gizmo * end_pos_skel
-	
+
 	# Draw Main Line
 	mesh.surface_add_vertex(start_pos)
 	mesh.surface_add_vertex(end_pos)
-	
+
 	# Draw Arrow Head
 	var dir = (end_pos - start_pos).normalized()
 	var ortho = dir.cross(Vector3.UP).normalized()
 	if ortho.length() < 0.01:
 		ortho = dir.cross(Vector3.RIGHT).normalized()
-	
+
 	var arrow_side_1 = end_pos - dir * 0.1 + ortho * 0.05
 	var arrow_side_2 = end_pos - dir * 0.1 - ortho * 0.05
-	
+
 	mesh.surface_add_vertex(end_pos)
 	mesh.surface_add_vertex(arrow_side_1)
 	mesh.surface_add_vertex(end_pos)
 	mesh.surface_add_vertex(arrow_side_2)
-	
+
 	mesh.surface_end()
 
 
