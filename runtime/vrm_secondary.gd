@@ -196,7 +196,11 @@ func _setup_spring_bone_adapter() -> void:
 		spring_bone_adapter = spring_bone_adapter_class.new(skel)
 
 	spring_bone_adapter.setup_simulator(
-		spring_bones, collider_groups, disable_colliders, update_in_editor, use_gdscript_spring_bones
+		spring_bones,
+		collider_groups,
+		disable_colliders,
+		update_in_editor,
+		use_gdscript_spring_bones
 	)
 	spring_bone_adapter.update_parameters(
 		springbone_gravity_multiplier, springbone_gravity_rotation, springbone_add_force
@@ -205,7 +209,7 @@ func _setup_spring_bone_adapter() -> void:
 
 func _setup_gizmo() -> void:
 	if _gizmo == null:
-		_gizmo = SecondaryGizmo.new(self )
+		_gizmo = SecondaryGizmo.new(self)
 		add_child(_gizmo, false, Node.INTERNAL_MODE_BACK)
 
 
@@ -222,9 +226,9 @@ func _process(delta: float):
 			_gizmo.draw_in_editor()
 		else:
 			_gizmo.draw_in_game()
-	
+
 	if spring_bone_adapter != null and use_gdscript_spring_bones:
-                # print("DEBUG: Ticking GDScript logic, delta=", delta)
+		# print("DEBUG: Ticking GDScript logic, delta=", delta)
 		spring_bone_adapter.update(delta)
 
 	if is_child_of_vrm and _parent_ref != null:

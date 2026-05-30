@@ -25,17 +25,11 @@ func _get_import_options(path: String):
 			4,
 			PROPERTY_HINT_LAYERS_3D_RENDER
 		)
+		add_import_option_advanced(TYPE_BOOL, "vrm/remove_end_bones", true, PROPERTY_HINT_NONE, "")
 		add_import_option_advanced(
 			TYPE_BOOL,
-			"vrm/remove_end_bones",
-			true,
+			"vrm/use_gdscript",
+			false,
 			PROPERTY_HINT_NONE,
-			""
+			"Use legacy GDScript implementation instead of C++ GDExtension for spring bones."
 		)
-                add_import_option_advanced(
-                        TYPE_BOOL,
-                        "vrm/use_gdscript",
-                        false,
-                        PROPERTY_HINT_NONE,
-                        "Use legacy GDScript implementation instead of C++ GDExtension for spring bones."
-                )
