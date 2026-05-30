@@ -44,6 +44,22 @@ var secondary_node: Node3D
 		default_springbone_center = value
 		if secondary_node:
 			secondary_node.default_springbone_center = value
+
+@export_group("Global Multipliers")
+@export var springbone_stiffness_multiplier: float = 1.0:
+	set(value):
+		if springbone_stiffness_multiplier == value:
+			return
+		springbone_stiffness_multiplier = value
+		if secondary_node:
+			secondary_node.springbone_stiffness_multiplier = value
+@export var springbone_drag_multiplier: float = 1.0:
+	set(value):
+		if springbone_drag_multiplier == value:
+			return
+		springbone_drag_multiplier = value
+		if secondary_node:
+			secondary_node.springbone_drag_multiplier = value
 @export var springbone_gravity_multiplier: float = 1.0:
 	set(value):
 		if springbone_gravity_multiplier == value:
@@ -51,6 +67,22 @@ var secondary_node: Node3D
 		springbone_gravity_multiplier = value
 		if secondary_node:
 			secondary_node.springbone_gravity_multiplier = value
+@export var springbone_hit_radius_multiplier: float = 1.0:
+	set(value):
+		if springbone_hit_radius_multiplier == value:
+			return
+		springbone_hit_radius_multiplier = value
+		if secondary_node:
+			secondary_node.springbone_hit_radius_multiplier = value
+@export var constraint_weight_multiplier: float = 1.0:
+	set(value):
+		if constraint_weight_multiplier == value:
+			return
+		constraint_weight_multiplier = value
+		if secondary_node:
+			secondary_node.constraint_weight_multiplier = value
+
+@export_group("Force & Gravity")
 @export var springbone_gravity_rotation: Quaternion = Quaternion.IDENTITY:
 	set(value):
 		if springbone_gravity_rotation == value:

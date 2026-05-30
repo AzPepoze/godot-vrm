@@ -20,11 +20,20 @@ const bone_node_constraint = preload("./bone_node_constraint.gd")
 var skel: Skeleton3D
 var internal_modifier_node: Node3D
 var _use_cpp_simulator: bool = false
+var global_weight_multiplier: float = 1.0
 
 
 func _ready() -> void:
 	if skeleton != NodePath():
 		skel = get_node(skeleton)
+
+	# Try to find VRMTopLevel or VRMSecondary for global config
+	var parent = get_parent()
+	while parent:
+		if parent.has_method("is_vrm_root") or parent is VRMSecondary:
+			global_weight_multiplier = parent.get("constraint_weight_multiplier")
+			break
+		parent = parent.get_parent()
 
 	for constraint in constraints:
 		constraint.set_node_references_from_paths(self)
@@ -50,6 +59,8 @@ func _ready() -> void:
 		internal_modifier_node.name = "VRM_ConstraintSimulator"
 		skel.add_child(internal_modifier_node, false, Node.INTERNAL_MODE_BACK)
 		internal_modifier_node.setup(constraints)
+		if internal_modifier_node.has_method("set_weight_multiplier"):
+			internal_modifier_node.set_weight_multiplier(global_weight_multiplier)
 	else:
 		if ClassDB.class_exists(&"SkeletonModifier3D"):
 			if internal_modifier_node != null:
@@ -72,4 +83,10 @@ func do_process() -> void:
 	if _use_cpp_simulator:
 		return
 	for constraint in constraints:
-		constraint.evaluate()
+		constraint.evaluate(global_weight_multiplier)
+
+
+func set_global_weight_multiplier(value: float) -> void:
+	global_weight_multiplier = value
+	if internal_modifier_node and internal_modifier_node.has_method("set_weight_multiplier"):
+		internal_modifier_node.set_weight_multiplier(global_weight_multiplier)
