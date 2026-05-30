@@ -92,7 +92,7 @@ func run_test_file(path: String):
 		print("  [WARN] No test methods starting with 'test_' found.")
 
 
-func fail_test(test_name: String, message: String):
+func fail_test(_test_name: String, message: String):
 	current_failed = true
 	current_error_message = message
 

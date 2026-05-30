@@ -32,3 +32,6 @@ addons/*/bin/*.wasm
 
 # VS Code
 .vscode/
+
+*.md
+!README.md

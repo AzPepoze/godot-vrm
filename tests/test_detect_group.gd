@@ -1,0 +1,134 @@
+extends "res://tests/test_base.gd"
+
+const VRMSecondaryService = preload("res://addons/vrm/importer/common/vrm_secondary_service.gd")
+
+# --- Comment priority ---
+
+
+func test_comment_takes_priority():
+	var result = VRMSecondaryService.detect_group("J_Sec_Hair3_01", "Pigtail")
+	assert_eq(result, "Pigtail", "Comment should take priority over bone name")
+
+
+func test_comment_with_newline():
+	var result = VRMSecondaryService.detect_group("J_Sec_Hair3_01", "Hair\nsome extra text")
+	assert_eq(result, "Hair", "Only first line of comment should be used")
+
+
+func test_empty_comment_falls_back_to_bone():
+	var result = VRMSecondaryService.detect_group("J_Sec_Skirt_01", "")
+	assert_eq(result, "Skirt", "Empty comment should fall back to bone name parsing")
+
+
+# --- VRM prefix stripping ---
+
+
+func test_j_sec_prefix():
+	var result = VRMSecondaryService.detect_group("J_Sec_Hair3_01", "")
+	assert_eq(result, "Hair3", "J_Sec_ prefix should be stripped")
+
+
+func test_j_prefix():
+	var result = VRMSecondaryService.detect_group("J_Sec_Hair_01", "")
+	assert_eq(result, "Hair", "J_ prefix should be stripped")
+
+
+func test_s_j_prefix():
+	var result = VRMSecondaryService.detect_group("S_J_Hair_01", "")
+	assert_eq(result, "Hair", "S_J_ prefix should be stripped")
+
+
+# --- Side prefix stripping ---
+
+
+func test_left_side_prefix():
+	var result = VRMSecondaryService.detect_group("J_Sec_L_SkirtSide2_01", "")
+	assert_eq(result, "SkirtSide2", "L_ side prefix should be stripped")
+
+
+func test_right_side_prefix():
+	var result = VRMSecondaryService.detect_group("J_Sec_R_SkirtSide2_01", "")
+	assert_eq(result, "SkirtSide2", "R_ side prefix should be stripped")
+
+
+# --- Trailing chain index stripping ---
+
+
+func test_trailing_chain_index():
+	var result = VRMSecondaryService.detect_group("J_Sec_Hair3_01", "")
+	assert_eq(result, "Hair3", "Trailing _01 chain index should be stripped")
+
+
+func test_higher_chain_index():
+	var result = VRMSecondaryService.detect_group("J_Sec_Hair3_10", "")
+	assert_eq(result, "Hair3", "Trailing _10 chain index should be stripped")
+
+
+# --- _end marker ---
+
+
+func test_end_marker():
+	var result = VRMSecondaryService.detect_group("J_Sec_Hair3_01_end", "")
+	assert_eq(result, "Hair3", "Trailing _end marker should be stripped")
+
+
+# --- Real-world bone names from AvatarSample_M ---
+
+
+func test_avatar_hair3():
+	var result = VRMSecondaryService.detect_group("J_Sec_Hair3_01", "")
+	assert_eq(result, "Hair3", "AvatarSample_M hair3 bone")
+
+
+func test_avatar_hair5():
+	var result = VRMSecondaryService.detect_group("J_Sec_Hair5_06", "")
+	assert_eq(result, "Hair5", "AvatarSample_M hair5 bone")
+
+
+func test_avatar_skirt_left():
+	var result = VRMSecondaryService.detect_group("J_Sec_L_SkirtSide2_01", "")
+	assert_eq(result, "SkirtSide2", "AvatarSample_M left skirt bone")
+
+
+func test_avatar_skirt_right():
+	var result = VRMSecondaryService.detect_group("J_Sec_R_SkirtSide2_03", "")
+	assert_eq(result, "SkirtSide2", "AvatarSample_M right skirt bone")
+
+
+func test_avatar_bust_left():
+	var result = VRMSecondaryService.detect_group("J_Sec_L_Bust2", "")
+	assert_eq(result, "Bust2", "AvatarSample_M left bust bone (no trailing index)")
+
+
+func test_avatar_bust_right():
+	var result = VRMSecondaryService.detect_group("J_Sec_R_Bust2", "")
+	assert_eq(result, "Bust2", "AvatarSample_M right bust bone (no trailing index)")
+
+
+# --- Edge cases ---
+
+
+func test_empty_bone_name():
+	var result = VRMSecondaryService.detect_group("", "")
+	assert_eq(result, "Other", "Empty bone name should return 'Other'")
+
+
+func test_unexpected_prefix():
+	var result = VRMSecondaryService.detect_group("CustomBone_01", "")
+	assert_eq(
+		result, "CustomBone", "Bone without known prefix should still strip trailing chain index"
+	)
+
+
+func test_trailing_number_after_prefix():
+	var result = VRMSecondaryService.detect_group("J_Sec_01", "")
+	assert_eq(
+		result,
+		"Other",
+		"Bone name that becomes purely numeric after stripping should return 'Other'"
+	)
+
+
+func test_trailing_number_no_prefix():
+	var result = VRMSecondaryService.detect_group("_01", "")
+	assert_eq(result, "Other", "Bone name that becomes purely numeric should return 'Other'")

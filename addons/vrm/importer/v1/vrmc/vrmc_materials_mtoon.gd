@@ -6,7 +6,7 @@ const VRMLogger = preload("../../../core/logger.gd")
 func _import_preflight(state: GLTFState, extensions = PackedStringArray()) -> Error:
 	if extensions.has("VRMC_materials_mtoon"):
 		return OK
-	return ERR_INVALID_DATA
+	return ERR_SKIP
 
 
 func _prepare_gltf_texture(

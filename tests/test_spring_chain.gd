@@ -1,9 +1,5 @@
 extends "res://tests/test_base.gd"
 
-const VRMSpringBone = preload("res://addons/vrm/runtime/vrm_spring_bone.gd")
-const VRMCollider = preload("res://addons/vrm/runtime/vrm_collider.gd")
-const VRMColliderGroup = preload("res://addons/vrm/runtime/vrm_collider_group.gd")
-const VRMSecondary = preload("res://addons/vrm/runtime/vrm_secondary.gd")
 const vrm_secondary_service = preload("res://addons/vrm/importer/common/vrm_secondary_service.gd")
 
 

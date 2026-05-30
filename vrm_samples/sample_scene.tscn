@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://2yf18ir612b6" path="res://vrm_samples/Godette_vrm_v4.vrm" id="2"]
 [ext_resource type="Script" uid="uid://cpfyjntkemwak" path="res://vrm_samples/sample_script.gd" id="3"]
 [ext_resource type="PackedScene" uid="uid://bphayojtnhqu6" path="res://vrm_samples/AvatarSample_M.vrm" id="5_oxsfh"]
+[ext_resource type="Script" uid="uid://caxa436rxb8o3" path="res://addons/vrm/runtime/vrm_spring_bone.gd" id="5_w5qep"]
+[ext_resource type="Script" uid="uid://bws3xb0lfbr1f" path="res://addons/vrm/runtime/vrm_collider_group.gd" id="6_0g8rx"]
 
 [sub_resource type="ProceduralSkyMaterial" id="68"]
 sky_top_color = Color(0.454902, 0.678431, 0.87451, 1)
@@ -20,8 +22,1237 @@ sky_material = SubResource("68")
 background_mode = 2
 sky = SubResource("69")
 
-[sub_resource type="BoxMesh" id="86"]
-size = Vector3(0, 1, 0)
+[sub_resource type="Resource" id="Resource_il37v"]
+resource_name = "Bust · J_Sec_L_Bust1"
+script = ExtResource("5_w5qep")
+comment = "Bust"
+group = "Bust"
+joint_nodes = PackedStringArray("J_Sec_L_Bust1", "J_Sec_L_Bust2", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_yjmsj"]
+resource_name = "Bust · J_Sec_L_Bust2"
+script = ExtResource("5_w5qep")
+comment = "Bust"
+group = "Bust"
+joint_nodes = PackedStringArray("J_Sec_L_Bust2", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_qet0a"]
+resource_name = "Bust · J_Sec_R_Bust1"
+script = ExtResource("5_w5qep")
+comment = "Bust"
+group = "Bust"
+joint_nodes = PackedStringArray("J_Sec_R_Bust1", "J_Sec_R_Bust2", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_xruuu"]
+resource_name = "Bust · J_Sec_R_Bust2"
+script = ExtResource("5_w5qep")
+comment = "Bust"
+group = "Bust"
+joint_nodes = PackedStringArray("J_Sec_R_Bust2", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_xqgyt"]
+resource_name = "Hair · J_Sec_Hair3_06"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair3_06", "J_Sec_Hair4_06", "J_Sec_Hair5_06", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_4uf5l"]
+resource_name = "Hair · J_Sec_Hair2_06"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair2_06", "J_Sec_Hair3_06", "J_Sec_Hair4_06", "J_Sec_Hair5_06", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_lwjl8"]
+resource_name = "Hair · J_Sec_Hair1_06"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair1_06", "J_Sec_Hair2_06", "J_Sec_Hair3_06", "J_Sec_Hair4_06", "J_Sec_Hair5_06", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_2nmks"]
+resource_name = "Hair · J_Sec_Hair3_05"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair3_05", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_o6mln"]
+resource_name = "Hair · J_Sec_Hair2_05"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair2_05", "J_Sec_Hair3_05", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_arvku"]
+resource_name = "Hair · J_Sec_Hair1_05"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair1_05", "J_Sec_Hair2_05", "J_Sec_Hair3_05", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_tso64"]
+resource_name = "Hair · J_Sec_Hair3_01"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair3_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_5xd53"]
+resource_name = "Hair · J_Sec_Hair2_01"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair2_01", "J_Sec_Hair3_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_x2b3g"]
+resource_name = "Hair · J_Sec_Hair1_01"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair1_01", "J_Sec_Hair2_01", "J_Sec_Hair3_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_5qm1q"]
+resource_name = "Hair · J_Sec_Hair3_02"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair3_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_0cgrg"]
+resource_name = "Hair · J_Sec_Hair2_02"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair2_02", "J_Sec_Hair3_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_tfr54"]
+resource_name = "Hair · J_Sec_Hair1_02"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair1_02", "J_Sec_Hair2_02", "J_Sec_Hair3_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_mgoni"]
+resource_name = "Hair · J_Sec_Hair3_03"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair3_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_xxejy"]
+resource_name = "Hair · J_Sec_Hair2_03"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair2_03", "J_Sec_Hair3_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_yqt14"]
+resource_name = "Hair · J_Sec_Hair1_03"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair1_03", "J_Sec_Hair2_03", "J_Sec_Hair3_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_jmdmx"]
+resource_name = "Hair · J_Sec_Hair3_04"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair3_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_gng40"]
+resource_name = "Hair · J_Sec_Hair2_04"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair2_04", "J_Sec_Hair3_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_34m7k"]
+resource_name = "Hair · J_Sec_Hair1_04"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair1_04", "J_Sec_Hair2_04", "J_Sec_Hair3_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_1g52d"]
+resource_name = "Hair · J_Sec_Hair3_10"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair3_10", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_gi3ga"]
+resource_name = "Hair · J_Sec_Hair2_10"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair2_10", "J_Sec_Hair3_10", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_pni2v"]
+resource_name = "Hair · J_Sec_Hair1_10"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair1_10", "J_Sec_Hair2_10", "J_Sec_Hair3_10", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_ik4ck"]
+resource_name = "Hair · J_Sec_Hair3_09"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair3_09", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_13qxq"]
+resource_name = "Hair · J_Sec_Hair2_09"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair2_09", "J_Sec_Hair3_09", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_dwlfn"]
+resource_name = "Hair · J_Sec_Hair1_09"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair1_09", "J_Sec_Hair2_09", "J_Sec_Hair3_09", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_4snon"]
+resource_name = "Hair · J_Sec_Hair5_08"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair5_08", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_1fj4m"]
+resource_name = "Hair · J_Sec_Hair4_08"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair4_08", "J_Sec_Hair5_08", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_qrpej"]
+resource_name = "Hair · J_Sec_Hair3_08"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair3_08", "J_Sec_Hair4_08", "J_Sec_Hair5_08", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_yuljg"]
+resource_name = "Hair · J_Sec_Hair2_08"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair2_08", "J_Sec_Hair3_08", "J_Sec_Hair4_08", "J_Sec_Hair5_08", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_48jhl"]
+resource_name = "Hair · J_Sec_Hair1_08"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair1_08", "J_Sec_Hair2_08", "J_Sec_Hair3_08", "J_Sec_Hair4_08", "J_Sec_Hair5_08", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_2rl0f"]
+resource_name = "Hair · J_Sec_Hair5_07"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair5_07", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_1kufa"]
+resource_name = "Hair · J_Sec_Hair4_07"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair4_07", "J_Sec_Hair5_07", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_0yhow"]
+resource_name = "Hair · J_Sec_Hair3_07"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair3_07", "J_Sec_Hair4_07", "J_Sec_Hair5_07", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_4gn08"]
+resource_name = "Hair · J_Sec_Hair2_07"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair2_07", "J_Sec_Hair3_07", "J_Sec_Hair4_07", "J_Sec_Hair5_07", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_837qt"]
+resource_name = "Hair · J_Sec_Hair1_07"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair1_07", "J_Sec_Hair2_07", "J_Sec_Hair3_07", "J_Sec_Hair4_07", "J_Sec_Hair5_07", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_gaenb"]
+resource_name = "Hair · J_Sec_Hair5_06"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair5_06", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_3f4cn"]
+resource_name = "Hair · J_Sec_Hair4_06"
+script = ExtResource("5_w5qep")
+comment = "Hair"
+group = "Hair"
+joint_nodes = PackedStringArray("J_Sec_Hair4_06", "J_Sec_Hair5_06", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_mn1jr"]
+resource_name = "Skirt · J_Sec_L_SkirtSide2_end_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtSide2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_t26o3"]
+resource_name = "Skirt · J_Sec_L_SkirtSide2_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtSide2_02", "J_Sec_L_SkirtSide2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_y3he5"]
+resource_name = "Skirt · J_Sec_L_SkirtSide1_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtSide1_02", "J_Sec_L_SkirtSide2_02", "J_Sec_L_SkirtSide2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_2oc71"]
+resource_name = "Skirt · J_Sec_L_SkirtFront2_end_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtFront2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_i8eqf"]
+resource_name = "Skirt · J_Sec_L_SkirtFront2_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtFront2_02", "J_Sec_L_SkirtFront2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_2u2bi"]
+resource_name = "Skirt · J_Sec_L_SkirtFront1_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtFront1_02", "J_Sec_L_SkirtFront2_02", "J_Sec_L_SkirtFront2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_a04t5"]
+resource_name = "Skirt · J_Sec_L_SkirtBack2_end_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtBack2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_brrgq"]
+resource_name = "Skirt · J_Sec_L_SkirtBack2_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtBack2_02", "J_Sec_L_SkirtBack2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_vfkli"]
+resource_name = "Skirt · J_Sec_L_SkirtBack1_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtBack1_02", "J_Sec_L_SkirtBack2_02", "J_Sec_L_SkirtBack2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_n5yjh"]
+resource_name = "Skirt · J_Sec_R_SkirtBack1_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtBack1_02", "J_Sec_R_SkirtBack2_02", "J_Sec_R_SkirtBack2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_iks5m"]
+resource_name = "Skirt · J_Sec_R_SkirtBack2_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtBack2_02", "J_Sec_R_SkirtBack2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_5e5wj"]
+resource_name = "Skirt · J_Sec_R_SkirtBack2_end_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtBack2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_pduf0"]
+resource_name = "Skirt · J_Sec_R_SkirtFront1_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtFront1_02", "J_Sec_R_SkirtFront2_02", "J_Sec_R_SkirtFront2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_b708d"]
+resource_name = "Skirt · J_Sec_R_SkirtFront2_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtFront2_02", "J_Sec_R_SkirtFront2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_lgij5"]
+resource_name = "Skirt · J_Sec_R_SkirtFront2_end_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtFront2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_0g6um"]
+resource_name = "Skirt · J_Sec_R_SkirtSide1_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtSide1_02", "J_Sec_R_SkirtSide2_02", "J_Sec_R_SkirtSide2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_edxt8"]
+resource_name = "Skirt · J_Sec_R_SkirtSide2_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtSide2_02", "J_Sec_R_SkirtSide2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_jhbmj"]
+resource_name = "Skirt · J_Sec_R_SkirtSide2_end_02"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtSide2_end_02", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_u2nh6"]
+resource_name = "Skirt · J_Sec_L_SkirtBack1_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtBack1_01", "J_Sec_L_SkirtBack2_01", "J_Sec_L_SkirtBack2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_i3bxh"]
+resource_name = "Skirt · J_Sec_L_SkirtBack2_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtBack2_01", "J_Sec_L_SkirtBack2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_e00nh"]
+resource_name = "Skirt · J_Sec_L_SkirtBack2_end_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtBack2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_umn7d"]
+resource_name = "Skirt · J_Sec_L_SkirtFront1_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtFront1_01", "J_Sec_L_SkirtFront2_01", "J_Sec_L_SkirtFront2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_uvrql"]
+resource_name = "Skirt · J_Sec_L_SkirtFront2_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtFront2_01", "J_Sec_L_SkirtFront2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_tj4in"]
+resource_name = "Skirt · J_Sec_L_SkirtFront2_end_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtFront2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_v203g"]
+resource_name = "Skirt · J_Sec_L_SkirtSide1_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtSide1_01", "J_Sec_L_SkirtSide2_01", "J_Sec_L_SkirtSide2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_4pa5q"]
+resource_name = "Skirt · J_Sec_L_SkirtSide2_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtSide2_01", "J_Sec_L_SkirtSide2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_7we05"]
+resource_name = "Skirt · J_Sec_L_SkirtSide2_end_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtSide2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_ldpdc"]
+resource_name = "Skirt · J_Sec_R_SkirtBack1_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtBack1_01", "J_Sec_R_SkirtBack2_01", "J_Sec_R_SkirtBack2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_fgr4g"]
+resource_name = "Skirt · J_Sec_R_SkirtBack2_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtBack2_01", "J_Sec_R_SkirtBack2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_6b8rs"]
+resource_name = "Skirt · J_Sec_R_SkirtBack2_end_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtBack2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_d77me"]
+resource_name = "Skirt · J_Sec_R_SkirtFront1_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtFront1_01", "J_Sec_R_SkirtFront2_01", "J_Sec_R_SkirtFront2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_wxn6e"]
+resource_name = "Skirt · J_Sec_R_SkirtFront2_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtFront2_01", "J_Sec_R_SkirtFront2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_ylgep"]
+resource_name = "Skirt · J_Sec_R_SkirtFront2_end_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtFront2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_d7ns8"]
+resource_name = "Skirt · J_Sec_R_SkirtSide1_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtSide1_01", "J_Sec_R_SkirtSide2_01", "J_Sec_R_SkirtSide2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_k4mnp"]
+resource_name = "Skirt · J_Sec_R_SkirtSide2_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtSide2_01", "J_Sec_R_SkirtSide2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_phigp"]
+resource_name = "Skirt · J_Sec_R_SkirtSide2_end_01"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtSide2_end_01", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_7nud0"]
+resource_name = "Skirt · J_Sec_R_SkirtSide2_end_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtSide2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_j0ajl"]
+resource_name = "Skirt · J_Sec_R_SkirtSide2_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtSide2_03", "J_Sec_R_SkirtSide2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_a5su3"]
+resource_name = "Skirt · J_Sec_R_SkirtSide1_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtSide1_03", "J_Sec_R_SkirtSide2_03", "J_Sec_R_SkirtSide2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_v1h7s"]
+resource_name = "Skirt · J_Sec_R_SkirtFront2_end_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtFront2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_dga3s"]
+resource_name = "Skirt · J_Sec_R_SkirtFront2_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtFront2_03", "J_Sec_R_SkirtFront2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_mfoxf"]
+resource_name = "Skirt · J_Sec_R_SkirtFront1_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtFront1_03", "J_Sec_R_SkirtFront2_03", "J_Sec_R_SkirtFront2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_6wyau"]
+resource_name = "Skirt · J_Sec_R_SkirtBack2_end_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtBack2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_aedw3"]
+resource_name = "Skirt · J_Sec_R_SkirtBack2_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtBack2_03", "J_Sec_R_SkirtBack2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_35iib"]
+resource_name = "Skirt · J_Sec_R_SkirtBack1_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtBack1_03", "J_Sec_R_SkirtBack2_03", "J_Sec_R_SkirtBack2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_7wpyy"]
+resource_name = "Skirt · J_Sec_L_SkirtBack1_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtBack1_03", "J_Sec_L_SkirtBack2_03", "J_Sec_L_SkirtBack2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_lcbm2"]
+resource_name = "Skirt · J_Sec_L_SkirtBack2_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtBack2_03", "J_Sec_L_SkirtBack2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_jp1m0"]
+resource_name = "Skirt · J_Sec_L_SkirtBack2_end_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtBack2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_5r81q"]
+resource_name = "Skirt · J_Sec_L_SkirtFront1_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtFront1_03", "J_Sec_L_SkirtFront2_03", "J_Sec_L_SkirtFront2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_x8p5d"]
+resource_name = "Skirt · J_Sec_L_SkirtFront2_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtFront2_03", "J_Sec_L_SkirtFront2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_wfe3p"]
+resource_name = "Skirt · J_Sec_L_SkirtFront2_end_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtFront2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_41nvs"]
+resource_name = "Skirt · J_Sec_L_SkirtSide1_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtSide1_03", "J_Sec_L_SkirtSide2_03", "J_Sec_L_SkirtSide2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_hr454"]
+resource_name = "Skirt · J_Sec_L_SkirtSide2_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtSide2_03", "J_Sec_L_SkirtSide2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_8hk1i"]
+resource_name = "Skirt · J_Sec_L_SkirtSide2_end_03"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtSide2_end_03", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_oglai"]
+resource_name = "Skirt · J_Sec_R_SkirtSide2_end_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtSide2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_owmlv"]
+resource_name = "Skirt · J_Sec_R_SkirtSide2_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtSide2_04", "J_Sec_R_SkirtSide2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_2ucw1"]
+resource_name = "Skirt · J_Sec_R_SkirtSide1_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtSide1_04", "J_Sec_R_SkirtSide2_04", "J_Sec_R_SkirtSide2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_4aga0"]
+resource_name = "Skirt · J_Sec_R_SkirtFront2_end_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtFront2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_4s515"]
+resource_name = "Skirt · J_Sec_R_SkirtFront2_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtFront2_04", "J_Sec_R_SkirtFront2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_5vbfh"]
+resource_name = "Skirt · J_Sec_R_SkirtFront1_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtFront1_04", "J_Sec_R_SkirtFront2_04", "J_Sec_R_SkirtFront2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_jj4hn"]
+resource_name = "Skirt · J_Sec_R_SkirtBack2_end_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtBack2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_kdx0m"]
+resource_name = "Skirt · J_Sec_R_SkirtBack2_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtBack2_04", "J_Sec_R_SkirtBack2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_wwbq5"]
+resource_name = "Skirt · J_Sec_R_SkirtBack1_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_R_SkirtBack1_04", "J_Sec_R_SkirtBack2_04", "J_Sec_R_SkirtBack2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_t6iuh"]
+resource_name = "Skirt · J_Sec_L_SkirtSide2_end_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtSide2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_hxhne"]
+resource_name = "Skirt · J_Sec_L_SkirtSide2_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtSide2_04", "J_Sec_L_SkirtSide2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_cg4l2"]
+resource_name = "Skirt · J_Sec_L_SkirtSide1_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtSide1_04", "J_Sec_L_SkirtSide2_04", "J_Sec_L_SkirtSide2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_jgasn"]
+resource_name = "Skirt · J_Sec_L_SkirtFront2_end_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtFront2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_omd2v"]
+resource_name = "Skirt · J_Sec_L_SkirtFront2_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtFront2_04", "J_Sec_L_SkirtFront2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_3f07a"]
+resource_name = "Skirt · J_Sec_L_SkirtFront1_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtFront1_04", "J_Sec_L_SkirtFront2_04", "J_Sec_L_SkirtFront2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_xtpku"]
+resource_name = "Skirt · J_Sec_L_SkirtBack2_end_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtBack2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_c7816"]
+resource_name = "Skirt · J_Sec_L_SkirtBack2_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtBack2_04", "J_Sec_L_SkirtBack2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
+
+[sub_resource type="Resource" id="Resource_8afc4"]
+resource_name = "Skirt · J_Sec_L_SkirtBack1_04"
+script = ExtResource("5_w5qep")
+comment = "Skirt"
+group = "Skirt"
+joint_nodes = PackedStringArray("J_Sec_L_SkirtBack1_04", "J_Sec_L_SkirtBack2_04", "J_Sec_L_SkirtBack2_end_04", "")
+drag_force_scale = 0.5
+hit_radius_scale = 0.0
+gravity_scale = 0.0
+center_bone = "Root"
 
 [node name="Spatial" type="Node3D" unique_id=2048687081]
 script = ExtResource("3")
@@ -39,21 +1270,20 @@ light_color = Color(1, 0.956863, 0.839216, 1)
 shadow_bias = 0.03
 
 [node name="Godette_vrm_v4" parent="." unique_id=1514511858 instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3014004, 0, 0)
 update_in_editor = true
-
-[node name="Cube" type="MeshInstance3D" parent="." unique_id=1964507458]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.195, 0.5, 0)
-mesh = SubResource("86")
 
 [node name="AliciaSolid_vrm-051" parent="." unique_id=2099088371 instance=ExtResource("1")]
 transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, 1.2609091, 0, 0)
+springbone_add_force = Vector3(0, 0.965, 0)
 update_in_editor = true
 
 [node name="AliciaSolid_vrm-052" parent="." unique_id=758035844 instance=ExtResource("1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.034526, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8785737, 0, 0)
+springbone_gravity_rotation = Quaternion(2.2, -0.085, 0, 1)
 update_in_editor = true
 
 [node name="AvatarSample_M" parent="." unique_id=1247857604 instance=ExtResource("5_oxsfh")]
-transform = Transform3D(-1, 0, 1.509958e-07, 0, 1, 0, -1.509958e-07, 0, -1, -1.421233, 0, 0)
-springbone_add_force = Vector3(10, 10, 10)
+transform = Transform3D(-1, 0, 1.509958e-07, 0, 1, 0, -1.509958e-07, 0, -1, 0, 0, 0)
+spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_il37v"), SubResource("Resource_yjmsj"), SubResource("Resource_qet0a"), SubResource("Resource_xruuu"), SubResource("Resource_xqgyt"), SubResource("Resource_4uf5l"), SubResource("Resource_lwjl8"), SubResource("Resource_2nmks"), SubResource("Resource_o6mln"), SubResource("Resource_arvku"), SubResource("Resource_tso64"), SubResource("Resource_5xd53"), SubResource("Resource_x2b3g"), SubResource("Resource_5qm1q"), SubResource("Resource_0cgrg"), SubResource("Resource_tfr54"), SubResource("Resource_mgoni"), SubResource("Resource_xxejy"), SubResource("Resource_yqt14"), SubResource("Resource_jmdmx"), SubResource("Resource_gng40"), SubResource("Resource_34m7k"), SubResource("Resource_1g52d"), SubResource("Resource_gi3ga"), SubResource("Resource_pni2v"), SubResource("Resource_ik4ck"), SubResource("Resource_13qxq"), SubResource("Resource_dwlfn"), SubResource("Resource_4snon"), SubResource("Resource_1fj4m"), SubResource("Resource_qrpej"), SubResource("Resource_yuljg"), SubResource("Resource_48jhl"), SubResource("Resource_2rl0f"), SubResource("Resource_1kufa"), SubResource("Resource_0yhow"), SubResource("Resource_4gn08"), SubResource("Resource_837qt"), SubResource("Resource_gaenb"), SubResource("Resource_3f4cn"), SubResource("Resource_mn1jr"), SubResource("Resource_t26o3"), SubResource("Resource_y3he5"), SubResource("Resource_2oc71"), SubResource("Resource_i8eqf"), SubResource("Resource_2u2bi"), SubResource("Resource_a04t5"), SubResource("Resource_brrgq"), SubResource("Resource_vfkli"), SubResource("Resource_n5yjh"), SubResource("Resource_iks5m"), SubResource("Resource_5e5wj"), SubResource("Resource_pduf0"), SubResource("Resource_b708d"), SubResource("Resource_lgij5"), SubResource("Resource_0g6um"), SubResource("Resource_edxt8"), SubResource("Resource_jhbmj"), SubResource("Resource_u2nh6"), SubResource("Resource_i3bxh"), SubResource("Resource_e00nh"), SubResource("Resource_umn7d"), SubResource("Resource_uvrql"), SubResource("Resource_tj4in"), SubResource("Resource_v203g"), SubResource("Resource_4pa5q"), SubResource("Resource_7we05"), SubResource("Resource_ldpdc"), SubResource("Resource_fgr4g"), SubResource("Resource_6b8rs"), SubResource("Resource_d77me"), SubResource("Resource_wxn6e"), SubResource("Resource_ylgep"), SubResource("Resource_d7ns8"), SubResource("Resource_k4mnp"), SubResource("Resource_phigp"), SubResource("Resource_7nud0"), SubResource("Resource_j0ajl"), SubResource("Resource_a5su3"), SubResource("Resource_v1h7s"), SubResource("Resource_dga3s"), SubResource("Resource_mfoxf"), SubResource("Resource_6wyau"), SubResource("Resource_aedw3"), SubResource("Resource_35iib"), SubResource("Resource_7wpyy"), SubResource("Resource_lcbm2"), SubResource("Resource_jp1m0"), SubResource("Resource_5r81q"), SubResource("Resource_x8p5d"), SubResource("Resource_wfe3p"), SubResource("Resource_41nvs"), SubResource("Resource_hr454"), SubResource("Resource_8hk1i"), SubResource("Resource_oglai"), SubResource("Resource_owmlv"), SubResource("Resource_2ucw1"), SubResource("Resource_4aga0"), SubResource("Resource_4s515"), SubResource("Resource_5vbfh"), SubResource("Resource_jj4hn"), SubResource("Resource_kdx0m"), SubResource("Resource_wwbq5"), SubResource("Resource_t6iuh"), SubResource("Resource_hxhne"), SubResource("Resource_cg4l2"), SubResource("Resource_jgasn"), SubResource("Resource_omd2v"), SubResource("Resource_3f07a"), SubResource("Resource_xtpku"), SubResource("Resource_c7816"), SubResource("Resource_8afc4")])
 update_in_editor = true

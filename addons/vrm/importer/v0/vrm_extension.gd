@@ -26,8 +26,8 @@ enum DebugMode {
 }
 
 enum FirstPersonFlag {
-	Auto,  # Create headlessModel
-	Both,  # Default layer
+	Auto, # Create headlessModel
+	Both, # Default layer
 	ThirdPersonOnly,
 	FirstPersonOnly,
 	FirstWithShadow,
@@ -107,6 +107,7 @@ func _import_preflight(
 	)
 	gstate.set_additional_data(&"vrm/first_person_layers", 2)
 	gstate.set_additional_data(&"vrm/third_person_layers", 4)
+	gstate.set_additional_data(&"vrm/remove_end_bones", true)
 	var gltf_json_parsed: Dictionary = gstate.json
 	var gltf_nodes = gltf_json_parsed["nodes"]
 	if not _add_vrm_nodes_to_skin(gltf_json_parsed):
@@ -222,6 +223,9 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 		pose_diffs
 	)
 	root_node.set("vrm_meta", vrm_meta)
+
+	if gstate.get_additional_data(&"vrm/remove_end_bones"):
+		vrm_utils.remove_end_bone_nodes(root_node, skeleton)
 
 	VRMLogger.info("vrm_extension.gd", "_import_post: VRM 0.0 import complete OK")
 	return OK

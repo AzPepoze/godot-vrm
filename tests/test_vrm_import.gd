@@ -6,14 +6,14 @@ const VRM_EXTENSION = preload("res://addons/vrm/importer/v0/vrm_extension.gd")
 func test_load_alicia_v0_skeleton():
 	var gltf := GLTFDocument.new()
 	var vrm_ext := VRM_EXTENSION.new()
-	gltf.register_gltf_document_extension(vrm_ext, true)
+	GLTFDocument.register_gltf_document_extension(vrm_ext, true)
 
 	var state := GLTFState.new()
 	var err := gltf.append_from_file("res://vrm_samples/AliciaSolid_vrm-0.51.vrm", state, 8)
 	assert_eq(err, OK, "append_from_file for Alicia should succeed")
 
 	if err != OK:
-		gltf.unregister_gltf_document_extension(vrm_ext)
+		GLTFDocument.unregister_gltf_document_extension(vrm_ext)
 		return
 
 	var scene_root := gltf.generate_scene(state)
@@ -51,19 +51,19 @@ func test_load_alicia_v0_skeleton():
 
 	scene_root.queue_free()
 	await runner.wait_frame
-	gltf.unregister_gltf_document_extension(vrm_ext)
+	GLTFDocument.unregister_gltf_document_extension(vrm_ext)
 
 
 func test_load_alicia_spring_bones():
 	var gltf := GLTFDocument.new()
 	var vrm_ext := VRM_EXTENSION.new()
-	gltf.register_gltf_document_extension(vrm_ext, true)
+	GLTFDocument.register_gltf_document_extension(vrm_ext, true)
 
 	var state := GLTFState.new()
 	var err := gltf.append_from_file("res://vrm_samples/AliciaSolid_vrm-0.51.vrm", state, 8)
 	assert_eq(err, OK, "append_from_file should succeed")
 	if err != OK:
-		gltf.unregister_gltf_document_extension(vrm_ext)
+		GLTFDocument.unregister_gltf_document_extension(vrm_ext)
 		return
 
 	var scene_root := gltf.generate_scene(state)
@@ -91,19 +91,19 @@ func test_load_alicia_spring_bones():
 
 	scene_root.queue_free()
 	await runner.wait_frame
-	gltf.unregister_gltf_document_extension(vrm_ext)
+	GLTFDocument.unregister_gltf_document_extension(vrm_ext)
 
 
 func test_load_godette_small_file():
 	var gltf := GLTFDocument.new()
 	var vrm_ext := VRM_EXTENSION.new()
-	gltf.register_gltf_document_extension(vrm_ext, true)
+	GLTFDocument.register_gltf_document_extension(vrm_ext, true)
 
 	var state := GLTFState.new()
 	var err := gltf.append_from_file("res://vrm_samples/Godette_vrm_v4.vrm", state, 8)
 	assert_eq(err, OK, "append_from_file for Godette should succeed")
 	if err != OK:
-		gltf.unregister_gltf_document_extension(vrm_ext)
+		GLTFDocument.unregister_gltf_document_extension(vrm_ext)
 		return
 
 	var scene_root := gltf.generate_scene(state)
@@ -115,7 +115,7 @@ func test_load_godette_small_file():
 
 	scene_root.queue_free()
 	await runner.wait_frame
-	gltf.unregister_gltf_document_extension(vrm_ext)
+	GLTFDocument.unregister_gltf_document_extension(vrm_ext)
 
 
 func _find_skeleton(root: Node) -> Skeleton3D:
@@ -123,3 +123,92 @@ func _find_skeleton(root: Node) -> Skeleton3D:
 	if children.size() > 0:
 		return children[0]
 	return null
+
+
+# ── End-bone cleanup (v0 path) ──────────────────────────────────────────────
+
+
+func test_v0_alicia_end_bones_removed():
+	var gltf := GLTFDocument.new()
+	var vrm_ext := VRM_EXTENSION.new()
+	GLTFDocument.register_gltf_document_extension(vrm_ext, true)
+
+	var state := GLTFState.new()
+	var err := gltf.append_from_file("res://vrm_samples/AliciaSolid_vrm-0.51.vrm", state, 8)
+	assert_eq(err, OK, "append_from_file should succeed")
+	if err != OK:
+		GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+		return
+
+	var scene_root := gltf.generate_scene(state)
+	runner.root.add_child(scene_root)
+	await runner.wait_frame
+
+	var skeleton := _find_skeleton(scene_root)
+	assert_not_null(skeleton, "Skeleton should exist")
+	if skeleton:
+		# After cleanup, no skeleton child should match an end-bone pattern
+		var end_bone_children := []
+		for child in skeleton.get_children():
+			if child.name.contains("_end"):
+				end_bone_children.append(child)
+		assert_eq(
+			end_bone_children.size(),
+			0,
+			(
+				"Skeleton should have zero *_end children after cleanup, "
+				+"found %d: %s" % [end_bone_children.size(), str(end_bone_children)]
+			)
+		)
+		# Skeleton must still have bones (bones != scene-node children)
+		assert_ge(
+			skeleton.get_bone_count(),
+			10,
+			"Skeleton must retain 10+ bones after cleanup, got %d" % skeleton.get_bone_count()
+		)
+
+	scene_root.queue_free()
+	await runner.wait_frame
+	GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+
+
+func test_v0_godette_end_bones_removed():
+	var gltf := GLTFDocument.new()
+	var vrm_ext := VRM_EXTENSION.new()
+	GLTFDocument.register_gltf_document_extension(vrm_ext, true)
+
+	var state := GLTFState.new()
+	var err := gltf.append_from_file("res://vrm_samples/Godette_vrm_v4.vrm", state, 8)
+	assert_eq(err, OK, "append_from_file for Godette should succeed")
+	if err != OK:
+		GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+		return
+
+	var scene_root := gltf.generate_scene(state)
+	runner.root.add_child(scene_root)
+	await runner.wait_frame
+
+	var skeleton := _find_skeleton(scene_root)
+	assert_not_null(skeleton, "Skeleton should exist")
+	if skeleton:
+		var end_bone_children := []
+		for child in skeleton.get_children():
+			if child.name.contains("_end"):
+				end_bone_children.append(child)
+		assert_eq(
+			end_bone_children.size(),
+			0,
+			(
+				"Skeleton should have zero *_end children after cleanup, "
+				+"found %d: %s" % [end_bone_children.size(), str(end_bone_children)]
+			)
+		)
+		assert_ge(
+			skeleton.get_bone_count(),
+			10,
+			"Skeleton must retain 10+ bones after cleanup, got %d" % skeleton.get_bone_count()
+		)
+
+	scene_root.queue_free()
+	await runner.wait_frame
+	GLTFDocument.unregister_gltf_document_extension(vrm_ext)

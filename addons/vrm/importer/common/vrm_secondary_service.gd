@@ -8,6 +8,47 @@ const vrm_collider_group = preload("../../runtime/vrm_collider_group.gd")
 const vrm_collider = preload("../../runtime/vrm_collider.gd")
 
 
+# Detect a human-readable group label from a bone name or VRM comment.
+# Comment takes highest priority, then bone name prefix parsing.
+# Examples:
+#   bone="J_Sec_Hair3_01" comment=""         → "Hair3"
+#   bone="J_Sec_L_SkirtSide2_01" comment=""  → "SkirtSide2"
+#   bone="J_Sec_L_Bust2" comment=""          → "Bust2"
+#   bone="J_Sec_Hair3_01" comment="Pigtail"  → "Pigtail"
+static func detect_group(bone_name: String, comment: String) -> String:
+	# Comment takes priority
+	if not comment.is_empty():
+		return comment.split("\n")[0].strip_edges()
+
+	var name = bone_name
+
+	# Strip common VRM bone prefixes
+	for prefix in ["J_Sec_", "J_", "S_J_"]:
+		if name.begins_with(prefix):
+			name = name.trim_prefix(prefix)
+			break
+
+	# Strip side prefixes (L_ / R_)
+	if name.begins_with("L_") or name.begins_with("R_"):
+		name = name.substr(2)
+
+	# Remove trailing _end marker
+	if name.ends_with("_end"):
+		name = name.trim_suffix("_end")
+
+	# Remove trailing _ followed by digits (bone chain index like _01)
+	var underscore_idx = name.rfind("_")
+	if underscore_idx != -1:
+		var suffix = name.substr(underscore_idx + 1)
+		if suffix.is_valid_int():
+			name = name.substr(0, underscore_idx)
+
+	# If the result is empty or purely numeric (e.g. "01"), return "Other"
+	if name.is_empty() or name.is_valid_int():
+		return "Other"
+	return name
+
+
 static func _get_skel_godot_node(
 	gstate: GLTFState, nodes: Array, skeletons: Array, skel_id: int
 ) -> Node:
@@ -175,12 +216,17 @@ static func parse_secondary_node(
 			spring_bone.drag_force_scale = drag_force
 			spring_bone.hit_radius_scale = hit_radius
 
+			# Use a descriptive name combining group and first bone for readability
 			if not comment.is_empty():
-				spring_bone.resource_name = comment.split("\n")[0]
+				spring_bone.resource_name = "%s · %s" % [comment.split("\n")[0], chain[0]]
 			else:
 				spring_bone.resource_name = chain[0]
 
+			spring_bone.group = detect_group(chain[0], comment)
 			spring_bones.append(spring_bone)
+
+	# Sort by group so same-group bones appear together in the inspector
+	spring_bones.sort_custom(func(a, b): return a.group < b.group)
 
 	VRMLogger.debug(
 		"vrm_secondary_service.gd",

@@ -33,8 +33,12 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
 		&"vrm/third_person_layers",
 		options.get(&"vrm/only_if_head_hiding_uses_layers/third_person_layers", 4) as int
 	)
+	state.set_additional_data(
+		&"vrm/remove_end_bones",
+		options.get(&"vrm/remove_end_bones", true) as bool
+	)
 	# HANDLE_BINARY_EMBED_AS_BASISU crashes on some files in 4.0 and 4.1
-	state.handle_binary_image = GLTFState.HANDLE_BINARY_EMBED_AS_UNCOMPRESSED  # GLTFState.HANDLE_BINARY_EXTRACT_TEXTURES
+	state.handle_binary_image = GLTFState.HANDLE_BINARY_EMBED_AS_UNCOMPRESSED # GLTFState.HANDLE_BINARY_EXTRACT_TEXTURES
 	VRMLogger.info("import_vrm.gd", "_import_scene: importing %s" % path)
 	var err = gltf.append_from_file(path, state, 8)
 	if err != OK:

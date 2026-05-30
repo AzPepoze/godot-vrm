@@ -99,10 +99,10 @@ func _import_post_parse(gstate: GLTFState) -> Error:
 			vrm_utils.generate_mesh_index_to_meshinstance_mapping(gstate)
 		)
 		var material_idx_to_mesh_and_surface_idx: Dictionary = {}
-		var materials: Array = gstate.get_materials()
+		var meshes: Array = gstate.get_meshes()
 
-		for i in range(materials.size()):
-			var gltfmesh: GLTFMesh = gstate.get_meshes()[i]
+		for i in range(meshes.size()):
+			var gltfmesh: GLTFMesh = meshes[i]
 			for j in range(gltfmesh.mesh.get_surface_count()):
 				material_idx_to_mesh_and_surface_idx[gltfmesh.mesh.get_surface_material(j).resource_name] = [
 					i, j
