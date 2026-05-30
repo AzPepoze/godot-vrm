@@ -68,6 +68,7 @@ private:
   std::vector<CPPSpringBoneChain> chains;
   std::vector<CPPSpringBoneCollider> all_colliders;
   bool is_setup = false;
+  bool need_reset = true;
 
   float gravity_multiplier = 1.0f;
   Quaternion gravity_rotation;
@@ -84,6 +85,10 @@ public:
   void update_parameters(float p_gravity_multiplier,
                          Quaternion p_gravity_rotation, Vector3 p_add_force);
   void _process_modification() override;
+
+  int get_chain_count() const;
+  int get_joint_count(int p_chain_idx) const;
+  Vector3 get_joint_current_tail(int p_chain_idx, int p_joint_idx) const;
 
 private:
   void _update_colliders(Skeleton3D *skel);

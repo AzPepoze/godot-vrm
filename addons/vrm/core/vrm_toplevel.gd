@@ -22,6 +22,15 @@ var secondary_node: Node3D
 		update_secondary_fixed = value
 		if secondary_node:
 			secondary_node.update_secondary_fixed = value
+
+@export var use_gdscript_spring_bones: bool = false:
+	set(value):
+		if use_gdscript_spring_bones == value:
+			return
+		use_gdscript_spring_bones = value
+		if secondary_node:
+			secondary_node.use_gdscript_spring_bones = value
+
 @export var disable_colliders: bool = false:
 	set(value):
 		if disable_colliders == value:
