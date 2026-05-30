@@ -162,15 +162,33 @@ func _process(_delta: float):
 		# Only sync non-physics flags that are not in VRMSettings
 		# Note: In a full cleanup, these should probably move to VRMSettings too
 		# but for now we'll keep them on the node to avoid too many changes at once.
-		update_secondary_fixed = _parent_ref.get("update_secondary_fixed")
-		disable_colliders = _parent_ref.get("disable_colliders")
-		override_springbone_center = _parent_ref.get("override_springbone_center")
-		default_springbone_center = _parent_ref.get("default_springbone_center")
-		gizmo_spring_bone = _parent_ref.get("gizmo_spring_bone")
-		gizmo_spring_bone_color = _parent_ref.get("gizmo_spring_bone_color")
-		gizmo_show_colliders = _parent_ref.get("gizmo_show_colliders")
-		gizmo_show_wind = _parent_ref.get("gizmo_show_wind")
-		gizmo_wind_color = _parent_ref.get("gizmo_wind_color")
+		var val_update_secondary_fixed = _parent_ref.get("update_secondary_fixed")
+		if val_update_secondary_fixed != null:
+			update_secondary_fixed = val_update_secondary_fixed
+		var val_disable_colliders = _parent_ref.get("disable_colliders")
+		if val_disable_colliders != null:
+			disable_colliders = val_disable_colliders
+		var val_override_springbone_center = _parent_ref.get("override_springbone_center")
+		if val_override_springbone_center != null:
+			override_springbone_center = val_override_springbone_center
+		var val_default_springbone_center = _parent_ref.get("default_springbone_center")
+		if val_default_springbone_center != null:
+			default_springbone_center = val_default_springbone_center
+		var val_gizmo_spring_bone = _parent_ref.get("gizmo_spring_bone")
+		if val_gizmo_spring_bone != null:
+			gizmo_spring_bone = val_gizmo_spring_bone
+		var val_gizmo_spring_bone_color = _parent_ref.get("gizmo_spring_bone_color")
+		if val_gizmo_spring_bone_color != null:
+			gizmo_spring_bone_color = val_gizmo_spring_bone_color
+		var val_gizmo_show_colliders = _parent_ref.get("gizmo_show_colliders")
+		if val_gizmo_show_colliders != null:
+			gizmo_show_colliders = val_gizmo_show_colliders
+		var val_gizmo_show_wind = _parent_ref.get("gizmo_show_wind")
+		if val_gizmo_show_wind != null:
+			gizmo_show_wind = val_gizmo_show_wind
+		var val_gizmo_wind_color = _parent_ref.get("gizmo_wind_color")
+		if val_gizmo_wind_color != null:
+			gizmo_wind_color = val_gizmo_wind_color
 
 
 func _draw_wind_arrow(mesh: ImmediateMesh, direction: Vector3, color: Color, skel_to_gizmo: Transform3D) -> void:

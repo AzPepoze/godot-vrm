@@ -32,10 +32,14 @@ func _ready() -> void:
 	while parent:
 		if parent is VRMInstance or parent is VRMSecondary:
 			var settings = parent.get("settings")
+			if settings == null and "_settings" in parent:
+				settings = parent.get("_settings")
 			if settings is VRMSettings:
 				global_weight_multiplier = settings.constraint_weight_multiplier
 			else:
-				global_weight_multiplier = parent.get("constraint_weight_multiplier")
+				var multiplier = parent.get("constraint_weight_multiplier")
+				if multiplier != null:
+					global_weight_multiplier = multiplier
 			break
 		parent = parent.get_parent()
 
