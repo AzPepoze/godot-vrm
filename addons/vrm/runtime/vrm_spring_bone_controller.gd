@@ -215,6 +215,7 @@ func update_parameters() -> void:
 			_settings.wind_frequency,
 			_settings.environment_collision_enabled,
 			_settings.environment_collision_mask,
+			_settings.environment_collision_bounce_damping,
 			_settings.springbone_stiffness_multiplier,
 			_settings.springbone_drag_multiplier,
 			_settings.springbone_hit_radius_multiplier
