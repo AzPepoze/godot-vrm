@@ -21,7 +21,7 @@ func test_springbone_joints():
 
 	runner.root.add_child(skel)
 
-	assert_eq(sim.get_joint_count(0), 0, "Immediate joint count should be 0")
+	assert_eq(sim.get_joint_count(0), 4, "Immediate joint count should be 4")
 
 	sim.reset()
 

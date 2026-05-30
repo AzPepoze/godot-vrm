@@ -125,7 +125,7 @@ func test_cleanup_keeps_node_with_scripted_descendant():
 	parent.name = "Custom"
 	var scripted := Node3D.new()
 	scripted.name = "ScriptedChild"
-	scripted.set_script(load("res://tests/test_base.gd"))
+	scripted.set_script(load("res://addons/vrm/runtime/vrm_secondary.gd"))
 	parent.add_child(scripted)
 	skel.add_child(parent)
 	runner.root.add_child(skel)
@@ -187,7 +187,7 @@ func test_cleanup_keeps_scripted_node():
 	skel.add_bone("ScriptedBone")
 	var scripted := Node3D.new()
 	scripted.name = "ScriptedBone"
-	scripted.set_script(load("res://tests/test_base.gd"))
+	scripted.set_script(load("res://addons/vrm/runtime/vrm_secondary.gd"))
 	skel.add_child(scripted)
 	runner.root.add_child(skel)
 	await runner.process_frame
@@ -234,7 +234,7 @@ func test_cleanup_mixed_scenario():
 	# Should be kept: Node3D matching bone but has script
 	var scripted_parent := Node3D.new()
 	scripted_parent.name = "Bone_Scripted"
-	scripted_parent.set_script(load("res://tests/test_base.gd"))
+	scripted_parent.set_script(load("res://addons/vrm/runtime/vrm_secondary.gd"))
 	skel.add_child(scripted_parent)
 
 	# Should be kept: Node3D not matching any bone name
@@ -306,7 +306,7 @@ func test_has_meaningful_descendant_scripted():
 	var parent := Node3D.new()
 	var child := Node3D.new()
 	child.name = "Scripted"
-	child.set_script(load("res://tests/test_base.gd"))
+	child.set_script(load("res://addons/vrm/runtime/vrm_secondary.gd"))
 	parent.add_child(child)
 	assert_true(Cleanup._has_meaningful_descendant(parent), "Scripted child → true")
 	parent.queue_free()

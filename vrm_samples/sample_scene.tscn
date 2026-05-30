@@ -1193,7 +1193,7 @@ transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, 1.260909
 spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_h258g"), SubResource("Resource_mv8js"), SubResource("Resource_lqj5w"), SubResource("Resource_l0tbh"), SubResource("Resource_wkadp"), SubResource("Resource_dxxmn"), SubResource("Resource_lnecv"), SubResource("Resource_yw60t"), SubResource("Resource_r1ld8"), SubResource("Resource_dm4qk"), SubResource("Resource_wq5dl"), SubResource("Resource_ml37b"), SubResource("Resource_fiooa"), SubResource("Resource_g22pl"), SubResource("Resource_b1xvl"), SubResource("Resource_chwut"), SubResource("Resource_gk3yj"), SubResource("Resource_mhxmc")])
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_n2x26"), SubResource("Resource_nyvw0"), SubResource("Resource_i4btq"), SubResource("Resource_5v3ys"), SubResource("Resource_n1wtj"), SubResource("Resource_pn8mf")])
 collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_kv660"), SubResource("Resource_xq6cj"), SubResource("Resource_4cwog"), SubResource("Resource_clhby"), SubResource("Resource_scewi"), SubResource("Resource_1a8w0"), SubResource("Resource_amd33"), SubResource("Resource_wdq6c"), SubResource("Resource_2645e"), SubResource("Resource_2q1eb"), SubResource("Resource_nu8lt"), SubResource("Resource_5f7il"), SubResource("Resource_dpi23"), SubResource("Resource_nsb8s")])
-springbone_add_force = Vector3(0, 0.455, 0)
+springbone_add_force = Vector3(0, 0.5, 0)
 update_in_editor = true
 
 [node name="AliciaSolid_vrm-053" parent="." unique_id=700165865 instance=ExtResource("1")]
@@ -1201,7 +1201,7 @@ transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, -0.02913
 spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_h258g"), SubResource("Resource_mv8js"), SubResource("Resource_lqj5w"), SubResource("Resource_l0tbh"), SubResource("Resource_wkadp"), SubResource("Resource_dxxmn"), SubResource("Resource_lnecv"), SubResource("Resource_yw60t"), SubResource("Resource_r1ld8"), SubResource("Resource_dm4qk"), SubResource("Resource_wq5dl"), SubResource("Resource_ml37b"), SubResource("Resource_fiooa"), SubResource("Resource_g22pl"), SubResource("Resource_b1xvl"), SubResource("Resource_chwut"), SubResource("Resource_gk3yj"), SubResource("Resource_mhxmc")])
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_n2x26"), SubResource("Resource_nyvw0"), SubResource("Resource_i4btq"), SubResource("Resource_5v3ys"), SubResource("Resource_n1wtj"), SubResource("Resource_pn8mf")])
 collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_kv660"), SubResource("Resource_xq6cj"), SubResource("Resource_4cwog"), SubResource("Resource_clhby"), SubResource("Resource_scewi"), SubResource("Resource_1a8w0"), SubResource("Resource_amd33"), SubResource("Resource_wdq6c"), SubResource("Resource_2645e"), SubResource("Resource_2q1eb"), SubResource("Resource_nu8lt"), SubResource("Resource_5f7il"), SubResource("Resource_dpi23"), SubResource("Resource_nsb8s")])
-springbone_add_force = Vector3(0, 0.665, 0)
+springbone_add_force = Vector3(0, 0.5, 0)
 update_in_editor = true
 
 [node name="AliciaSolid_vrm-054" parent="." unique_id=1032706178 instance=ExtResource("1")]
@@ -1209,7 +1209,7 @@ transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, -0.02913
 spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_h258g"), SubResource("Resource_mv8js"), SubResource("Resource_lqj5w"), SubResource("Resource_l0tbh"), SubResource("Resource_wkadp"), SubResource("Resource_dxxmn"), SubResource("Resource_lnecv"), SubResource("Resource_yw60t"), SubResource("Resource_r1ld8"), SubResource("Resource_dm4qk"), SubResource("Resource_wq5dl"), SubResource("Resource_ml37b"), SubResource("Resource_fiooa"), SubResource("Resource_g22pl"), SubResource("Resource_b1xvl"), SubResource("Resource_chwut"), SubResource("Resource_gk3yj"), SubResource("Resource_mhxmc")])
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_n2x26"), SubResource("Resource_nyvw0"), SubResource("Resource_i4btq"), SubResource("Resource_5v3ys"), SubResource("Resource_n1wtj"), SubResource("Resource_pn8mf")])
 collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_kv660"), SubResource("Resource_xq6cj"), SubResource("Resource_4cwog"), SubResource("Resource_clhby"), SubResource("Resource_scewi"), SubResource("Resource_1a8w0"), SubResource("Resource_amd33"), SubResource("Resource_wdq6c"), SubResource("Resource_2645e"), SubResource("Resource_2q1eb"), SubResource("Resource_nu8lt"), SubResource("Resource_5f7il"), SubResource("Resource_dpi23"), SubResource("Resource_nsb8s")])
-springbone_add_force = Vector3(0, 0.455, 0)
+springbone_add_force = Vector3(0, 0.5, 0)
 update_in_editor = true
 
 [node name="AliciaSolid_vrm-055" parent="." unique_id=1799337604 instance=ExtResource("1")]
@@ -1217,7 +1217,7 @@ transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, 1.302045
 spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_h258g"), SubResource("Resource_mv8js"), SubResource("Resource_lqj5w"), SubResource("Resource_l0tbh"), SubResource("Resource_wkadp"), SubResource("Resource_dxxmn"), SubResource("Resource_lnecv"), SubResource("Resource_yw60t"), SubResource("Resource_r1ld8"), SubResource("Resource_dm4qk"), SubResource("Resource_wq5dl"), SubResource("Resource_ml37b"), SubResource("Resource_fiooa"), SubResource("Resource_g22pl"), SubResource("Resource_b1xvl"), SubResource("Resource_chwut"), SubResource("Resource_gk3yj"), SubResource("Resource_mhxmc")])
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_n2x26"), SubResource("Resource_nyvw0"), SubResource("Resource_i4btq"), SubResource("Resource_5v3ys"), SubResource("Resource_n1wtj"), SubResource("Resource_pn8mf")])
 collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_kv660"), SubResource("Resource_xq6cj"), SubResource("Resource_4cwog"), SubResource("Resource_clhby"), SubResource("Resource_scewi"), SubResource("Resource_1a8w0"), SubResource("Resource_amd33"), SubResource("Resource_wdq6c"), SubResource("Resource_2645e"), SubResource("Resource_2q1eb"), SubResource("Resource_nu8lt"), SubResource("Resource_5f7il"), SubResource("Resource_dpi23"), SubResource("Resource_nsb8s")])
-springbone_add_force = Vector3(0, 0.455, 0)
+springbone_add_force = Vector3(0, 0.5, 0)
 update_in_editor = true
 
 [node name="AliciaSolid_vrm-056" parent="." unique_id=2033267642 instance=ExtResource("1")]
@@ -1225,7 +1225,7 @@ transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, 2.559363
 spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_h258g"), SubResource("Resource_mv8js"), SubResource("Resource_lqj5w"), SubResource("Resource_l0tbh"), SubResource("Resource_wkadp"), SubResource("Resource_dxxmn"), SubResource("Resource_lnecv"), SubResource("Resource_yw60t"), SubResource("Resource_r1ld8"), SubResource("Resource_dm4qk"), SubResource("Resource_wq5dl"), SubResource("Resource_ml37b"), SubResource("Resource_fiooa"), SubResource("Resource_g22pl"), SubResource("Resource_b1xvl"), SubResource("Resource_chwut"), SubResource("Resource_gk3yj"), SubResource("Resource_mhxmc")])
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_n2x26"), SubResource("Resource_nyvw0"), SubResource("Resource_i4btq"), SubResource("Resource_5v3ys"), SubResource("Resource_n1wtj"), SubResource("Resource_pn8mf")])
 collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_kv660"), SubResource("Resource_xq6cj"), SubResource("Resource_4cwog"), SubResource("Resource_clhby"), SubResource("Resource_scewi"), SubResource("Resource_1a8w0"), SubResource("Resource_amd33"), SubResource("Resource_wdq6c"), SubResource("Resource_2645e"), SubResource("Resource_2q1eb"), SubResource("Resource_nu8lt"), SubResource("Resource_5f7il"), SubResource("Resource_dpi23"), SubResource("Resource_nsb8s")])
-springbone_add_force = Vector3(0, 0.455, 0)
+springbone_add_force = Vector3(0, 0.5, 0)
 update_in_editor = true
 
 [node name="AliciaSolid_vrm-052" parent="." unique_id=758035844 instance=ExtResource("1")]
@@ -1233,7 +1233,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8785737, 0, 0)
 spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_h258g"), SubResource("Resource_mv8js"), SubResource("Resource_lqj5w"), SubResource("Resource_l0tbh"), SubResource("Resource_wkadp"), SubResource("Resource_dxxmn"), SubResource("Resource_lnecv"), SubResource("Resource_yw60t"), SubResource("Resource_r1ld8"), SubResource("Resource_dm4qk"), SubResource("Resource_wq5dl"), SubResource("Resource_ml37b"), SubResource("Resource_fiooa"), SubResource("Resource_g22pl"), SubResource("Resource_b1xvl"), SubResource("Resource_chwut"), SubResource("Resource_gk3yj"), SubResource("Resource_mhxmc")])
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_n2x26"), SubResource("Resource_nyvw0"), SubResource("Resource_i4btq"), SubResource("Resource_5v3ys"), SubResource("Resource_n1wtj"), SubResource("Resource_pn8mf")])
 collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_kv660"), SubResource("Resource_xq6cj"), SubResource("Resource_4cwog"), SubResource("Resource_clhby"), SubResource("Resource_scewi"), SubResource("Resource_1a8w0"), SubResource("Resource_amd33"), SubResource("Resource_wdq6c"), SubResource("Resource_2645e"), SubResource("Resource_2q1eb"), SubResource("Resource_nu8lt"), SubResource("Resource_5f7il"), SubResource("Resource_dpi23"), SubResource("Resource_nsb8s")])
-springbone_add_force = Vector3(0, 0.455, 0)
+springbone_add_force = Vector3(0, 0.5, 0)
 update_in_editor = true
 
 [node name="AliciaSolid_vrm-057" parent="." unique_id=1522896309 instance=ExtResource("1")]
@@ -1241,7 +1241,7 @@ transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, 1.260909
 spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_h258g"), SubResource("Resource_mv8js"), SubResource("Resource_lqj5w"), SubResource("Resource_l0tbh"), SubResource("Resource_wkadp"), SubResource("Resource_dxxmn"), SubResource("Resource_lnecv"), SubResource("Resource_yw60t"), SubResource("Resource_r1ld8"), SubResource("Resource_dm4qk"), SubResource("Resource_wq5dl"), SubResource("Resource_ml37b"), SubResource("Resource_fiooa"), SubResource("Resource_g22pl"), SubResource("Resource_b1xvl"), SubResource("Resource_chwut"), SubResource("Resource_gk3yj"), SubResource("Resource_mhxmc")])
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_n2x26"), SubResource("Resource_nyvw0"), SubResource("Resource_i4btq"), SubResource("Resource_5v3ys"), SubResource("Resource_n1wtj"), SubResource("Resource_pn8mf")])
 collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_kv660"), SubResource("Resource_xq6cj"), SubResource("Resource_4cwog"), SubResource("Resource_clhby"), SubResource("Resource_scewi"), SubResource("Resource_1a8w0"), SubResource("Resource_amd33"), SubResource("Resource_wdq6c"), SubResource("Resource_2645e"), SubResource("Resource_2q1eb"), SubResource("Resource_nu8lt"), SubResource("Resource_5f7il"), SubResource("Resource_dpi23"), SubResource("Resource_nsb8s")])
-springbone_add_force = Vector3(0, 0.455, 0)
+springbone_add_force = Vector3(0, 0.5, 0)
 update_in_editor = true
 
 [node name="AliciaSolid_vrm-058" parent="." unique_id=1061782231 instance=ExtResource("1")]
@@ -1249,7 +1249,7 @@ transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, -0.02913
 spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_h258g"), SubResource("Resource_mv8js"), SubResource("Resource_lqj5w"), SubResource("Resource_l0tbh"), SubResource("Resource_wkadp"), SubResource("Resource_dxxmn"), SubResource("Resource_lnecv"), SubResource("Resource_yw60t"), SubResource("Resource_r1ld8"), SubResource("Resource_dm4qk"), SubResource("Resource_wq5dl"), SubResource("Resource_ml37b"), SubResource("Resource_fiooa"), SubResource("Resource_g22pl"), SubResource("Resource_b1xvl"), SubResource("Resource_chwut"), SubResource("Resource_gk3yj"), SubResource("Resource_mhxmc")])
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_n2x26"), SubResource("Resource_nyvw0"), SubResource("Resource_i4btq"), SubResource("Resource_5v3ys"), SubResource("Resource_n1wtj"), SubResource("Resource_pn8mf")])
 collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_kv660"), SubResource("Resource_xq6cj"), SubResource("Resource_4cwog"), SubResource("Resource_clhby"), SubResource("Resource_scewi"), SubResource("Resource_1a8w0"), SubResource("Resource_amd33"), SubResource("Resource_wdq6c"), SubResource("Resource_2645e"), SubResource("Resource_2q1eb"), SubResource("Resource_nu8lt"), SubResource("Resource_5f7il"), SubResource("Resource_dpi23"), SubResource("Resource_nsb8s")])
-springbone_add_force = Vector3(0, 0.455, 0)
+springbone_add_force = Vector3(0, 0.5, 0)
 update_in_editor = true
 
 [node name="AliciaSolid_vrm-059" parent="." unique_id=1988248279 instance=ExtResource("1")]
@@ -1257,7 +1257,7 @@ transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, -0.02913
 spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_h258g"), SubResource("Resource_mv8js"), SubResource("Resource_lqj5w"), SubResource("Resource_l0tbh"), SubResource("Resource_wkadp"), SubResource("Resource_dxxmn"), SubResource("Resource_lnecv"), SubResource("Resource_yw60t"), SubResource("Resource_r1ld8"), SubResource("Resource_dm4qk"), SubResource("Resource_wq5dl"), SubResource("Resource_ml37b"), SubResource("Resource_fiooa"), SubResource("Resource_g22pl"), SubResource("Resource_b1xvl"), SubResource("Resource_chwut"), SubResource("Resource_gk3yj"), SubResource("Resource_mhxmc")])
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_n2x26"), SubResource("Resource_nyvw0"), SubResource("Resource_i4btq"), SubResource("Resource_5v3ys"), SubResource("Resource_n1wtj"), SubResource("Resource_pn8mf")])
 collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_kv660"), SubResource("Resource_xq6cj"), SubResource("Resource_4cwog"), SubResource("Resource_clhby"), SubResource("Resource_scewi"), SubResource("Resource_1a8w0"), SubResource("Resource_amd33"), SubResource("Resource_wdq6c"), SubResource("Resource_2645e"), SubResource("Resource_2q1eb"), SubResource("Resource_nu8lt"), SubResource("Resource_5f7il"), SubResource("Resource_dpi23"), SubResource("Resource_nsb8s")])
-springbone_add_force = Vector3(0, 0.455, 0)
+springbone_add_force = Vector3(0, 0.5, 0)
 update_in_editor = true
 
 [node name="AliciaSolid_vrm-060" parent="." unique_id=2036278062 instance=ExtResource("1")]
@@ -1265,7 +1265,7 @@ transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, 1.302045
 spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_h258g"), SubResource("Resource_mv8js"), SubResource("Resource_lqj5w"), SubResource("Resource_l0tbh"), SubResource("Resource_wkadp"), SubResource("Resource_dxxmn"), SubResource("Resource_lnecv"), SubResource("Resource_yw60t"), SubResource("Resource_r1ld8"), SubResource("Resource_dm4qk"), SubResource("Resource_wq5dl"), SubResource("Resource_ml37b"), SubResource("Resource_fiooa"), SubResource("Resource_g22pl"), SubResource("Resource_b1xvl"), SubResource("Resource_chwut"), SubResource("Resource_gk3yj"), SubResource("Resource_mhxmc")])
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_n2x26"), SubResource("Resource_nyvw0"), SubResource("Resource_i4btq"), SubResource("Resource_5v3ys"), SubResource("Resource_n1wtj"), SubResource("Resource_pn8mf")])
 collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_kv660"), SubResource("Resource_xq6cj"), SubResource("Resource_4cwog"), SubResource("Resource_clhby"), SubResource("Resource_scewi"), SubResource("Resource_1a8w0"), SubResource("Resource_amd33"), SubResource("Resource_wdq6c"), SubResource("Resource_2645e"), SubResource("Resource_2q1eb"), SubResource("Resource_nu8lt"), SubResource("Resource_5f7il"), SubResource("Resource_dpi23"), SubResource("Resource_nsb8s")])
-springbone_add_force = Vector3(0, 0.455, 0)
+springbone_add_force = Vector3(0, 0.5, 0)
 update_in_editor = true
 
 [node name="AliciaSolid_vrm-061" parent="." unique_id=1714890321 instance=ExtResource("1")]
@@ -1273,7 +1273,7 @@ transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, 2.559363
 spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_h258g"), SubResource("Resource_mv8js"), SubResource("Resource_lqj5w"), SubResource("Resource_l0tbh"), SubResource("Resource_wkadp"), SubResource("Resource_dxxmn"), SubResource("Resource_lnecv"), SubResource("Resource_yw60t"), SubResource("Resource_r1ld8"), SubResource("Resource_dm4qk"), SubResource("Resource_wq5dl"), SubResource("Resource_ml37b"), SubResource("Resource_fiooa"), SubResource("Resource_g22pl"), SubResource("Resource_b1xvl"), SubResource("Resource_chwut"), SubResource("Resource_gk3yj"), SubResource("Resource_mhxmc")])
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_n2x26"), SubResource("Resource_nyvw0"), SubResource("Resource_i4btq"), SubResource("Resource_5v3ys"), SubResource("Resource_n1wtj"), SubResource("Resource_pn8mf")])
 collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_kv660"), SubResource("Resource_xq6cj"), SubResource("Resource_4cwog"), SubResource("Resource_clhby"), SubResource("Resource_scewi"), SubResource("Resource_1a8w0"), SubResource("Resource_amd33"), SubResource("Resource_wdq6c"), SubResource("Resource_2645e"), SubResource("Resource_2q1eb"), SubResource("Resource_nu8lt"), SubResource("Resource_5f7il"), SubResource("Resource_dpi23"), SubResource("Resource_nsb8s")])
-springbone_add_force = Vector3(0, 0.455, 0)
+springbone_add_force = Vector3(0, 0.5, 0)
 update_in_editor = true
 
 [node name="AliciaSolid_vrm-062" parent="." unique_id=161110295 instance=ExtResource("1")]
@@ -1281,7 +1281,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8785737, 0, -2.0307484)
 spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_h258g"), SubResource("Resource_mv8js"), SubResource("Resource_lqj5w"), SubResource("Resource_l0tbh"), SubResource("Resource_wkadp"), SubResource("Resource_dxxmn"), SubResource("Resource_lnecv"), SubResource("Resource_yw60t"), SubResource("Resource_r1ld8"), SubResource("Resource_dm4qk"), SubResource("Resource_wq5dl"), SubResource("Resource_ml37b"), SubResource("Resource_fiooa"), SubResource("Resource_g22pl"), SubResource("Resource_b1xvl"), SubResource("Resource_chwut"), SubResource("Resource_gk3yj"), SubResource("Resource_mhxmc")])
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_n2x26"), SubResource("Resource_nyvw0"), SubResource("Resource_i4btq"), SubResource("Resource_5v3ys"), SubResource("Resource_n1wtj"), SubResource("Resource_pn8mf")])
 collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_kv660"), SubResource("Resource_xq6cj"), SubResource("Resource_4cwog"), SubResource("Resource_clhby"), SubResource("Resource_scewi"), SubResource("Resource_1a8w0"), SubResource("Resource_amd33"), SubResource("Resource_wdq6c"), SubResource("Resource_2645e"), SubResource("Resource_2q1eb"), SubResource("Resource_nu8lt"), SubResource("Resource_5f7il"), SubResource("Resource_dpi23"), SubResource("Resource_nsb8s")])
-springbone_add_force = Vector3(0, 0.455, 0)
+springbone_add_force = Vector3(0, 0.5, 0)
 update_in_editor = true
 
 [node name="AvatarSample_M" parent="." unique_id=1025114336 instance=ExtResource("7_0g8rx")]
@@ -1289,5 +1289,6 @@ transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -2.5
 spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_il37v"), SubResource("Resource_yjmsj"), SubResource("Resource_5xd53"), SubResource("Resource_tso64"), SubResource("Resource_arvku"), SubResource("Resource_o6mln"), SubResource("Resource_2nmks"), SubResource("Resource_lwjl8"), SubResource("Resource_4uf5l"), SubResource("Resource_xqgyt"), SubResource("Resource_xruuu"), SubResource("Resource_qet0a"), SubResource("Resource_pni2v"), SubResource("Resource_ik4ck"), SubResource("Resource_13qxq"), SubResource("Resource_dwlfn"), SubResource("Resource_4snon"), SubResource("Resource_1fj4m"), SubResource("Resource_qrpej"), SubResource("Resource_yuljg"), SubResource("Resource_48jhl"), SubResource("Resource_2rl0f"), SubResource("Resource_1kufa"), SubResource("Resource_0yhow"), SubResource("Resource_gi3ga"), SubResource("Resource_1g52d"), SubResource("Resource_34m7k"), SubResource("Resource_gng40"), SubResource("Resource_jmdmx"), SubResource("Resource_yqt14"), SubResource("Resource_xxejy"), SubResource("Resource_mgoni"), SubResource("Resource_tfr54"), SubResource("Resource_0cgrg"), SubResource("Resource_5qm1q"), SubResource("Resource_x2b3g")])
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_837qt"), SubResource("Resource_brrgq"), SubResource("Resource_2u2bi"), SubResource("Resource_2oc71"), SubResource("Resource_n5yjh"), SubResource("Resource_lgij5"), SubResource("Resource_edxt8"), SubResource("Resource_e00nh"), SubResource("Resource_4pa5q"), SubResource("Resource_ldpdc"), SubResource("Resource_wxn6e"), SubResource("Resource_phigp")])
 collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_4gn08"), SubResource("Resource_gaenb"), SubResource("Resource_3f4cn"), SubResource("Resource_vfkli"), SubResource("Resource_a04t5"), SubResource("Resource_i8eqf"), SubResource("Resource_y3he5"), SubResource("Resource_t26o3"), SubResource("Resource_mn1jr"), SubResource("Resource_iks5m"), SubResource("Resource_5e5wj"), SubResource("Resource_pduf0"), SubResource("Resource_b708d"), SubResource("Resource_0g6um"), SubResource("Resource_jhbmj"), SubResource("Resource_u2nh6"), SubResource("Resource_i3bxh"), SubResource("Resource_umn7d"), SubResource("Resource_uvrql"), SubResource("Resource_tj4in"), SubResource("Resource_v203g"), SubResource("Resource_7we05"), SubResource("Resource_fgr4g"), SubResource("Resource_6b8rs"), SubResource("Resource_d77me"), SubResource("Resource_ylgep"), SubResource("Resource_d7ns8"), SubResource("Resource_k4mnp")])
-springbone_add_force = Vector3(0, 1.08, 0)
+springbone_add_force = Vector3(0, 0.355, 0)
 update_in_editor = true
+gizmo_spring_bone = true

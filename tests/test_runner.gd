@@ -36,7 +36,7 @@ func _init():
 	test_files.sort()
 
 	for file in test_files:
-		run_test_file("res://tests/" + file)
+		await run_test_file("res://tests/" + file)
 
 	print("=========================================")
 	print("Execution finished.")
