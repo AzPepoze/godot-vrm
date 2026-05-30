@@ -4,12 +4,10 @@ extends Node
 
 const vrm_meta_class = preload("./vrm_meta.gd")
 
-# Reference to the spring_bone_controller node if it exists.
 var spring_bone_controller: Node3D:
 	set(value):
 		spring_bone_controller = value
 		if spring_bone_controller:
-			# Sync arrays to spring_bone_controller
 			var parent_springs = spring_bones
 			var child_springs = spring_bone_controller.get("spring_bones")
 			if child_springs is Array:
@@ -79,7 +77,6 @@ var recreate_spring_bone_simulation: Callable = recreate_simulation
 
 func recreate_simulation() -> void:
 	if spring_bone_controller:
-		# Sync parent arrays to child if child is empty
 		if spring_bone_controller.get("spring_bones").is_empty() and not spring_bones.is_empty():
 			spring_bone_controller.set("spring_bones", spring_bones)
 		if (
