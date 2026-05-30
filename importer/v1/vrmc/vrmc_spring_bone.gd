@@ -106,7 +106,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 		spring_bone.comment = comment
 
 		var spring_collider_groups: Array[vrm_collider_group]
-		for cgroup_idx in sbone.get("colliders", []):
+		for cgroup_idx in sbone.get("colliderGroups", []):
 			spring_collider_groups.append(collider_groups[int(cgroup_idx)])
 		spring_bone.collider_groups = spring_collider_groups
 
