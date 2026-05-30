@@ -1,13 +1,13 @@
 @tool
 extends MeshInstance3D
 
-var secondary_node: Node3D
+var spring_bone_controller: Node3D
 var m: StandardMaterial3D = StandardMaterial3D.new()
 
 
 func _init(parent: Node3D) -> void:
 	mesh = ImmediateMesh.new()
-	secondary_node = parent
+	spring_bone_controller = parent
 	m.no_depth_test = true
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.vertex_color_use_as_albedo = true

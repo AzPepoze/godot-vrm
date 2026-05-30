@@ -7,8 +7,8 @@ enum DebugMode {
 }
 
 enum FirstPersonFlag {
-	Auto,  # Create headlessModel
-	Both,  # Default layer
+	Auto, # Create headlessModel
+	Both, # Default layer
 	ThirdPersonOnly,
 	FirstPersonOnly,
 	FirstWithShadow,
@@ -19,7 +19,7 @@ enum FirstPersonFlag {
 
 const vrm_constants_class = preload("../../core/vrm_constants.gd")
 const vrm_meta_class = preload("../../core/vrm_meta.gd")
-const vrm_secondary = preload("../../runtime/vrm_secondary.gd")
+const vrm_spring_bone_controller = preload("../../runtime/vrm_spring_bone_controller.gd")
 const vrm_collider_group = preload("../../runtime/vrm_collider_group.gd")
 const vrm_collider = preload("../../runtime/vrm_collider.gd")
 const vrm_spring_bone = preload("../../runtime/vrm_spring_bone.gd")
@@ -32,7 +32,7 @@ const vrm_utils = preload("../common/vrm_utils.gd")
 # Module preloads
 const vrm_material_module = preload("./vrm_material.gd")
 const vrm_first_person_module = preload("./vrm_first_person.gd")
-const vrm_secondary_setup_module = preload("./vrm_secondary_setup.gd")
+const vrm_spring_bone_controller_setup_module = preload("./vrm_spring_bone_controller_setup.gd")
 
 var vrm_meta: Resource = null
 
@@ -197,19 +197,20 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 		)
 	):
 		VRMLogger.debug(
-			"vrm_extension.gd", "Setting up secondary animation (spring bones/colliders)"
+			"vrm_extension.gd",
+			"Setting up spring_bone_controller animation (spring bones/colliders)"
 		)
-		var secondary_node: Node = root_node.get_node_or_null("secondary")
-		if secondary_node == null:
-			secondary_node = Node3D.new()
-			secondary_node.name = "secondary"
-			root_node.add_child(secondary_node, true)
+		var spring_bone_controller: Node = root_node.get_node_or_null("VRMSpringBoneController")
+		if spring_bone_controller == null:
+			spring_bone_controller = Node3D.new()
+			spring_bone_controller.name = "VRMSpringBoneController"
+			root_node.add_child(spring_bone_controller, true)
 
-		vrm_secondary_setup_module.parse_secondary_node(
-			secondary_node, vrm_extension, gstate, pose_diffs, true
+		vrm_spring_bone_controller_setup_module.parse_spring_bone_controller(
+			spring_bone_controller, vrm_extension, gstate, pose_diffs, true
 		)
 	else:
-		VRMLogger.debug("vrm_extension.gd", "No secondary animation to set up")
+		VRMLogger.debug("vrm_extension.gd", "No spring_bone_controller animation to set up")
 
 	VRMLogger.debug("vrm_extension.gd", "Creating VRM meta resource...")
 	var vrm_meta: Resource = _create_meta(

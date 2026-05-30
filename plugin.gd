@@ -26,7 +26,7 @@ var post_import_plugin_instance: EditorScenePostImportPlugin = null
 
 const vrm_meta_class = preload("./core/vrm_meta.gd")
 const vrm_instance = preload("./core/vrm_instance.gd")
-const vrm_secondary = preload("./runtime/vrm_secondary.gd")
+const vrm_spring_bone_controller = preload("./runtime/vrm_spring_bone_controller.gd")
 
 const export_as_item: String = "VRM 1.0 Avatar..."
 const export_as_id: int = 0x56524d31  # 'VRM1'

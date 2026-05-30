@@ -27,10 +27,10 @@ func _ready() -> void:
 	if skeleton != NodePath():
 		skel = get_node(skeleton)
 
-	# Try to find VRMInstance or VRMSecondary for global config
+	# Try to find VRMInstance or VRMSpringBoneController for global config
 	var parent = get_parent()
 	while parent:
-		if parent is VRMInstance or parent is VRMSecondary:
+		if parent is VRMInstance or parent is VRMSpringBoneController:
 			var settings = parent.get("settings")
 			if settings == null and "_settings" in parent:
 				settings = parent.get("_settings")
