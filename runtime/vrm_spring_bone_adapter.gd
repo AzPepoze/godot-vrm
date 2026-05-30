@@ -4,9 +4,9 @@ extends RefCounted
 const VRMLogger = preload("../core/logger.gd")
 const vrm_collider_class = preload("./vrm_collider.gd")
 
-var simulator: SkeletonModifier3D = null
+var simulation: SkeletonModifier3D = null
 var skeleton: Skeleton3D = null
-var has_simulator: bool = false
+var has_simulation: bool = false
 
 var gravity_multiplier: float = 1.0
 var stiffness_multiplier: float = 1.0
@@ -18,14 +18,14 @@ var add_force: Vector3 = Vector3.ZERO
 
 func _init(p_skeleton: Skeleton3D) -> void:
 	skeleton = p_skeleton
-	has_simulator = ClassDB.class_exists(&"VRMSpringBoneSimulator")
-	if not has_simulator:
+	has_simulation = ClassDB.class_exists(&"VRMSpringBoneSimulation")
+	if not has_simulation:
 		VRMLogger.error(
-			"vrm_spring_bone_adapter.gd", "VRMSpringBoneSimulator GDExtension not found!"
+			"vrm_spring_bone_adapter.gd", "VRMSpringBoneSimulation GDExtension not found!"
 		)
 
 
-func setup_simulator(
+func setup_simulation(
 	spring_bones: Array, collider_groups: Array, disable_colliders: bool, update_in_editor: bool
 ) -> void:
 	if skeleton == null:
@@ -39,27 +39,27 @@ func setup_simulator(
 func _setup_cpp(
 	spring_bones: Array, collider_groups: Array, disable_colliders: bool, update_in_editor: bool
 ) -> void:
-	if not has_simulator:
+	if not has_simulation:
 		return
 
-	if skeleton.has_node("VRMSpringBoneSimulator"):
-		skeleton.get_node("VRMSpringBoneSimulator").queue_free()
-	simulator = ClassDB.instantiate("VRMSpringBoneSimulator")
-	simulator.name = "VRMSpringBoneSimulator"
-	skeleton.add_child(simulator)
+	if skeleton.has_node("VRMSpringBoneSimulation"):
+		skeleton.get_node("VRMSpringBoneSimulation").queue_free()
+	simulation = ClassDB.instantiate("VRMSpringBoneSimulation")
+	simulation.name = "VRMSpringBoneSimulation"
+	skeleton.add_child(simulation)
 
 	VRMLogger.debug(
 		"vrm_spring_bone_adapter.gd",
 		(
-			"setup_simulator (CPP): created simulator with %d spring bones, %d collider groups"
+			"setup_simulation (CPP): created simulation with %d spring bones, %d collider groups"
 			% [spring_bones.size(), collider_groups.size()]
 		)
 	)
 
-	simulator.setup(spring_bones, collider_groups)
-	simulator.active = !disable_colliders
+	simulation.setup(spring_bones, collider_groups)
+	simulation.active = !disable_colliders
 	if Engine.is_editor_hint():
-		simulator.active = update_in_editor
+		simulation.active = update_in_editor
 
 
 func update_parameters(
@@ -83,8 +83,8 @@ func update_parameters(
 	gravity_rotation = p_gravity_rotation
 	add_force = p_add_force
 
-	if simulator:
-		simulator.update_parameters(
+	if simulation:
+		simulation.update_parameters(
 			gravity_multiplier,
 			gravity_rotation,
 			add_force,
@@ -92,17 +92,17 @@ func update_parameters(
 			drag_multiplier,
 			hit_radius_multiplier
 		)
-		simulator.set_wind_direction(p_wind_direction)
-		simulator.set_wind_strength(p_wind_strength)
-		simulator.set_wind_turbulence(p_wind_turbulence)
-		simulator.set_wind_frequency(p_wind_frequency)
-		simulator.set_environment_collision_enabled(p_env_coll_enabled)
-		simulator.set_environment_collision_mask(p_env_coll_mask)
+		simulation.set_wind_direction(p_wind_direction)
+		simulation.set_wind_strength(p_wind_strength)
+		simulation.set_wind_turbulence(p_wind_turbulence)
+		simulation.set_wind_frequency(p_wind_frequency)
+		simulation.set_environment_collision_enabled(p_env_coll_enabled)
+		simulation.set_environment_collision_mask(p_env_coll_mask)
 
 
 func set_active(active: bool) -> void:
-	if simulator:
-		simulator.active = active
+	if simulation:
+		simulation.active = active
 
 
 func draw_gizmo(
@@ -112,11 +112,11 @@ func draw_gizmo(
 	draw_spring_bones: bool,
 	draw_colliders: bool
 ) -> void:
-	if simulator:
-		simulator.draw_gizmo(mesh, skel_to_gizmo, color, draw_spring_bones, draw_colliders)
+	if simulation:
+		simulation.draw_gizmo(mesh, skel_to_gizmo, color, draw_spring_bones, draw_colliders)
 
 
 func cleanup() -> void:
-	if simulator != null:
-		simulator.queue_free()
-		simulator = null
+	if simulation != null:
+		simulation.queue_free()
+		simulation = null

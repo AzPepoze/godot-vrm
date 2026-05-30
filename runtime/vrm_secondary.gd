@@ -113,7 +113,7 @@ func _setup_spring_bone_adapter() -> void:
 	else:
 		spring_bone_adapter.skeleton = skel
 
-	spring_bone_adapter.setup_simulator(
+	spring_bone_adapter.setup_simulation(
 		spring_bones, collider_groups, disable_colliders, update_in_editor
 	)
 	update_parameters()
