@@ -186,5 +186,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 	secondary_node.set_script(vrm_secondary)
 	secondary_node.set("skeleton", skeleton_path)
 	secondary_node.set("spring_bones", spring_bones)
+	# Use untyped Array to avoid type-mismatch between preload-const and class_name
+	secondary_node.set("collider_groups", Array(collider_groups))
 
 	return OK

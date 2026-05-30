@@ -26,10 +26,10 @@ func draw_in_editor(_do_draw_spring_bones: bool = false) -> void:
 			)
 			_logged_missing_condition = true
 		return
-	if not secondary_node.get_parent().gizmo_spring_bone:
-		return
-	draw_spring_bones(secondary_node.get_parent().gizmo_spring_bone_color)
-	draw_collider_groups()
+	if secondary_node.get_parent().gizmo_spring_bone:
+		draw_spring_bones(secondary_node.get_parent().gizmo_spring_bone_color)
+	if secondary_node.get_parent().gizmo_show_colliders:
+		draw_collider_groups()
 
 
 func draw_in_game() -> void:
@@ -41,10 +41,10 @@ func draw_in_game() -> void:
 			)
 			_logged_missing_condition = true
 		return
-	if not secondary_node.get_parent().gizmo_spring_bone:
-		return
-	draw_spring_bones(secondary_node.get_parent().gizmo_spring_bone_color)
-	draw_collider_groups()
+	if secondary_node.get_parent().gizmo_spring_bone:
+		draw_spring_bones(secondary_node.get_parent().gizmo_spring_bone_color)
+	if secondary_node.get_parent().gizmo_show_colliders:
+		draw_collider_groups()
 
 
 func _get_bone_global_position(bone_name: String) -> Vector3:
@@ -77,55 +77,92 @@ func draw_spring_bones(color: Color) -> void:
 	var spring_bones: Array = secondary_node.spring_bones
 	if spring_bones.is_empty():
 		return
+
 	set_material_override(m)
-	mesh.surface_begin(Mesh.PRIMITIVE_LINES)
+
+	# Joint chain lines
+	var has_lines := false
 	for sb in spring_bones:
 		if sb == null:
 			continue
 		var joints: PackedStringArray = sb.joint_nodes
-		if joints.is_empty():
-			continue
-		var prev_pos: Vector3
-		var first: bool = true
-		for bone_name in joints:
-			if bone_name.is_empty():
+		var non_empty := 0
+		for j in joints:
+			if not j.is_empty():
+				non_empty += 1
+		if non_empty >= 2:
+			has_lines = true
+			break
+	if has_lines:
+		mesh.surface_begin(Mesh.PRIMITIVE_LINES)
+		for sb in spring_bones:
+			if sb == null:
 				continue
-			var pos: Vector3 = secondary_node.to_local(_get_bone_global_position(bone_name))
-			if first:
-				first = false
-			else:
-				draw_line(prev_pos, pos, color)
-			prev_pos = pos
-	mesh.surface_end()
-	# Draw hit-radius spheres in a second surface
-	mesh.surface_begin(Mesh.PRIMITIVE_LINES)
+			var joints: PackedStringArray = sb.joint_nodes
+			if joints.is_empty():
+				continue
+			var prev_pos: Vector3
+			var first: bool = true
+			for bone_name in joints:
+				if bone_name.is_empty():
+					continue
+				var pos: Vector3 = secondary_node.to_local(_get_bone_global_position(bone_name))
+				if first:
+					first = false
+				else:
+					draw_line(prev_pos, pos, color)
+				prev_pos = pos
+		mesh.surface_end()
+
+	# Hit-radius spheres (skip if all scales are zero)
+	var has_hit_radius := false
+	for sb in spring_bones:
+		if sb != null and sb.hit_radius_scale > 0.0:
+			has_hit_radius = true
+			break
+	if has_hit_radius:
+		mesh.surface_begin(Mesh.PRIMITIVE_LINES)
+		for sb in spring_bones:
+			if sb == null:
+				continue
+			var joints: PackedStringArray = sb.joint_nodes
+			if joints.is_empty():
+				continue
+			var hit_radius_scale: float = sb.hit_radius_scale
+			if hit_radius_scale <= 0.0:
+				continue
+			for bone_name in joints:
+				if bone_name.is_empty():
+					continue
+				var pos: Vector3 = secondary_node.to_local(_get_bone_global_position(bone_name))
+				draw_sphere(Basis.IDENTITY, pos, hit_radius_scale * 0.05, color)
+		mesh.surface_end()
+
+	# Small joint indicator spheres at every joint
+	var has_joints := false
 	for sb in spring_bones:
 		if sb == null:
 			continue
-		var joints: PackedStringArray = sb.joint_nodes
-		if joints.is_empty():
-			continue
-		var hit_radius_scale: float = sb.hit_radius_scale
-		for bone_name in joints:
-			if bone_name.is_empty():
+		for j in sb.joint_nodes:
+			if not j.is_empty():
+				has_joints = true
+				break
+		if has_joints:
+			break
+	if has_joints:
+		mesh.surface_begin(Mesh.PRIMITIVE_LINES)
+		for sb in spring_bones:
+			if sb == null:
 				continue
-			var pos: Vector3 = secondary_node.to_local(_get_bone_global_position(bone_name))
-			draw_sphere(Basis.IDENTITY, pos, hit_radius_scale * 0.05, color)
-	mesh.surface_end()
-	# Draw small joint indicator spheres at every joint
-	mesh.surface_begin(Mesh.PRIMITIVE_LINES)
-	for sb in spring_bones:
-		if sb == null:
-			continue
-		var joints: PackedStringArray = sb.joint_nodes
-		if joints.is_empty():
-			continue
-		for bone_name in joints:
-			if bone_name.is_empty():
+			var joints: PackedStringArray = sb.joint_nodes
+			if joints.is_empty():
 				continue
-			var joint_pos: Vector3 = secondary_node.to_local(_get_bone_global_position(bone_name))
-			draw_sphere(Basis.IDENTITY, joint_pos, 0.003, color)
-	mesh.surface_end()
+			for bone_name in joints:
+				if bone_name.is_empty():
+					continue
+				var joint_pos: Vector3 = secondary_node.to_local(_get_bone_global_position(bone_name))
+				draw_sphere(Basis.IDENTITY, joint_pos, 0.003, color)
+		mesh.surface_end()
 
 
 func draw_collider_groups() -> void:
