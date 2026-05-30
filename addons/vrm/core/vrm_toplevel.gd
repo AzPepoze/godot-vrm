@@ -24,3 +24,4 @@ var secondary_node: Node3D
 @export var update_in_editor: bool = false
 @export var gizmo_spring_bone: bool = false
 @export var gizmo_spring_bone_color: Color = Color.LIGHT_YELLOW
+@export var gizmo_show_colliders: bool = false

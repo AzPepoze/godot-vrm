@@ -72,6 +72,11 @@ const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 		gizmo_spring_bone_color = value
 		if is_child_of_vrm:
 			get_parent().gizmo_spring_bone_color = value
+@export var gizmo_show_colliders: bool = false:
+	set(value):
+		gizmo_show_colliders = value
+		if is_child_of_vrm:
+			get_parent().gizmo_show_colliders = value
 
 @export_category("Spring bones")
 @export_node_path("Skeleton3D") var skeleton: NodePath:
@@ -94,8 +99,18 @@ var _parent_ref: Node = null
 var spring_bone_adapter: RefCounted = null
 var _gizmo: MeshInstance3D = null
 
-@export var collider_groups: Array[collider_group_class]
-@export var collider_library: Array[collider_class]
+@export var collider_groups: Array[VRMColliderGroup]:
+	set(value):
+		collider_groups = value
+		if is_child_of_vrm:
+			get_parent().collider_groups = value
+		if skel != null:
+			_setup_spring_bone_adapter()
+@export var collider_library: Array[VRMCollider]:
+	set(value):
+		collider_library = value
+		if is_child_of_vrm:
+			get_parent().collider_library = value
 
 
 func _ready() -> void:
@@ -147,7 +162,7 @@ func _setup_spring_bone_adapter() -> void:
 
 func _setup_gizmo() -> void:
 	if _gizmo == null:
-		_gizmo = SecondaryGizmo.new(self)
+		_gizmo = SecondaryGizmo.new(self )
 		add_child(_gizmo, false, Node.INTERNAL_MODE_BACK)
 
 

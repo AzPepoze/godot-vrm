@@ -1,7 +1,7 @@
 # VRM addon for Godot Engine
 
 This Godot addon fully implements an importer and exporter for models with the [VRM specification](https://github.com/vrm-c/vrm-specification/tree/master/specification).
-Compatible with Godot Engine 4.0 stable or newer.
+Compatible with **Godot Engine 4.3 or newer**.
 
 Originally created by the [V-Sekai team](https://v-sekai.org/about). This fork is maintained by [AzPepoze](https://github.com/AzPepoze).
 
@@ -16,41 +16,54 @@ See [https://vrm.dev/en/](https://vrm.dev/en/)
 "VRM" is a file format for handling 3D humanoid avatar (3D model) data for VR applications.
 It is based on [glTF 2.0](https://www.khronos.org/gltf/). Anyone is free to use it.
 
-## VRM Features are currently supported in Godot Engine!
+## Feature Status
 
 Import and export of VRM through version 1.0 is supported. Here is a feature breakdown:
 
-* VRM 0.0 Import: ✅Implemented; will convert to VRM 1.0 compatible naming!
-* VRM 1.0 Import: ✅Implemented
-* VRM Export (`.vrm`): ✅Implemented, will export all models as VRM 1.0
-* glTF Export with VRM 1.0 extensions (`.gltf`): ✅`VRMC_node_constraint`, ✅`VRMC_materials_mtoon`
-	* ⚠️ `VRMC_springBone` not supported in non-`.vrm` standalone `.gltf` export.
-	* ⚠️ Warning: When exporting `.gltf`, a clone of the scene root node is not made by Godot.
-	  Because some export operations are destructive, the export process will corrupt some of your materials.
-	  Please save the scene first and revert after export!
+| Feature                                        | Status                                                             |
+| ---------------------------------------------- | ------------------------------------------------------------------ |
+| VRM 0.0 Import                                 | ✅ Implemented; converts to VRM 1.0 compatible naming              |
+| VRM 1.0 Import                                 | ✅ Implemented                                                     |
+| VRM Export (`.vrm`)                            | ✅ Implemented; exports all models as VRM 1.0                      |
+| glTF Export with VRM 1.0 extensions (`.gltf`)  | ✅ `VRMC_node_constraint`, ✅ `VRMC_materials_mtoon`               |
+| `VRMC_springBone` in standalone `.gltf` export | ⚠️ Not supported                                                   |
+| `VRMC_materials_mtoon`                         | ✅ Implemented                                                     |
+| `VRMC_node_constraint`                         | ⚠️ Known issues when combined with retargeting                     |
+| `VRMC_springBone`                              | ✅ Implemented (C++ GDExtension simulator)                         |
+| `VRMC_materials_hdr_emissive`                  | ✅ Implemented                                                     |
+| `VRMC_vrm`                                     | ✅ Implemented                                                     |
+| `firstPerson`                                  | ⚠️ Head hiding via import option (camera layers or runtime script) |
+| `eyeOffset`                                    | ✅ `BoneAttachment3D` `"LookOffset"` on `Head`                     |
+| `lookAt`                                       | ⚠️ Creates animation tracks (app must create `BlendSpace2D`)       |
+| `expressions` (blend shapes / material binds)  | ✅ Animation tracks for `BlendTree` `Add2`                         |
+| `humanoid`                                     | ✅ Uses `%GeneralSkeleton` `SkeletonProfileHumanoid` retargeting   |
+| Metadata (license, screenshot)                 | ✅ Implemented                                                     |
 
-* `VRMC_materials_mtoon`: ✅Implemented
-* `VRMC_node_constraint`: ⚠️Buggy: known issues when combined with retargeting.
-* `VRMC_springBone`: ✅Implemented, but needs optimization.
-* `VRMC_materials_hdr_emissive`: ✅Implemented
-* `VRMC_vrm`: ✅Implemented
-	* `firstPerson`: ⚠️Head hiding implemented and supported as an import option (camera layers or runtime script needed)
-	* `eyeOffset`: ✅I️mplemented (`BoneAttachment3D` `"LookOffset"` on `Head`)
-	* `lookAt`: ⚠Only creates animation tracks (application must create `BlendSpace2D`)
-	* `expressions` (mood, viseme):
-		* blend shapes / binds: ✅I️mplemented (Animation tracks intended for `BlendTree` `Add2`)
-		* material color / UV offsets: ✅I️mplemented (Animation tracks intended for `BlendTree` `Add2`)
-	* `humanoid`: ✅I️mplemented (uses `%GeneralSkeleton` `SkeletonProfileHumanoid` compatible retargeting.)
-	* Metadata: ✅I️mplemented, including License information and screenshot
+## Runtime Spring Bone System
 
-## Maintenance Status
+Spring bones are driven by a **C++ GDExtension** (`VRMSpringBoneSimulator`) registered as a `SkeletonModifier3D`:
 
-This fork by **AzPepoze** includes the following improvements:
-- **Linting & Standards**: Resolved `gdlint` warnings (naming conventions, unused arguments).
-- **Project Structure**: Updated internal organization (Core, Importer, Runtime).
-- **Build System**: Fixed GDExtension compilation and library issues.
-- **Git Optimization**: Modernized `.gitignore` and removed legacy Japanese documentation.
-- **Branching**: Main development branch renamed to `main`.
+```
+VRMTopLevel (scene root)
+  └─ VRMSecondary (Node3D) — holds spring bone chains & collider groups
+       └─ VRMSpringBoneAdapter (GDScript bridge)
+            └─ VRMSpringBoneSimulator (C++ SkeletonModifier3D, child of skeleton)
+```
+
+- **Simulator**: Per-frame physics for joint chains with configurable stiffness, gravity, drag, and sphere/capsule collider collision.
+- **Adapter**: Auto-detects if the C++ GDExtension is available; falls back gracefully with a warning if not built.
+- **Per-Joint Settings**: Each spring bone chain supports per-joint overrides for stiffness force, gravity power/direction, drag force, and hit radius (optional `PackedFloat64Array` / `PackedVector3Array` exports).
+- **Gizmo**: Editor visualization of spring bone chains and colliders (`VRMSecondaryGizmo`). Spring bones and colliders have independent toggle controls (`gizmo_spring_bone` and `gizmo_show_colliders`).
+- **Gravity Control**: Exposed on `VRMSecondary` — multiplier, rotation offset, and additive force vector for wind or directional gravity effects.
+- **Collision**: Sphere and capsule colliders with configurable radius and offset; colliders are organized into groups per the VRM spec.
+
+## Import Options (Post-Import Plugin)
+
+When importing a `.vrm` file, the following options are available in the Import dock:
+
+- **Head Hiding Method**: `ThirdPersonOnly`, `FirstPersonOnly`, `FirstWithShadow`, `Layers`, `LayersWithShadow`, or `IgnoreHeadHiding`
+- **First/Third Person Layers**: Render layer masks (when using `Layers` mode)
+- **Remove End Bones**: `true`/`false` — strips redundant empty end-bone scene nodes from the skeleton after import
 
 ## How to use
 
