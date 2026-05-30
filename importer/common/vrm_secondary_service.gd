@@ -31,18 +31,12 @@ static func parse_secondary_node(
 
 	# Parse Colliders
 	var collider_groups = vrm_spring_bone_parser.parse_colliders_v0(
-		vrm_extension["secondaryAnimation"]["colliderGroups"],
-		gstate,
-		pose_diffs,
-		secondary_node
+		vrm_extension["secondaryAnimation"]["colliderGroups"], gstate, pose_diffs, secondary_node
 	)
 
 	# Parse Spring Bones
 	var spring_bones = vrm_spring_bone_parser.parse_springs_v0(
-		vrm_extension["secondaryAnimation"]["boneGroups"],
-		gstate,
-		collider_groups,
-		secondary_node
+		vrm_extension["secondaryAnimation"]["boneGroups"], gstate, collider_groups, secondary_node
 	)
 
 	# Collect all colliders into a flat library

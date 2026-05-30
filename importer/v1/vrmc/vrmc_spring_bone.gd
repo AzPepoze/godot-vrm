@@ -25,9 +25,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 
 	# Parse Colliders (v1 flat list)
 	var colliders = vrm_spring_bone_parser.parse_colliders_v1(
-		vrm_extension.get("colliders", []),
-		gstate,
-		secondary_node
+		vrm_extension.get("colliders", []), gstate, secondary_node
 	)
 
 	# Parse Collider Groups referencing colliders by index
@@ -40,10 +38,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 
 	# Parse Spring Bones
 	var spring_bones = vrm_spring_bone_parser.parse_springs_v1(
-		vrm_extension.get("springs", []),
-		gstate,
-		collider_groups,
-		secondary_node
+		vrm_extension.get("springs", []), gstate, collider_groups, secondary_node
 	)
 
 	# Determine skeleton path from first spring bone

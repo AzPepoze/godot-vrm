@@ -2,9 +2,7 @@
 extends GLTFDocumentExtension
 
 const vrm_constraint = preload("../../../node_constraint/vrm_constraint.gd")
-const vrm_constraint_applier = preload(
-	"../../../node_constraint/vrm_constraint_applier.gd"
-)
+const vrm_constraint_applier = preload("../../../node_constraint/vrm_constraint_applier.gd")
 
 
 func _import_preflight(

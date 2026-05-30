@@ -35,9 +35,7 @@ static func detect_group(bone_name: String, comment: String) -> String:
 	return name
 
 
-static func _get_skel_godot_node(
-	gstate: GLTFState, skeletons: Array, skel_id: int
-) -> Node:
+static func _get_skel_godot_node(gstate: GLTFState, skeletons: Array, skel_id: int) -> Node:
 	if skel_id < 0 or skel_id >= skeletons.size():
 		return null
 	var gltfskel: GLTFSkeleton = skeletons[skel_id]
@@ -48,17 +46,14 @@ static func _get_skel_godot_node(
 
 
 static func create_joints_recursive(
-	joint_chains: Array[PackedStringArray],
-	skeleton: Skeleton3D,
-	bone_idx: int,
-	current_chain: int
+	joint_chains: Array[PackedStringArray], skeleton: Skeleton3D, bone_idx: int, current_chain: int
 ):
 	if current_chain == -1:
 		current_chain = len(joint_chains)
 		joint_chains.push_back(PackedStringArray())
-	
+
 	joint_chains[current_chain].push_back(skeleton.get_bone_name(bone_idx))
-	
+
 	var bone_children = skeleton.get_bone_children(bone_idx)
 	if bone_children.is_empty():
 		joint_chains[current_chain].push_back("")
@@ -88,7 +83,7 @@ static func parse_colliders_v0(
 		var node_path: NodePath
 		var bone: String = ""
 		var pose_diff: Basis = Basis()
-		
+
 		if gltfnode.skeleton == -1:
 			var found_node: Node = gstate.get_scene_node(int(cgroup["node"]))
 			node_path = secondary_node.get_path_to(found_node)
@@ -101,12 +96,16 @@ static func parse_colliders_v0(
 			var collider: vrm_collider = vrm_collider.new()
 			collider.node_path = node_path
 			collider.bone = bone
-			collider.resource_name = bone if not bone.is_empty() else gstate.get_scene_node(int(cgroup["node"])).name
-			
+			collider.resource_name = (
+				bone if not bone.is_empty() else gstate.get_scene_node(int(cgroup["node"])).name
+			)
+
 			var offset_obj = collider_info.get("offset", {"x": 0.0, "y": 0.0, "z": 0.0})
-			var offset_vec = offset_flip * Vector3(offset_obj["x"], offset_obj["y"], offset_obj["z"])
+			var offset_vec = (
+				offset_flip * Vector3(offset_obj["x"], offset_obj["y"], offset_obj["z"])
+			)
 			var local_pos: Vector3 = pose_diff * offset_vec
-			
+
 			collider.is_capsule = false
 			collider.offset = local_pos
 			collider.tail = local_pos
@@ -117,9 +116,7 @@ static func parse_colliders_v0(
 
 
 static func parse_colliders_v1(
-	colliders_json: Array,
-	gstate: GLTFState,
-	secondary_node: Node
+	colliders_json: Array, gstate: GLTFState, secondary_node: Node
 ) -> Array[VRMCollider]:
 	var nodes = gstate.get_nodes()
 	var skeletons = gstate.get_skeletons()
@@ -131,7 +128,7 @@ static func parse_colliders_v1(
 		var node_path: NodePath
 		var bone: String = ""
 		var pose_diff: Basis = Basis()
-		
+
 		if gltfnode.skeleton == -1:
 			var found_node: Node = gstate.get_scene_node(int(collider_json["node"]))
 			node_path = secondary_node.get_path_to(found_node)
@@ -145,8 +142,10 @@ static func parse_colliders_v1(
 
 		collider.node_path = node_path
 		collider.bone = bone
-		collider.resource_name = bone if not bone.is_empty() else gstate.get_scene_node(int(collider_json["node"])).name
-		
+		collider.resource_name = (
+			bone if not bone.is_empty() else gstate.get_scene_node(int(collider_json["node"])).name
+		)
+
 		var shape = collider_json.get("shape", {})
 		if shape.has("sphere"):
 			var offset_obj = shape["sphere"].get("offset", [0.0, 0.0, 0.0])
@@ -188,7 +187,9 @@ static func parse_springs_v0(
 		var stiffness_force = float(sbone.get("stiffiness", 1.0))
 		var gravity_power = float(sbone.get("gravityPower", 0.0))
 		var gravity_dir_json = sbone.get("gravityDir", {"x": 0.0, "y": -1.0, "z": 0.0})
-		var gravity_dir = Vector3(gravity_dir_json["x"], gravity_dir_json["y"], gravity_dir_json["z"])
+		var gravity_dir = Vector3(
+			gravity_dir_json["x"], gravity_dir_json["y"], gravity_dir_json["z"]
+		)
 		var drag_force = float(sbone.get("dragForce", 0.4))
 		var hit_radius = float(sbone.get("hitRadius", 0.02))
 
@@ -199,10 +200,7 @@ static func parse_springs_v0(
 		var joint_chains: Array[PackedStringArray] = []
 		for bone_node in sbone["bones"]:
 			create_joints_recursive(
-				joint_chains,
-				skeleton,
-				skeleton.find_bone(nodes[int(bone_node)].resource_name),
-				-1
+				joint_chains, skeleton, skeleton.find_bone(nodes[int(bone_node)].resource_name), -1
 			)
 
 		var center_node: NodePath = NodePath()
@@ -211,7 +209,10 @@ static func parse_springs_v0(
 		if center_node_idx != -1:
 			var center_gltfnode: GLTFNode = nodes[int(center_node_idx)]
 			var bone_name: String = center_gltfnode.resource_name
-			if center_gltfnode.skeleton == gltfnode.skeleton and skeleton.find_bone(bone_name) != -1:
+			if (
+				center_gltfnode.skeleton == gltfnode.skeleton
+				and skeleton.find_bone(bone_name) != -1
+			):
 				center_bone = bone_name
 			else:
 				var found_node: Node = gstate.get_scene_node(int(center_node_idx))
@@ -232,7 +233,11 @@ static func parse_springs_v0(
 			spring_bone.gravity_dir_default = gravity_dir
 			spring_bone.drag_force_scale = drag_force
 			spring_bone.hit_radius_scale = hit_radius
-			spring_bone.resource_name = "%s · %s" % [comment.split("\n")[0], chain[0]] if not comment.is_empty() else chain[0]
+			spring_bone.resource_name = (
+				"%s · %s" % [comment.split("\n")[0], chain[0]]
+				if not comment.is_empty()
+				else chain[0]
+			)
 			spring_bone.group = detect_group(chain[0], comment)
 			result.append(spring_bone)
 	return result
@@ -287,8 +292,14 @@ static func parse_springs_v1(
 		if center_node_idx != -1:
 			var center_gltfnode: GLTFNode = nodes[int(center_node_idx)]
 			var bone_name: String = center_gltfnode.resource_name
-			var skeleton: Skeleton3D = _get_skel_godot_node(gstate, skeletons, nodes[int(first_bone_node)].skeleton)
-			if skeleton != null and center_gltfnode.skeleton == nodes[int(first_bone_node)].skeleton and skeleton.find_bone(bone_name) != -1:
+			var skeleton: Skeleton3D = _get_skel_godot_node(
+				gstate, skeletons, nodes[int(first_bone_node)].skeleton
+			)
+			if (
+				skeleton != null
+				and center_gltfnode.skeleton == nodes[int(first_bone_node)].skeleton
+				and skeleton.find_bone(bone_name) != -1
+			):
 				spring_bone.center_bone = bone_name
 			else:
 				var found_node: Node = gstate.get_scene_node(int(center_node_idx))
@@ -296,7 +307,11 @@ static func parse_springs_v1(
 				if spring_bone.center_node == NodePath():
 					spring_bone.center_node = secondary_node.get_path_to(secondary_node)
 
-		spring_bone.resource_name = "%s · %s" % [comment.split("\n")[0], spring_bone.joint_nodes[0]] if not comment.is_empty() else spring_bone.joint_nodes[0]
+		spring_bone.resource_name = (
+			"%s · %s" % [comment.split("\n")[0], spring_bone.joint_nodes[0]]
+			if not comment.is_empty()
+			else spring_bone.joint_nodes[0]
+		)
 		spring_bone.group = detect_group(spring_bone.joint_nodes[0], comment)
 		result.append(spring_bone)
 	return result
@@ -305,7 +320,10 @@ static func parse_springs_v1(
 static func _process_v1_joint_parameters(spring_bone: vrm_spring_bone) -> void:
 	if not spring_bone.stiffness_force.is_empty():
 		spring_bone.stiffness_scale = spring_bone.stiffness_force[0]
-		if spring_bone.stiffness_force.count(spring_bone.stiffness_scale) == spring_bone.stiffness_force.size():
+		if (
+			spring_bone.stiffness_force.count(spring_bone.stiffness_scale)
+			== spring_bone.stiffness_force.size()
+		):
 			spring_bone.stiffness_force.clear()
 		elif spring_bone.stiffness_scale > 0.0:
 			for i in range(spring_bone.stiffness_force.size()):
@@ -315,7 +333,10 @@ static func _process_v1_joint_parameters(spring_bone: vrm_spring_bone) -> void:
 
 	if not spring_bone.gravity_power.is_empty():
 		spring_bone.gravity_scale = spring_bone.gravity_power[0]
-		if spring_bone.gravity_power.count(spring_bone.gravity_scale) == spring_bone.gravity_power.size():
+		if (
+			spring_bone.gravity_power.count(spring_bone.gravity_scale)
+			== spring_bone.gravity_power.size()
+		):
 			spring_bone.gravity_power.clear()
 		elif spring_bone.gravity_scale > 0.0:
 			for i in range(spring_bone.gravity_power.size()):
@@ -325,7 +346,10 @@ static func _process_v1_joint_parameters(spring_bone: vrm_spring_bone) -> void:
 
 	if not spring_bone.drag_force.is_empty():
 		spring_bone.drag_force_scale = spring_bone.drag_force[0]
-		if spring_bone.drag_force.count(spring_bone.drag_force_scale) == spring_bone.drag_force.size():
+		if (
+			spring_bone.drag_force.count(spring_bone.drag_force_scale)
+			== spring_bone.drag_force.size()
+		):
 			spring_bone.drag_force.clear()
 		elif spring_bone.drag_force_scale > 0.0:
 			for i in range(spring_bone.drag_force.size()):
@@ -335,7 +359,10 @@ static func _process_v1_joint_parameters(spring_bone: vrm_spring_bone) -> void:
 
 	if not spring_bone.hit_radius.is_empty():
 		spring_bone.hit_radius_scale = spring_bone.hit_radius[0]
-		if spring_bone.hit_radius.count(spring_bone.hit_radius_scale) == spring_bone.hit_radius.size():
+		if (
+			spring_bone.hit_radius.count(spring_bone.hit_radius_scale)
+			== spring_bone.hit_radius.size()
+		):
 			spring_bone.hit_radius.clear()
 		elif spring_bone.hit_radius_scale > 0.0:
 			for i in range(spring_bone.hit_radius.size()):
@@ -345,5 +372,8 @@ static func _process_v1_joint_parameters(spring_bone: vrm_spring_bone) -> void:
 
 	if not spring_bone.gravity_dir.is_empty():
 		spring_bone.gravity_dir_default = spring_bone.gravity_dir[0]
-		if spring_bone.gravity_dir.count(spring_bone.gravity_dir_default) == spring_bone.gravity_dir.size():
+		if (
+			spring_bone.gravity_dir.count(spring_bone.gravity_dir_default)
+			== spring_bone.gravity_dir.size()
+		):
 			spring_bone.gravity_dir.clear()

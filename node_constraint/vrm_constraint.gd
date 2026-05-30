@@ -107,51 +107,47 @@ func evaluate(multiplier: float = 1.0) -> void:
 func evaluate_aim(multiplier: float = 1.0) -> void:
 	if source_node == null or target_node == null:
 		return
-	var source_global_transform: Transform3D = _get_source_global_transform() # * source_node.get_bone_pose(source_bone).affine_inverse() * Transform3D(source_node.get_bone_rest(source_bone).basis, Vector3())
+	var source_global_transform: Transform3D = _get_source_global_transform()  # * source_node.get_bone_pose(source_bone).affine_inverse() * Transform3D(source_node.get_bone_rest(source_bone).basis, Vector3())
 	var target_global_transform: Transform3D = (
 		_get_target_global_transform() * target_node.get_bone_pose(target_bone).affine_inverse()
-	) # * Transform3D(target_node.get_bone_rest(target_bone).basis, Vector3())
-	var target_rest_transform: Transform3D = target_node.get_bone_rest(target_bone) # .basis.get_rotation_quaternion()
+	)  # * Transform3D(target_node.get_bone_rest(target_bone).basis, Vector3())
+	var target_rest_transform: Transform3D = target_node.get_bone_rest(target_bone)  # .basis.get_rotation_quaternion()
 	# var relative_source_transform: Transform3D = target_rest_transform.affine_inverse() * target_global_transform.affine_inverse() * source_global_transform * source_rest_transform
 	var relative_source_transform: Transform3D = (
 		target_global_transform.affine_inverse() * source_global_transform * source_rest_transform
 	)
-	var rest_dir: Vector3 = _aim_get_rest_direction(target_rest_transform.basis) # Basis(target_rest_rotation))
+	var rest_dir: Vector3 = _aim_get_rest_direction(target_rest_transform.basis)  # Basis(target_rest_rotation))
 	#if source_bone_name == 'LeftHand':
 	VRMLogger.debug(
-		"vrm_constraint.gd"
-,
+		"vrm_constraint.gd",
 		(
 			"evaluate_aim: relative_source_transform.origin.normalized()="
 			+ str(relative_source_transform.origin.normalized())
 		)
 	)
 	#  - target_rest_rotation * target_rest_transform.origin
-	var aim_dir: Vector3 = (relative_source_transform.origin - target_rest_origin).normalized() # target_global_transform.origin.direction_to(source_global_transform.origin)
+	var aim_dir: Vector3 = (relative_source_transform.origin - target_rest_origin).normalized()  # target_global_transform.origin.direction_to(source_global_transform.origin)
 	#if rest_dir.is_zero_approx() or aim_dir.is_zero_approx():
 	#	return
 	var arc := Quaternion(rest_dir, aim_dir).normalized()
 	#if source_bone_name == 'LeftHand':
 	#	print(str(rest_dir)+","+str(aim_dir))#print(arc.get_euler())
 	#_set_weighted_global_target_rotation(arc)
-	
+
 	var final_weight = weight * multiplier
 	if final_weight != 1.0:
 		arc = Quaternion.IDENTITY.slerp(arc, final_weight)
 
 	target_node.set_bone_pose_rotation(
 		target_bone, target_rest_transform.basis.get_rotation_quaternion() * arc
-	) # * arc) #  * arc)
+	)  # * arc) #  * arc)
 
 
 func evaluate_roll(multiplier: float = 1.0) -> void:
 	if source_node == null or target_node == null:
 		return
 	if aim_or_roll_axis < AimRollAxis.POSITIVE_X or aim_or_roll_axis > AimRollAxis.POSITIVE_Z:
-		VRMLogger.error(
-			"vrm_constraint.gd"
-, "Roll axis not set! Must be positive X, Y, or Z."
-		)
+		VRMLogger.error("vrm_constraint.gd", "Roll axis not set! Must be positive X, Y, or Z.")
 		return
 	# Gather axis-angle information from the source rotation.
 	var source_transform: Transform3D = _get_posed_source_transform()
@@ -159,7 +155,7 @@ func evaluate_roll(multiplier: float = 1.0) -> void:
 	var source_axis: Vector3 = source_quat.get_axis()
 	var source_angle: float = source_quat.get_angle()
 	# Calculate what we need to apply to the target.
-	var axis_index: int = aim_or_roll_axis - 1 # Vector3.Axis
+	var axis_index: int = aim_or_roll_axis - 1  # Vector3.Axis
 	var axis_value: float = source_axis[axis_index]
 	var rotation_quat := Quaternion.IDENTITY
 	if not is_zero_approx(axis_value):
@@ -177,7 +173,7 @@ func evaluate_rotation(multiplier: float = 1.0) -> void:
 	_set_weighted_posed_target_rotation(source_quat, multiplier)
 
 
-static func from_dictionary(dict: Dictionary): # -> VRMConstraint:
+static func from_dictionary(dict: Dictionary):  # -> VRMConstraint:
 	VRMLogger.debug("vrm_constraint.gd", "from_dictionary: parsing constraint from dict")
 	var ret := new()
 	if not dict.has("constraint"):
@@ -194,10 +190,7 @@ static func from_dictionary(dict: Dictionary): # -> VRMConstraint:
 	elif constraint_type_string == "rotation":
 		ret.constraint_type = ConstraintType.ROTATION
 	else:
-		VRMLogger.error(
-			"vrm_constraint.gd"
-, "Unknown constraint type: " + constraint_type_string
-		)
+		VRMLogger.error("vrm_constraint.gd", "Unknown constraint type: " + constraint_type_string)
 	# Set up weight and source node index.
 	var constraint_parameters: Dictionary = constraint_dict[constraint_type_string]
 	ret.weight = constraint_dict.get("weight", 1.0)
@@ -272,7 +265,9 @@ func _get_target_global_rest() -> Transform3D:
 	return ret
 
 
-func _set_weighted_posed_target_rotation(rotation_quat: Quaternion, multiplier: float = 1.0) -> void:
+func _set_weighted_posed_target_rotation(
+	rotation_quat: Quaternion, multiplier: float = 1.0
+) -> void:
 	#print("A!")
 	var final_weight = weight * multiplier
 	if final_weight != 1.0:
@@ -288,7 +283,9 @@ func _set_weighted_posed_target_rotation(rotation_quat: Quaternion, multiplier: 
 	skeleton.set_bone_pose_rotation(target_bone, rest_quat * rotation_quat)
 
 
-func _set_weighted_global_target_rotation(rotation_quat: Quaternion, multiplier: float = 1.0) -> void:
+func _set_weighted_global_target_rotation(
+	rotation_quat: Quaternion, multiplier: float = 1.0
+) -> void:
 	var final_weight = weight * multiplier
 	if final_weight != 1.0:
 		rotation_quat = Quaternion.IDENTITY.slerp(rotation_quat, final_weight)
@@ -302,9 +299,9 @@ func _set_weighted_global_target_rotation(rotation_quat: Quaternion, multiplier:
 	#rotation_quat = Quaternion(_get_target_global_rest().basis).inverse() * rotation_quat
 	var parent_global_quat = (
 		skeleton
-		.get_bone_global_pose(skeleton.get_bone_parent(target_bone))
-		.basis
-		.get_rotation_quaternion()
+		. get_bone_global_pose(skeleton.get_bone_parent(target_bone))
+		. basis
+		. get_rotation_quaternion()
 	)
 	rotation_quat = target_rest_rotation * parent_global_quat.inverse() * rotation_quat
 	skeleton.set_bone_pose_rotation(target_bone, rotation_quat)
