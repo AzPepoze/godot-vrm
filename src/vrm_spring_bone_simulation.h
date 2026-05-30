@@ -100,6 +100,7 @@ private:
   // Environment Collision Global switches/options
   bool environment_collision_enabled = false;
   uint32_t environment_collision_mask = 1;
+  float environment_collision_bounce_damping = 0.8f;
 
 protected:
   static void _bind_methods();
@@ -158,6 +159,9 @@ public:
 
   void set_environment_collision_mask(uint32_t p_mask);
   uint32_t get_environment_collision_mask() const;
+
+  void set_environment_collision_bounce_damping(float p_damping);
+  float get_environment_collision_bounce_damping() const;
 
 private:
   void _update_colliders(Skeleton3D *skel);

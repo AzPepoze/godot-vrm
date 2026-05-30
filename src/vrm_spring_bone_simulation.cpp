@@ -5,11 +5,11 @@
 #include "spring_bone_setup.h"
 #include "spring_bone_wind.h"
 
+#include <godot_cpp/classes/capsule_shape3d.hpp>
 #include <godot_cpp/classes/collision_object3d.hpp>
 #include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/classes/physics_direct_space_state3d.hpp>
 #include <godot_cpp/classes/physics_shape_query_parameters3d.hpp>
-#include <godot_cpp/classes/capsule_shape3d.hpp>
 #include <godot_cpp/classes/sphere_shape3d.hpp>
 #include <godot_cpp/classes/world3d.hpp>
 #include <godot_cpp/core/class_db.hpp>
@@ -158,6 +158,12 @@ void VRMSpringBoneSimulation::_bind_methods() {
   ClassDB::bind_method(
       D_METHOD("get_environment_collision_mask"),
       &VRMSpringBoneSimulation::get_environment_collision_mask);
+  ClassDB::bind_method(
+      D_METHOD("set_environment_collision_bounce_damping", "damping"),
+      &VRMSpringBoneSimulation::set_environment_collision_bounce_damping);
+  ClassDB::bind_method(
+      D_METHOD("get_environment_collision_bounce_damping"),
+      &VRMSpringBoneSimulation::get_environment_collision_bounce_damping);
 
   ADD_GROUP("Wind Settings", "wind_");
   ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "wind_direction"),
@@ -176,6 +182,11 @@ void VRMSpringBoneSimulation::_bind_methods() {
   ADD_PROPERTY(PropertyInfo(Variant::INT, "environment_collision_mask"),
                "set_environment_collision_mask",
                "get_environment_collision_mask");
+  ADD_PROPERTY(PropertyInfo(Variant::FLOAT,
+                            "environment_collision_bounce_damping",
+                            PROPERTY_HINT_RANGE, "0.0,10.0,0.1"),
+               "set_environment_collision_bounce_damping",
+               "get_environment_collision_bounce_damping");
 }
 
 VRMSpringBoneSimulation::VRMSpringBoneSimulation() {}
@@ -360,15 +371,29 @@ void VRMSpringBoneSimulation::_simulate_chains(
 
       // Environment collision (optional)
       if (environment_collision_enabled && chain.enable_environment_collision) {
+        // Transform to world space: center is in skeleton-local space,
+        // physics queries require world coordinates.
+        Transform3D skel_world = skel->get_global_transform();
+        Vector3 origin_world = skel_world.xform(center.xform(origin));
+        Vector3 tail_world = skel_world.xform(center.xform(next_tail));
+
         Vector3 env_push;
-        _query_game_object_collisions(skel, center.xform(origin),
-                                      center.xform(next_tail), radius,
+        _query_game_object_collisions(skel, origin_world, tail_world, radius,
                                       chain.environment_collision_mask,
                                       env_push);
         if (!env_push.is_zero_approx()) {
-          next_tail += center_inv.basis.xform(env_push);
+          // Project to surface: push the tail center to sit at radius
+          // distance from the collided surface (just touching).
+          Vector3 push_local = center_inv.basis.xform(
+              skel_world.affine_inverse().basis.xform(env_push));
+          next_tail += push_local;
           next_tail = SpringBonePhysics::apply_length_constraint(
               next_tail, origin, joint.length);
+
+          // Pin prev_tail to the same position to kill bounce.
+          // Verlet velocity = current_tail - prev_tail.
+          // Setting prev_tail = next_tail zeros velocity through the surface.
+          joint.prev_tail = next_tail;
         }
       }
 
@@ -492,14 +517,20 @@ void VRMSpringBoneSimulation::set_environment_collision_mask(uint32_t p_mask) {
 uint32_t VRMSpringBoneSimulation::get_environment_collision_mask() const {
   return environment_collision_mask;
 }
+void VRMSpringBoneSimulation::set_environment_collision_bounce_damping(
+    float p_damping) {
+  environment_collision_bounce_damping = p_damping;
+}
+float VRMSpringBoneSimulation::get_environment_collision_bounce_damping() const {
+  return environment_collision_bounce_damping;
+}
 
 // ---------------------------------------------------------------------------
 // PhysicsServer3D query for game object collision
 // ---------------------------------------------------------------------------
 void VRMSpringBoneSimulation::_query_game_object_collisions(
-    Skeleton3D *skel, const Vector3 &origin_world,
-    const Vector3 &tail_world, float radius, uint32_t mask,
-    Vector3 &out_push) {
+    Skeleton3D *skel, const Vector3 &origin_world, const Vector3 &tail_world,
+    float radius, uint32_t mask, Vector3 &out_push) {
   out_push = Vector3();
   if (!skel)
     return;
