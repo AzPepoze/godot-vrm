@@ -164,7 +164,9 @@ func draw_spring_bones(color: Color) -> void:
 			for bone_name in joints:
 				if bone_name.is_empty():
 					continue
-				var joint_pos: Vector3 = secondary_node.to_local(_get_bone_global_position(bone_name))
+				var joint_pos: Vector3 = secondary_node.to_local(
+					_get_bone_global_position(bone_name)
+				)
 				draw_sphere(Basis.IDENTITY, joint_pos, 0.015, color)
 		mesh.surface_end()
 

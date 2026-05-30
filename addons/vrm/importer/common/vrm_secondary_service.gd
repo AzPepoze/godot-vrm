@@ -161,7 +161,7 @@ static func parse_secondary_node(
 		var comment: String = sbone.get("comment", "")
 		var stiffness_force = float(sbone.get("stiffiness", 1.0))
 		var gravity_power = float(sbone.get("gravityPower", 0.0))
-		var gravity_dir_json = sbone.get("gravityDir", {"x": 0.0, "y": - 1.0, "z": 0.0})
+		var gravity_dir_json = sbone.get("gravityDir", {"x": 0.0, "y": -1.0, "z": 0.0})
 		var gravity_dir = Vector3(
 			gravity_dir_json["x"], gravity_dir_json["y"], gravity_dir_json["z"]
 		)
@@ -246,4 +246,4 @@ static func parse_secondary_node(
 	# Use untyped Array to avoid type-mismatch between preload-const and class_name
 	secondary_node.set("collider_groups", Array(collider_groups))
 	secondary_node.set("collider_library", Array(collider_library))
-        secondary_node.set("use_gdscript_spring_bones", gstate.get_additional_data(&"vrm/use_gdscript"))
+	secondary_node.set("use_gdscript_spring_bones", gstate.get_additional_data(&"vrm/use_gdscript"))

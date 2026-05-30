@@ -354,8 +354,7 @@ func test_vrm1_collider_groups_consistent_with_spring_bones():
 
 	var collider_groups_raw = _secondary.get("collider_groups")
 	assert_not_null(
-		collider_groups_raw,
-		"secondary.collider_groups must exist (import should set it)"
+		collider_groups_raw, "secondary.collider_groups must exist (import should set it)"
 	)
 
 	if not spring_references_colliders:
@@ -368,8 +367,10 @@ func test_vrm1_collider_groups_consistent_with_spring_bones():
 		0,
 		(
 			"collider_groups must not be empty when spring bones reference collider groups. "
-			+"Size: %d. This indicates the import is not assigning collider_groups to secondary."
-			% collider_groups.size()
+			+ (
+				"Size: %d. This indicates the import is not assigning collider_groups to secondary."
+				% collider_groups.size()
+			)
 		)
 	)
 
@@ -421,7 +422,7 @@ func test_vrm1_end_bone_nodes_removed():
 		0,
 		(
 			"Skeleton should have zero children named '*_end*' after cleanup, "
-			+"but found %d: %s" % [end_bone_nodes.size(), str(end_bone_nodes)]
+			+ "but found %d: %s" % [end_bone_nodes.size(), str(end_bone_nodes)]
 		)
 	)
 

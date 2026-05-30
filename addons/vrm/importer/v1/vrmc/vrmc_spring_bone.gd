@@ -126,7 +126,9 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 				skeleton_path = secondary_node.get_path_to(skeleton)
 
 			if skeleton.find_bone(bone_name) == -1:
-				VRMLogger.error("vrmc_spring_bone.gd", "Failed to find bone %s in skeleton" % bone_name)
+				VRMLogger.error(
+					"vrmc_spring_bone.gd", "Failed to find bone %s in skeleton" % bone_name
+				)
 				continue
 
 			spring_bone.joint_nodes.append(bone_name)
@@ -144,7 +146,10 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 		# We use the first joint's values as the base scale and normalize the arrays if they are uniform.
 		if not spring_bone.stiffness_force.is_empty():
 			spring_bone.stiffness_scale = spring_bone.stiffness_force[0]
-			if spring_bone.stiffness_force.count(spring_bone.stiffness_scale) == spring_bone.stiffness_force.size():
+			if (
+				spring_bone.stiffness_force.count(spring_bone.stiffness_scale)
+				== spring_bone.stiffness_force.size()
+			):
 				spring_bone.stiffness_force.clear()
 			elif spring_bone.stiffness_scale > 0.0:
 				for i in range(spring_bone.stiffness_force.size()):
@@ -154,7 +159,10 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 
 		if not spring_bone.gravity_power.is_empty():
 			spring_bone.gravity_scale = spring_bone.gravity_power[0]
-			if spring_bone.gravity_power.count(spring_bone.gravity_scale) == spring_bone.gravity_power.size():
+			if (
+				spring_bone.gravity_power.count(spring_bone.gravity_scale)
+				== spring_bone.gravity_power.size()
+			):
 				spring_bone.gravity_power.clear()
 			elif spring_bone.gravity_scale > 0.0:
 				for i in range(spring_bone.gravity_power.size()):
@@ -164,7 +172,10 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 
 		if not spring_bone.drag_force.is_empty():
 			spring_bone.drag_force_scale = spring_bone.drag_force[0]
-			if spring_bone.drag_force.count(spring_bone.drag_force_scale) == spring_bone.drag_force.size():
+			if (
+				spring_bone.drag_force.count(spring_bone.drag_force_scale)
+				== spring_bone.drag_force.size()
+			):
 				spring_bone.drag_force.clear()
 			elif spring_bone.drag_force_scale > 0.0:
 				for i in range(spring_bone.drag_force.size()):
@@ -174,7 +185,10 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 
 		if not spring_bone.hit_radius.is_empty():
 			spring_bone.hit_radius_scale = spring_bone.hit_radius[0]
-			if spring_bone.hit_radius.count(spring_bone.hit_radius_scale) == spring_bone.hit_radius.size():
+			if (
+				spring_bone.hit_radius.count(spring_bone.hit_radius_scale)
+				== spring_bone.hit_radius.size()
+			):
 				spring_bone.hit_radius.clear()
 			elif spring_bone.hit_radius_scale > 0.0:
 				for i in range(spring_bone.hit_radius.size()):
@@ -184,7 +198,10 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 
 		if not spring_bone.gravity_dir.is_empty():
 			spring_bone.gravity_dir_default = spring_bone.gravity_dir[0]
-			if spring_bone.gravity_dir.count(spring_bone.gravity_dir_default) == spring_bone.gravity_dir.size():
+			if (
+				spring_bone.gravity_dir.count(spring_bone.gravity_dir_default)
+				== spring_bone.gravity_dir.size()
+			):
 				spring_bone.gravity_dir.clear()
 
 		var center_node: NodePath = NodePath()
@@ -218,7 +235,9 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 
 		# Use a descriptive name combining group and first bone for readability
 		if not comment.is_empty():
-			spring_bone.resource_name = "%s · %s" % [comment.split("\n")[0], spring_bone.joint_nodes[0]]
+			spring_bone.resource_name = (
+				"%s · %s" % [comment.split("\n")[0], spring_bone.joint_nodes[0]]
+			)
 		else:
 			spring_bone.resource_name = spring_bone.joint_nodes[0]
 
@@ -231,8 +250,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 	secondary_node.set_script(vrm_secondary)
 	secondary_node.set("skeleton", skeleton_path)
 	secondary_node.set("spring_bones", spring_bones)
-        secondary_node.set("use_gdscript_spring_bones", gstate.get_additional_data(&"vrm/use_gdscript"))
-        print("[VRM] Imported with use_gdscript = ", gstate.get_additional_data(&"vrm/use_gdscript"))
+	secondary_node.set("use_gdscript_spring_bones", gstate.get_additional_data(&"vrm/use_gdscript"))
 	# Use untyped Array to avoid type-mismatch between preload-const and class_name
 	secondary_node.set("collider_groups", Array(collider_groups))
 	secondary_node.set("collider_library", Array(colliders))

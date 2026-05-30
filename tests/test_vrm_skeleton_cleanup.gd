@@ -2,7 +2,6 @@ extends "res://tests/test_base.gd"
 
 const Cleanup = preload("res://addons/vrm/importer/common/utils/vrm_skeleton_cleanup.gd")
 
-
 # ── remove_end_bone_nodes: edge cases ────────────────────────────────────────
 
 
@@ -256,21 +255,11 @@ func test_cleanup_mixed_scenario():
 	var remaining_names := []
 	for c in skel.get_children():
 		remaining_names.append(c.name)
-	assert_true(
-		remaining_names.has("Bone_Mesh"), "Bone_Mesh must remain"
-	)
-	assert_true(
-		remaining_names.has("Bone_Look"), "Bone_Look must remain"
-	)
-	assert_true(
-		remaining_names.has("Bone_Scripted"), "Bone_Scripted must remain"
-	)
-	assert_true(
-		remaining_names.has("ExtraNode"), "ExtraNode must remain"
-	)
-	assert_false(
-		remaining_names.has("Bone_End"), "Bone_End must have been removed"
-	)
+	assert_true(remaining_names.has("Bone_Mesh"), "Bone_Mesh must remain")
+	assert_true(remaining_names.has("Bone_Look"), "Bone_Look must remain")
+	assert_true(remaining_names.has("Bone_Scripted"), "Bone_Scripted must remain")
+	assert_true(remaining_names.has("ExtraNode"), "ExtraNode must remain")
+	assert_false(remaining_names.has("Bone_End"), "Bone_End must have been removed")
 
 	skel.queue_free()
 	await runner.process_frame
@@ -341,7 +330,5 @@ func test_has_meaningful_descendant_deeply_nested_mesh():
 	l3.add_child(mesh)
 	l2.add_child(l3)
 	l1.add_child(l2)
-	assert_true(
-		Cleanup._has_meaningful_descendant(l1), "Deeply nested MeshInstance3D → true"
-	)
+	assert_true(Cleanup._has_meaningful_descendant(l1), "Deeply nested MeshInstance3D → true")
 	l1.queue_free()

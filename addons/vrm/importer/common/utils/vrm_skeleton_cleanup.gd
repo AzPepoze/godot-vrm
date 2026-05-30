@@ -1,6 +1,7 @@
 @tool
 extends RefCounted
 
+
 ## Remove redundant scene-node representations of skeleton end-bones.
 ##
 ## Removes Node3D AND BoneAttachment3D children of `skeleton` when they are
