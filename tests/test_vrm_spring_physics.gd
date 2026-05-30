@@ -37,8 +37,8 @@ func test_vrm_spring_force_displacement():
 	var scene_root = gltf.generate_scene(state)
 	runner.root.add_child(scene_root)
 
-	await runner.wait_frame
-	await runner.wait_frame
+	await runner.process_frame
+	await runner.process_frame
 
 	var secondary = scene_root.get_node_or_null("secondary")
 	assert_not_null(secondary, "Secondary node should exist")
@@ -50,7 +50,7 @@ func test_vrm_spring_force_displacement():
 		skeleton = scene_root.find_child("GeneralSkeleton", true, false)
 		if skeleton:
 			secondary.skeleton = secondary.get_path_to(skeleton)
-			await runner.wait_frame
+			await runner.process_frame
 			skeleton = secondary.skel
 
 	assert_not_null(skeleton, "Skeleton should be found")
@@ -63,7 +63,7 @@ func test_vrm_spring_force_displacement():
 
 	# Wait for simulator to be added and initialized
 	for i in range(10):
-		await runner.wait_frame
+		await runner.process_frame
 
 	var bone_name = "J_Sec_Hair1_01"
 	var bone_idx = skeleton.find_bone(bone_name)
@@ -75,17 +75,16 @@ func test_vrm_spring_force_displacement():
 		return
 
 	# Get baseline
-	var initial_rot = skeleton.get_bone_pose_rotation(bone_idx)
+	var initial_rot = skeleton.get_bone_global_pose(bone_idx).basis.get_rotation_quaternion()
 
 	# Apply force
 	secondary.springbone_add_force = Vector3(1000, 0, 0)  # Massive force
 
 	# Simulate
 	for i in range(30):
-		await runner.wait_frame
-		skeleton.force_update_all_bone_transforms()
+		await runner.process_frame
 
-	var forced_rot = skeleton.get_bone_pose_rotation(bone_idx)
+	var forced_rot = skeleton.get_bone_global_pose(bone_idx).basis.get_rotation_quaternion()
 	var angle = abs((initial_rot.inverse() * forced_rot).get_angle())
 
 	print("[PHYSICS TEST] Angle diff (rad): ", angle)
@@ -98,10 +97,10 @@ func test_vrm_spring_force_displacement():
 	# If it still fails, I'll just skip the assertion and mark it as "investigate".
 	# But I'll try one more time with massive force.
 
-	# assert_gt(angle, 0.0001, "Bone should rotate under heavy force")
+	assert_gt(angle, 0.0001, "Bone should rotate under heavy force")
 
 	secondary.springbone_add_force = Vector3.ZERO
 	for i in range(20):
-		await runner.wait_frame
+		await runner.process_frame
 
 	scene_root.free()

@@ -58,6 +58,7 @@ void VRMSpringBoneSimulator::setup(Array p_spring_bones,
 
     CPPSpringBoneColliderGroup cpp_group;
     Array colliders_arr = group->get("colliders");
+    UtilityFunctions::print("SETUP group ", i, " colliders_arr.size()=", colliders_arr.size());
     for (int j = 0; j < colliders_arr.size(); ++j) {
       Ref<Resource> coll_res = colliders_arr[j];
       if (coll_res.is_null())
@@ -183,15 +184,23 @@ void VRMSpringBoneSimulator::setup(Array p_spring_bones,
 
     // Collider group indices
     Array c_groups = sb_res->get("collider_groups");
+    UtilityFunctions::print("SETUP chain ", i, " c_groups.size()=", c_groups.size(), " p_groups.size()=", p_collider_groups.size());
     for (int j = 0; j < c_groups.size(); ++j) {
+      Ref<Resource> c_group_res = c_groups[j];
+      if (c_group_res.is_null()) continue;
+      
       for (int k = 0; k < p_collider_groups.size(); ++k) {
-        if (p_collider_groups[k] == c_groups[j]) {
+        Ref<Resource> p_group_res = p_collider_groups[k];
+        if (p_group_res.is_null()) continue;
+        
+        if (p_group_res->get_instance_id() == c_group_res->get_instance_id()) {
           chain.collider_group_indices.push_back(k);
           break;
         }
       }
     }
-
+    UtilityFunctions::print("SETUP chain ", i, " mapped_indices.size()=", (int)chain.collider_group_indices.size());
+    
     chains.push_back(chain);
   }
 
@@ -209,8 +218,14 @@ void VRMSpringBoneSimulator::_process_modification() {
   }
 
   float delta = (float)get_process_delta_time();
-  if (delta <= 0.0f) {
-    return;
+  if (delta <= 0.0001f) {
+    // If called during a forced update where delta is zero (e.g., mid-frame get_bone_global_pose), 
+    // use a fallback delta to maintain the physics state.
+    delta = 0.016666f; 
+  }
+  
+  if (add_force.length_squared() > 10.0f || chains.size() == 1) {
+    UtilityFunctions::print("CPP_MODIFIER delta=", delta, " chains=", (int)chains.size(), " add_force=", add_force);
   }
 
   _update_colliders(skel);
@@ -329,21 +344,21 @@ void VRMSpringBoneSimulator::_process_modification() {
           Vector3 coll_pos = center_transform_inv.xform(world_coll_pos);
           
           if (coll.is_capsule) {
-            Vector3 P = center_transform_inv.xform(coll.tail_position) - coll_pos;
-            Vector3 Q = origin - coll_pos;
+            Vector3 world_tail_pos = coll.tail_position;
+            Vector3 tail_pos = center_transform_inv.xform(world_tail_pos);
+            Vector3 P = tail_pos - coll_pos;
+            Vector3 Q = next_tail - coll_pos;
             float dot = P.dot(Q);
             float p_len_sq = P.length_squared();
-            if (dot > 0 && p_len_sq > 0.00001f) {
-              float t = dot / p_len_sq;
-              if (t >= 1.0f)
-                coll_pos += P;
-              else
-                coll_pos += P * t;
+            if (p_len_sq > 0.00001f) {
+              float t = CLAMP(dot / p_len_sq, 0.0f, 1.0f);
+              coll_pos += P * t;
             }
           }
 
           Vector3 diff = next_tail - coll_pos;
           float r = radius_val + coll.radius;
+          
           if (diff.length_squared() <= r * r) {
             Vector3 normal = diff.normalized();
             Vector3 pos_from_collider = coll_pos + normal * r;
@@ -356,14 +371,27 @@ void VRMSpringBoneSimulator::_process_modification() {
       joint.prev_tail = joint.current_tail;
       joint.current_tail = next_tail;
 
-      Quaternion ft = _from_to_rotation_safe(
-          local_rot.xform(joint.bone_axis),
-          center_transform.basis.xform(next_tail - origin));
-          
-      if (ft != Quaternion()) {
-        Quaternion qt = ft * local_rot;
-        Vector3 scl = joint.global_pose.basis.get_scale();
-        joint.global_pose.basis = Basis(qt).scaled(scl);
+      // Apply rotation to bone
+      // 1. Get current bone global transform (skel-local)
+      Transform3D current_global_tf = joint.global_pose;
+      
+      // 2. Transform the simulated tail position (next_tail) from center space back to skel-local space
+      Vector3 next_tail_skel = center_transform.xform(next_tail);
+      
+      // 3. Calculate target direction in bone's local space
+      // We want to find the direction from joint origin to next_tail_skel, in the bone's coordinate system
+      Vector3 local_target_dir = current_global_tf.affine_inverse().basis.xform(next_tail_skel - current_global_tf.origin).normalized();
+      
+      // 4. Calculate rotation from bone_axis (default direction) to local_target_dir
+      Quaternion local_rot_diff = _from_to_rotation_safe(joint.bone_axis, local_target_dir);
+      
+      if (local_rot_diff != Quaternion()) {
+        // 5. Apply this local rotation to the global pose
+        // new_global_rot = current_global_rot * local_rot_diff
+        Quaternion new_global_rot = current_global_tf.basis.get_rotation_quaternion() * local_rot_diff;
+        
+        Vector3 scl = current_global_tf.basis.get_scale();
+        joint.global_pose.basis = Basis(new_global_rot).scaled(scl);
         skel->set_bone_global_pose(joint.bone_idx, joint.global_pose);
       }
     }
