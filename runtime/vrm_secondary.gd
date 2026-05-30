@@ -208,11 +208,17 @@ func update_parameters() -> void:
 
 
 func _process(_delta: float):
-	if _gizmo != null:
-		if Engine.is_editor_hint():
-			_gizmo.draw_in_editor()
-		else:
-			_gizmo.draw_in_game()
+	if _gizmo != null and spring_bone_adapter != null:
+		var skel_to_gizmo: Transform3D = (
+			_gizmo.global_transform.affine_inverse() * skel.global_transform
+		)
+		spring_bone_adapter.draw_gizmo(
+			_gizmo.mesh,
+			skel_to_gizmo,
+			gizmo_spring_bone_color,
+			gizmo_spring_bone,
+			gizmo_show_colliders
+		)
 
 	if is_child_of_vrm and _parent_ref != null:
 		# Sync from toplevel if changed in editor

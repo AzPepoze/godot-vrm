@@ -48,23 +48,15 @@ func _setup_cpp(
 	simulator.name = "VRMSpringBoneSimulator"
 	skeleton.add_child(simulator)
 
-	var unique_collider_groups: Array = []
-	for sb in spring_bones:
-		if sb == null:
-			continue
-		for cg in sb.collider_groups:
-			if cg != null and cg not in unique_collider_groups:
-				unique_collider_groups.append(cg)
-
 	VRMLogger.debug(
 		"vrm_spring_bone_adapter.gd",
 		(
 			"setup_simulator (CPP): created simulator with %d spring bones, %d collider groups"
-			% [spring_bones.size(), unique_collider_groups.size()]
+			% [spring_bones.size(), collider_groups.size()]
 		)
 	)
 
-	simulator.setup(spring_bones, unique_collider_groups)
+	simulator.setup(spring_bones, collider_groups)
 	simulator.active = !disable_colliders
 	if Engine.is_editor_hint():
 		simulator.active = update_in_editor
@@ -84,6 +76,17 @@ func update_parameters(
 func set_active(active: bool) -> void:
 	if simulator:
 		simulator.active = active
+
+
+func draw_gizmo(
+	mesh: ImmediateMesh,
+	skel_to_gizmo: Transform3D,
+	color: Color,
+	draw_spring_bones: bool,
+	draw_colliders: bool
+) -> void:
+	if simulator:
+		simulator.draw_gizmo(mesh, skel_to_gizmo, color, draw_spring_bones, draw_colliders)
 
 
 func cleanup() -> void:
