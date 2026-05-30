@@ -228,6 +228,11 @@ static func parse_secondary_node(
 	# Sort by group so same-group bones appear together in the inspector
 	spring_bones.sort_custom(func(a, b): return a.group < b.group)
 
+	# Collect all colliders into a flat library for the inspector
+	var collider_library: Array[vrm_collider] = []
+	for cg in collider_groups:
+		collider_library.append_array(cg.colliders)
+
 	VRMLogger.debug(
 		"vrm_secondary_service.gd",
 		(
@@ -240,3 +245,4 @@ static func parse_secondary_node(
 	secondary_node.set("spring_bones", spring_bones)
 	# Use untyped Array to avoid type-mismatch between preload-const and class_name
 	secondary_node.set("collider_groups", Array(collider_groups))
+	secondary_node.set("collider_library", Array(collider_library))

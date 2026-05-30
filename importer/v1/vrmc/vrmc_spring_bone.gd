@@ -188,5 +188,6 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 	secondary_node.set("spring_bones", spring_bones)
 	# Use untyped Array to avoid type-mismatch between preload-const and class_name
 	secondary_node.set("collider_groups", Array(collider_groups))
+	secondary_node.set("collider_library", Array(colliders))
 
 	return OK

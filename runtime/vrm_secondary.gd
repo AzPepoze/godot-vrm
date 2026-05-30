@@ -2,9 +2,6 @@
 class_name VRMSecondary
 extends Node3D
 
-const spring_bone_class = preload("./vrm_spring_bone.gd")
-const collider_class = preload("./vrm_collider.gd")
-const collider_group_class = preload("./vrm_collider_group.gd")
 const VRMLogger = preload("../core/logger.gd")
 const spring_bone_adapter_class = preload("./vrm_spring_bone_adapter.gd")
 const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
@@ -85,11 +82,11 @@ const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 		if is_inside_tree():
 			_ready()
 
-@export var spring_bones: Array[spring_bone_class]:
+@export var spring_bones: Array[VRMSpringBone]:
 	set(value):
 		spring_bones = value
 		if is_child_of_vrm:
-			get_parent().spring_bones = value
+			get_parent().set("spring_bones", value)
 		if is_inside_tree():
 			_ready()
 
@@ -103,14 +100,24 @@ var _gizmo: MeshInstance3D = null
 	set(value):
 		collider_groups = value
 		if is_child_of_vrm:
-			get_parent().collider_groups = value
+			get_parent().set("collider_groups", value)
 		if skel != null:
 			_setup_spring_bone_adapter()
 @export var collider_library: Array[VRMCollider]:
 	set(value):
 		collider_library = value
 		if is_child_of_vrm:
-			get_parent().collider_library = value
+			get_parent().set("collider_library", value)
+
+
+func _enter_tree() -> void:
+	_parent_ref = get_parent()
+	if _parent_ref != null and "spring_bones" in _parent_ref:
+		is_child_of_vrm = true
+		# Push data to parent (set during import before is_child_of_vrm was true)
+		_parent_ref.set("collider_groups", collider_groups)
+		_parent_ref.set("collider_library", collider_library)
+		_parent_ref.set("spring_bones", spring_bones)
 
 
 func _ready() -> void:
@@ -120,7 +127,7 @@ func _ready() -> void:
 		var parent = get_parent()
 		if parent is Skeleton3D:
 			skel = parent
-			#else
+		else:
 			skel = parent.get_node_or_null("%GeneralSkeleton")
 		if skel:
 			skeleton = get_path_to(skel)
@@ -133,13 +140,6 @@ func _ready() -> void:
 
 	# Sort spring bones by group so the inspector shows them organized
 	spring_bones.sort_custom(func(a, b): return a.group < b.group)
-
-	if (
-		_parent_ref != null
-		and _parent_ref.script != null
-		and _parent_ref.script.resource_path.get_file() == "vrm_toplevel.gd"
-	):
-		is_child_of_vrm = true
 
 	_setup_spring_bone_adapter()
 	_setup_gizmo()
@@ -198,3 +198,7 @@ func _process(_delta: float):
 			update_in_editor = _parent_ref.update_in_editor
 			if spring_bone_adapter:
 				spring_bone_adapter.set_active(update_in_editor or not Engine.is_editor_hint())
+		if _parent_ref.collider_groups != collider_groups:
+			collider_groups = _parent_ref.collider_groups
+		if _parent_ref.collider_library != collider_library:
+			collider_library = _parent_ref.collider_library
