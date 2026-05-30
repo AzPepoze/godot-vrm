@@ -63,7 +63,10 @@ func _setup_cpp(
 
 
 func update_parameters(
-	p_gravity_multiplier: float, p_gravity_rotation: Quaternion, p_add_force: Vector3
+	p_gravity_multiplier: float, p_gravity_rotation: Quaternion, p_add_force: Vector3,
+	p_wind_direction: Vector3 = Vector3.ZERO, p_wind_strength: float = 0.0,
+	p_wind_turbulence: float = 0.2, p_wind_frequency: float = 1.0,
+	p_env_coll_enabled: bool = false, p_env_coll_mask: int = 1
 ) -> void:
 	gravity_multiplier = p_gravity_multiplier
 	gravity_rotation = p_gravity_rotation
@@ -71,6 +74,12 @@ func update_parameters(
 
 	if simulator:
 		simulator.update_parameters(gravity_multiplier, gravity_rotation, add_force)
+		simulator.set_wind_direction(p_wind_direction)
+		simulator.set_wind_strength(p_wind_strength)
+		simulator.set_wind_turbulence(p_wind_turbulence)
+		simulator.set_wind_frequency(p_wind_frequency)
+		simulator.set_environment_collision_enabled(p_env_coll_enabled)
+		simulator.set_environment_collision_mask(p_env_coll_mask)
 
 
 func set_active(active: bool) -> void:

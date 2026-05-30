@@ -27,6 +27,10 @@ const vrm_collider_group = preload("./vrm_collider_group.gd")
 
 @export var gravity_dir_default: Vector3 = Vector3(0, -1, 0)
 
+@export_group("Environment Collision Settings")
+@export var enable_environment_collision: bool = false
+@export var environment_collision_mask: int = 1
+
 # Reference to the vrm_collidergroup for collisions with swaying objects.
 @export var collider_groups: Array[vrm_collider_group]
 

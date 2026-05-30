@@ -1,602 +1,410 @@
 #include "vrm_spring_bone_simulator.h"
+#include "spring_bone_collision.h"
+#include "spring_bone_gizmo.h"
+#include "spring_bone_physics.h"
+#include "spring_bone_setup.h"
+#include "spring_bone_wind.h"
 
+#include <godot_cpp/classes/collision_object3d.hpp>
 #include <godot_cpp/classes/engine.hpp>
+#include <godot_cpp/classes/physics_direct_space_state3d.hpp>
+#include <godot_cpp/classes/physics_shape_query_parameters3d.hpp>
+#include <godot_cpp/classes/sphere_shape3d.hpp>
+#include <godot_cpp/classes/world3d.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/math.hpp>
-#include <godot_cpp/variant/utility_functions.hpp>
 
-using namespace godot;
+namespace godot {
 
+// ---------------------------------------------------------------------------
+// Per-joint parameter lookup: returns per-joint value if available, else the last
+// entry, else 1.0 (or default_val).
+// ---------------------------------------------------------------------------
+static float joint_param(const std::vector<float> &arr, size_t idx, float default_val = 1.0f) {
+    if (arr.empty()) {
+        return default_val;
+    }
+    return (idx < arr.size()) ? arr[idx] : arr.back();
+}
 
+static Vector3 joint_param_vec(const std::vector<Vector3> &arr, size_t idx, const Vector3 &default_val) {
+    if (arr.empty()) {
+        return default_val;
+    }
+    return (idx < arr.size()) ? arr[idx] : arr.back();
+}
+
+// ---------------------------------------------------------------------------
+// Compute the center_transform in skeleton-local space for a given chain.
+// ---------------------------------------------------------------------------
+static Transform3D get_center_transform(const VRMSpringBoneSimulator::CPPSpringBoneChain &chain,
+                                         Skeleton3D *skel, const Transform3D &skel_global_inv) {
+    if (chain.center_bone != -1) {
+        return skel->get_bone_global_pose(chain.center_bone);
+    } else if (chain.center_node) {
+        return skel_global_inv * chain.center_node->get_global_transform();
+    }
+    return Transform3D();
+}
+
+// ---------------------------------------------------------------------------
+// Build a flat list of ColliderViews in center space for the given chain.
+// ---------------------------------------------------------------------------
+static std::vector<SpringBoneCollision::ColliderView> gather_collider_views(
+    const VRMSpringBoneSimulator::CPPSpringBoneChain &chain,
+    const std::vector<VRMSpringBoneSimulator::CPPSpringBoneCollider> &all_colliders,
+    const std::vector<VRMSpringBoneSimulator::CPPSpringBoneColliderGroup> &all_groups,
+    const Transform3D &center_inv) {
+
+    std::vector<SpringBoneCollision::ColliderView> views;
+    for (int group_idx : chain.collider_group_indices) {
+        if (group_idx < 0 || group_idx >= (int)all_groups.size()) {
+            continue;
+        }
+        for (int coll_idx : all_groups[group_idx].collider_indices) {
+            const auto &coll = all_colliders[coll_idx];
+            SpringBoneCollision::ColliderView cv;
+            cv.position = center_inv.xform(coll.position);
+            cv.radius = coll.radius;
+            cv.is_capsule = coll.is_capsule;
+            if (coll.is_capsule) {
+                cv.tail_position = center_inv.xform(coll.tail_position);
+            }
+            views.push_back(cv);
+        }
+    }
+    return views;
+}
+
+// ---------------------------------------------------------------------------
+// Binding
+// ---------------------------------------------------------------------------
 void VRMSpringBoneSimulator::_bind_methods() {
-  ClassDB::bind_method(D_METHOD("setup", "spring_bones", "collider_groups"),
-                       &VRMSpringBoneSimulator::setup);
-  ClassDB::bind_method(D_METHOD("update_parameters", "gravity_multiplier",
-                                "gravity_rotation", "add_force"),
-                       &VRMSpringBoneSimulator::update_parameters);
-  ClassDB::bind_method(D_METHOD("step_simulation"),
-                       &VRMSpringBoneSimulator::step_simulation);
-  ClassDB::bind_method(D_METHOD("get_chain_count"),
-                       &VRMSpringBoneSimulator::get_chain_count);
-  ClassDB::bind_method(D_METHOD("get_joint_count", "chain_idx"),
-                       &VRMSpringBoneSimulator::get_joint_count);
-  ClassDB::bind_method(
-      D_METHOD("get_joint_current_tail", "chain_idx", "joint_idx"),
-      &VRMSpringBoneSimulator::get_joint_current_tail);
-  ClassDB::bind_method(D_METHOD("draw_gizmo", "mesh", "skel_to_gizmo", "color",
-                                "draw_spring_bones", "draw_colliders"),
-                       &VRMSpringBoneSimulator::draw_gizmo);
+    ClassDB::bind_method(D_METHOD("setup", "spring_bones", "collider_groups"), &VRMSpringBoneSimulator::setup);
+    ClassDB::bind_method(D_METHOD("update_parameters", "gravity_multiplier", "gravity_rotation", "add_force"), &VRMSpringBoneSimulator::update_parameters);
+    ClassDB::bind_method(D_METHOD("step_simulation"), &VRMSpringBoneSimulator::step_simulation);
+    ClassDB::bind_method(D_METHOD("get_chain_count"), &VRMSpringBoneSimulator::get_chain_count);
+    ClassDB::bind_method(D_METHOD("get_joint_count", "chain_idx"), &VRMSpringBoneSimulator::get_joint_count);
+    ClassDB::bind_method(D_METHOD("get_joint_current_tail", "chain_idx", "joint_idx"), &VRMSpringBoneSimulator::get_joint_current_tail);
+    ClassDB::bind_method(D_METHOD("draw_gizmo", "mesh", "skel_to_gizmo", "color", "draw_spring_bones", "draw_colliders"), &VRMSpringBoneSimulator::draw_gizmo);
+
+    // Wind
+    ClassDB::bind_method(D_METHOD("set_wind_direction", "direction"), &VRMSpringBoneSimulator::set_wind_direction);
+    ClassDB::bind_method(D_METHOD("get_wind_direction"), &VRMSpringBoneSimulator::get_wind_direction);
+    ClassDB::bind_method(D_METHOD("set_wind_strength", "strength"), &VRMSpringBoneSimulator::set_wind_strength);
+    ClassDB::bind_method(D_METHOD("get_wind_strength"), &VRMSpringBoneSimulator::get_wind_strength);
+    ClassDB::bind_method(D_METHOD("set_wind_turbulence", "turbulence"), &VRMSpringBoneSimulator::set_wind_turbulence);
+    ClassDB::bind_method(D_METHOD("get_wind_turbulence"), &VRMSpringBoneSimulator::get_wind_turbulence);
+    ClassDB::bind_method(D_METHOD("set_wind_frequency", "frequency"), &VRMSpringBoneSimulator::set_wind_frequency);
+    ClassDB::bind_method(D_METHOD("get_wind_frequency"), &VRMSpringBoneSimulator::get_wind_frequency);
+
+    // Environment Collision
+    ClassDB::bind_method(D_METHOD("set_environment_collision_enabled", "enabled"), &VRMSpringBoneSimulator::set_environment_collision_enabled);
+    ClassDB::bind_method(D_METHOD("is_environment_collision_enabled"), &VRMSpringBoneSimulator::is_environment_collision_enabled);
+    ClassDB::bind_method(D_METHOD("set_environment_collision_mask", "mask"), &VRMSpringBoneSimulator::set_environment_collision_mask);
+    ClassDB::bind_method(D_METHOD("get_environment_collision_mask"), &VRMSpringBoneSimulator::get_environment_collision_mask);
+
+    ADD_GROUP("Wind Settings", "wind_");
+    ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "wind_direction"), "set_wind_direction", "get_wind_direction");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "wind_strength"), "set_wind_strength", "get_wind_strength");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "wind_turbulence"), "set_wind_turbulence", "get_wind_turbulence");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "wind_frequency"), "set_wind_frequency", "get_wind_frequency");
+
+    ADD_GROUP("Environment Collision Settings", "environment_collision_");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "environment_collision_enabled"), "set_environment_collision_enabled", "is_environment_collision_enabled");
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "environment_collision_mask"), "set_environment_collision_mask", "get_environment_collision_mask");
 }
 
 VRMSpringBoneSimulator::VRMSpringBoneSimulator() {}
-
 VRMSpringBoneSimulator::~VRMSpringBoneSimulator() {}
 
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
 void VRMSpringBoneSimulator::update_parameters(float p_gravity_multiplier,
                                                Quaternion p_gravity_rotation,
                                                Vector3 p_add_force) {
-  gravity_multiplier = p_gravity_multiplier;
-  gravity_rotation = p_gravity_rotation;
-  add_force = p_add_force;
+    gravity_multiplier = p_gravity_multiplier;
+    gravity_rotation = p_gravity_rotation;
+    add_force = p_add_force;
 }
 
 void VRMSpringBoneSimulator::step_simulation() { _process_modification(); }
 
-void VRMSpringBoneSimulator::setup(Array p_spring_bones,
-                                   Array p_collider_groups) {
-  chains.clear();
-  all_colliders.clear();
-  all_collider_groups.clear();
-  is_setup = false;
+void VRMSpringBoneSimulator::setup(Array p_spring_bones, Array p_collider_groups) {
+    chains.clear();
+    all_colliders.clear();
+    all_collider_groups.clear();
+    is_setup = false;
 
-  Skeleton3D *skel = get_skeleton();
-  if (!skel) {
-    return;
-  }
-
-  // 1. Process Colliders
-  for (int i = 0; i < p_collider_groups.size(); ++i) {
-    Ref<Resource> group = p_collider_groups[i];
-    if (group.is_null())
-      continue;
-
-    CPPSpringBoneColliderGroup cpp_group;
-    Array colliders_arr = group->get("colliders");
-    for (int j = 0; j < colliders_arr.size(); ++j) {
-      Ref<Resource> coll_res = colliders_arr[j];
-      if (coll_res.is_null())
-        continue;
-
-      CPPSpringBoneCollider c;
-      String bone_name = coll_res->get("bone");
-      if (!bone_name.is_empty()) {
-        c.bone_idx = skel->find_bone(bone_name);
-      }
-
-      NodePath np = coll_res->get("node_path");
-      if (!np.is_empty()) {
-        c.node = Object::cast_to<Node3D>(get_node_or_null(np));
-      }
-
-      c.offset = coll_res->get("offset");
-      c.tail = coll_res->get("tail");
-      c.radius = coll_res->get("radius");
-      c.is_capsule = coll_res->get("is_capsule");
-      c.gizmo_color = coll_res->get("gizmo_color");
-
-      cpp_group.collider_indices.push_back((int)all_colliders.size());
-      all_colliders.push_back(c);
+    Skeleton3D *skel = get_skeleton();
+    if (!skel) {
+        return;
     }
-    UtilityFunctions::print("[VRM_DBG] ColliderGroup ", i, ": ", (int)cpp_group.collider_indices.size(), " colliders");
-    all_collider_groups.push_back(cpp_group);
-  }
 
-  // 2. Process Spring Bones (Chains)
-  for (int i = 0; i < p_spring_bones.size(); ++i) {
-    Ref<Resource> sb_res = p_spring_bones[i];
-    if (sb_res.is_null())
-      continue;
+    SpringBoneSetup::parse_collider_groups(p_collider_groups, skel, this, all_colliders, all_collider_groups);
+    SpringBoneSetup::parse_spring_bones(p_spring_bones, p_collider_groups, skel, this, chains);
 
-    CPPSpringBoneChain chain;
-    PackedStringArray joint_nodes = sb_res->get("joint_nodes");
+    is_setup = true;
+    need_reset = true;
+}
 
-    chain.stiffness_scale = sb_res->get("stiffness_scale");
-    chain.drag_force_scale = sb_res->get("drag_force_scale");
-    chain.hit_radius_scale = sb_res->get("hit_radius_scale");
-    chain.gravity_scale = sb_res->get("gravity_scale");
-    chain.gravity_dir_default = sb_res->get("gravity_dir_default");
-
-    // Joint specific arrays
-    PackedFloat64Array stiffness_force = sb_res->get("stiffness_force");
-    for (int j = 0; j < stiffness_force.size(); ++j)
-      chain.stiffness_force.push_back((float)stiffness_force[j]);
-
-    PackedFloat64Array gravity_power = sb_res->get("gravity_power");
-    for (int j = 0; j < gravity_power.size(); ++j)
-      chain.gravity_power.push_back((float)gravity_power[j]);
-
-    PackedVector3Array gravity_dir = sb_res->get("gravity_dir");
-    for (int j = 0; j < gravity_dir.size(); ++j)
-      chain.gravity_dir.push_back(gravity_dir[j]);
-
-    PackedFloat64Array drag_force = sb_res->get("drag_force");
-    for (int j = 0; j < drag_force.size(); ++j)
-      chain.drag_force.push_back((float)drag_force[j]);
-
-    PackedFloat64Array hit_radius = sb_res->get("hit_radius");
-    for (int j = 0; j < hit_radius.size(); ++j)
-      chain.hit_radius.push_back((float)hit_radius[j]);
-
-    // Center
-    String center_bone_name = sb_res->get("center_bone");
-    if (!center_bone_name.is_empty()) {
-      chain.center_bone = skel->find_bone(center_bone_name);
+// ---------------------------------------------------------------------------
+// Simulation
+// ---------------------------------------------------------------------------
+void VRMSpringBoneSimulator::_process_modification() {
+    Skeleton3D *skel = get_skeleton();
+    if (!skel || !is_setup) {
+        return;
     }
-    NodePath center_np = sb_res->get("center_node");
-    if (!center_np.is_empty()) {
-      chain.center_node = Object::cast_to<Node3D>(get_node_or_null(center_np));
+
+    float delta = (float)get_process_delta_time();
+    if (delta <= 0.0001f) {
+        delta = 0.016666f;
     }
+
+    wind_time += delta;
+    _update_colliders(skel);
 
     Transform3D skel_global_inv = skel->get_global_transform().affine_inverse();
-    Transform3D center_transform;
-    if (chain.center_bone != -1) {
-      center_transform = skel->get_bone_global_pose(chain.center_bone);
-    } else if (chain.center_node) {
-      center_transform =
-          skel_global_inv * chain.center_node->get_global_transform();
-    }
-    Transform3D center_transform_inv = center_transform.affine_inverse();
 
-    // Build joints
-    for (int j = 0; j < joint_nodes.size() - 1; ++j) {
-      CPPSpringBoneJoint joint;
-      joint.bone_idx = skel->find_bone(joint_nodes[j]);
-      if (joint.bone_idx == -1)
-        continue;
-
-      joint.parent_idx = skel->get_bone_parent(joint.bone_idx);
-
-      Vector3 pos;
-      if (joint_nodes[j + 1].is_empty()) {
-        Vector3 delta = skel->get_bone_rest(joint.bone_idx).origin;
-        pos = delta.normalized() * 0.07f;
-      } else {
-        int first_child = skel->find_bone(joint_nodes[j + 1]);
-        if (first_child != -1) {
-          Vector3 local_position = skel->get_bone_rest(first_child).origin;
-          Vector3 sca = skel->get_bone_rest(first_child).basis.get_scale();
-          pos = Vector3(local_position.x * sca.x, local_position.y * sca.y,
-                        local_position.z * sca.z);
-        } else {
-          pos = Vector3(0, -0.07f, 0);
-        }
-      }
-
-      joint.initial_transform =
-          skel->get_bone_global_pose_no_override(joint.bone_idx);
-      joint.global_pose = joint.initial_transform;
-      joint.bone_axis = pos.normalized();
-      joint.length = pos.length();
-
-      // Initial tail positions in center frame
-      Vector3 world_child_position = joint.initial_transform.xform(pos);
-      joint.current_tail = center_transform_inv.xform(world_child_position);
-      joint.prev_tail = joint.current_tail;
-
-      chain.joints.push_back(joint);
+    if (need_reset) {
+        _reset_chains(skel, skel_global_inv);
+        need_reset = false;
     }
 
-    // Collider group indices
-    Array c_groups = sb_res->get("collider_groups");
-    for (int j = 0; j < c_groups.size(); ++j) {
-      Ref<Resource> c_group_res = c_groups[j];
-      if (c_group_res.is_null())
-        continue;
-
-      bool found = false;
-      for (int k = 0; k < p_collider_groups.size(); ++k) {
-        Ref<Resource> p_group_res = p_collider_groups[k];
-        if (p_group_res.is_null())
-          continue;
-
-        if (p_group_res->get_instance_id() == c_group_res->get_instance_id()) {
-          chain.collider_group_indices.push_back(k);
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        UtilityFunctions::print("[VRM_DBG] Chain ", i, ": collider group NOT FOUND! instance_id=", (int64_t)c_group_res->get_instance_id());
-      }
-    }
-
-    UtilityFunctions::print("[VRM_DBG] Chain ", i, ": ", (int)chain.joints.size(), " joints, ", (int)chain.collider_group_indices.size(), " collider groups, center_bone=", chain.center_bone);
-    chains.push_back(chain);
-  }
-
-  is_setup = true;
-  need_reset = true;
-  _debug_logged = true;  // suppress until frame 60
-  _debug_frame = 0;
-  UtilityFunctions::print("[VRM_DBG] Setup complete: ", (int)chains.size(), " chains, ", (int)all_colliders.size(), " colliders, ", (int)all_collider_groups.size(), " groups");
+    _simulate_chains(skel, skel_global_inv, delta);
 }
 
-void VRMSpringBoneSimulator::_process_modification() {
-  Skeleton3D *skel = get_skeleton();
-  if (!skel) {
-    return;
-  }
-  if (!is_setup) {
-    return;
-  }
+void VRMSpringBoneSimulator::_reset_chains(Skeleton3D *skel, const Transform3D &skel_global_inv) {
+    static const int PUSH_OUT_PASSES = 4;
 
-  float delta = (float)get_process_delta_time();
-  if (delta <= 0.0001f) {
-    // Forced mid-frame updates can report zero delta; keep physics state
-    // moving.
-    delta = 0.016666f;
-  }
-
-  _debug_frame++;
-  // Only log after 60 frames so physics has settled
-  if (_debug_frame == 60) {
-    _debug_logged = false;
-  }
-
-  _update_colliders(skel);
-
-  Transform3D skel_global_inv = skel->get_global_transform().affine_inverse();
-
-  if (need_reset) {
     for (auto &chain : chains) {
-      Transform3D center_transform;
-      if (chain.center_bone != -1) {
-        center_transform = skel->get_bone_global_pose(chain.center_bone);
-      } else if (chain.center_node) {
-        center_transform =
-            skel_global_inv * chain.center_node->get_global_transform();
-      }
-      Transform3D center_transform_inv = center_transform.affine_inverse();
+        Transform3D center = get_center_transform(chain, skel, skel_global_inv);
+        Transform3D center_inv = center.affine_inverse();
 
-      for (auto &joint : chain.joints) {
-        if (joint.parent_idx == -1) {
-          joint.initial_transform = skel->get_bone_pose(joint.bone_idx);
-        } else {
-          joint.initial_transform =
-              skel->get_bone_global_pose(joint.parent_idx) *
-              skel->get_bone_pose(joint.bone_idx);
-        }
-        joint.global_pose = joint.initial_transform;
-        Vector3 pos = joint.bone_axis * joint.length;
-        Vector3 world_child_position = joint.initial_transform.xform(pos);
-        joint.current_tail = center_transform_inv.xform(world_child_position);
-        joint.prev_tail = joint.current_tail;
-      }
-    }
-    need_reset = false;
-  }
-
-  for (auto &chain : chains) {
-    Transform3D center_transform;
-    if (chain.center_bone != -1) {
-      center_transform = skel->get_bone_global_pose(chain.center_bone);
-    } else if (chain.center_node) {
-      center_transform =
-          skel_global_inv * chain.center_node->get_global_transform();
-    }
-
-    Transform3D center_transform_inv = center_transform.affine_inverse();
-    Quaternion center_rot = center_transform.basis.get_rotation_quaternion();
-    Quaternion center_rot_inv = center_rot.inverse();
-
-    for (size_t i = 0; i < chain.joints.size(); ++i) {
-      auto &joint = chain.joints[i];
-
-      float stiffness = chain.stiffness_scale * delta;
-      if (!chain.stiffness_force.empty()) {
-        stiffness *= (i < chain.stiffness_force.size())
-                         ? chain.stiffness_force[i]
-                         : chain.stiffness_force.back();
-      }
-
-      float drag = chain.drag_force_scale;
-      if (!chain.drag_force.empty()) {
-        drag *= (i < chain.drag_force.size()) ? chain.drag_force[i]
-                                              : chain.drag_force.back();
-      }
-
-      Vector3 gravity_dir = (i < chain.gravity_dir.size())
-                                ? chain.gravity_dir[i]
-                                : chain.gravity_dir_default;
-      float grav_pow = 1.0f;
-      if (!chain.gravity_power.empty()) {
-        grav_pow = (i < chain.gravity_power.size())
-                       ? chain.gravity_power[i]
-                       : chain.gravity_power.back();
-      }
-
-      Vector3 total_gravity =
-          gravity_rotation.xform(gravity_dir * grav_pow * gravity_multiplier);
-      Vector3 gravity_part = total_gravity * delta * chain.gravity_scale;
-      Vector3 external =
-          center_rot_inv.xform(gravity_part) + (add_force * delta);
-
-      if (joint.parent_idx == -1) {
-        joint.global_pose = skel->get_bone_pose(joint.bone_idx);
-      } else {
-        joint.global_pose = skel->get_bone_global_pose(joint.parent_idx) *
-                            skel->get_bone_pose(joint.bone_idx);
-      }
-
-      // origin in center space
-      Vector3 origin = center_transform_inv.xform(joint.global_pose.origin);
-      Quaternion local_rot = joint.global_pose.basis.get_rotation_quaternion();
-      Quaternion local_rot_center = center_rot_inv * local_rot;
-
-      Vector3 next_tail =
-          joint.current_tail +
-          (joint.current_tail - joint.prev_tail) * (1.0f - drag) +
-          (local_rot_center.xform(joint.bone_axis * stiffness) + external);
-
-      next_tail = origin + (next_tail - origin).normalized() * joint.length;
-
-      float radius_val = chain.hit_radius_scale;
-      if (!chain.hit_radius.empty()) {
-        radius_val *= (i < chain.hit_radius.size()) ? chain.hit_radius[i]
-                                                    : chain.hit_radius.back();
-      }
-
-      // Collision
-      for (auto &coll_group_idx : chain.collider_group_indices) {
-        if (coll_group_idx < 0 ||
-            coll_group_idx >= (int)all_collider_groups.size())
-          continue;
-
-        const auto &cpp_group = all_collider_groups[coll_group_idx];
-        for (auto &coll_idx : cpp_group.collider_indices) {
-          const auto &coll = all_colliders[coll_idx];
-          Vector3 coll_pos = center_transform_inv.xform(coll.position);
-
-          if (coll.is_capsule) {
-            Vector3 tail_pos = center_transform_inv.xform(coll.tail_position);
-            Vector3 P = tail_pos - coll_pos;
-            Vector3 Q = next_tail - coll_pos;
-            float dot = P.dot(Q);
-            float p_len_sq = P.length_squared();
-            if (p_len_sq > 0.00001f) {
-              float t = CLAMP(dot / p_len_sq, 0.0f, 1.0f);
-              coll_pos += P * t;
+        // Reset tail positions to rest pose
+        for (auto &joint : chain.joints) {
+            if (joint.parent_idx == -1) {
+                joint.initial_transform = skel->get_bone_pose(joint.bone_idx);
+            } else {
+                joint.initial_transform = skel->get_bone_global_pose(joint.parent_idx) * skel->get_bone_pose(joint.bone_idx);
             }
-          }
-
-          Vector3 diff = next_tail - coll_pos;
-          float r = radius_val + coll.radius;
-
-          if (!_debug_logged && !chain.collider_group_indices.empty()) {
-            UtilityFunctions::print("[VRM_DBG] Coll: skel=", coll.position, " center=", coll_pos, " tail=", next_tail, " diff=", diff.length(), " r=", r, " jR=", radius_val, " cR=", coll.radius, " bi=", coll.bone_idx);
-          }
-
-          if (diff.length_squared() <= r * r) {
-            if (!_debug_logged) {
-              UtilityFunctions::print("[VRM_DBG] HIT!");
-            }
-            Vector3 normal = diff.normalized();
-            Vector3 pos_from_collider = coll_pos + normal * r;
-            next_tail = origin + (pos_from_collider - origin).normalized() *
-                                     joint.length;
-          }
+            joint.global_pose = joint.initial_transform;
+            Vector3 world_child = joint.initial_transform.xform(joint.bone_axis * joint.length);
+            joint.current_tail = center_inv.xform(world_child);
+            joint.prev_tail = joint.current_tail;
         }
-      }
-      if (!_debug_logged && !chain.collider_group_indices.empty() && i == 0) {
-        UtilityFunctions::print("[VRM_DBG] Chain origin=", origin, " center=", center_transform, " bone=", joint.bone_idx, " len=", joint.length);
-        _debug_logged = true;
-      }
 
-      joint.prev_tail = joint.current_tail;
-      joint.current_tail = next_tail;
-
-      // Apply rotation to bone
-      // 1. Get current bone global transform (skel-local)
-      Transform3D current_global_tf = joint.global_pose;
-
-      // 2. Transform the simulated tail position (next_tail) from center space
-      // back to skel-local space
-      Vector3 next_tail_skel = center_transform.xform(next_tail);
-
-      // 3. Calculate target direction in bone's local space
-      // We want to find the direction from joint origin to next_tail_skel, in
-      // the bone's coordinate system
-      Vector3 local_target_dir =
-          current_global_tf.affine_inverse()
-              .basis.xform(next_tail_skel - current_global_tf.origin)
-              .normalized();
-
-      // 4. Calculate rotation from bone_axis (default direction) to
-      // local_target_dir
-      Quaternion local_rot_diff =
-          _from_to_rotation_safe(joint.bone_axis, local_target_dir);
-
-      if (local_rot_diff != Quaternion()) {
-        // 5. Apply this local rotation to the global pose
-        // new_global_rot = current_global_rot * local_rot_diff
-        Quaternion new_global_rot =
-            current_global_tf.basis.get_rotation_quaternion() * local_rot_diff;
-
-        Vector3 scl = current_global_tf.basis.get_scale();
-        joint.global_pose.basis = Basis(new_global_rot).scaled(scl);
-        skel->set_bone_global_pose(joint.bone_idx, joint.global_pose);
-      }
+        // Push-out pass: resolve initial collider penetration
+        auto collider_views = gather_collider_views(chain, all_colliders, all_collider_groups, center_inv);
+        for (int pass = 0; pass < PUSH_OUT_PASSES; ++pass) {
+            for (size_t i = 0; i < chain.joints.size(); ++i) {
+                auto &joint = chain.joints[i];
+                Vector3 origin = center_inv.xform(joint.global_pose.origin);
+                float radius = chain.hit_radius_scale * joint_param(chain.hit_radius, i);
+                joint.current_tail = SpringBoneCollision::resolve_all_colliders(
+                    joint.current_tail, origin, radius, joint.length, collider_views);
+                joint.prev_tail = joint.current_tail;
+            }
+        }
     }
-  }
 }
 
+void VRMSpringBoneSimulator::_simulate_chains(Skeleton3D *skel, const Transform3D &skel_global_inv, float delta) {
+    for (auto &chain : chains) {
+        Transform3D center = get_center_transform(chain, skel, skel_global_inv);
+        Transform3D center_inv = center.affine_inverse();
+        Quaternion center_rot = center.basis.get_rotation_quaternion();
+        Quaternion center_rot_inv = center_rot.inverse();
+
+        auto collider_views = gather_collider_views(chain, all_colliders, all_collider_groups, center_inv);
+
+        for (size_t i = 0; i < chain.joints.size(); ++i) {
+            auto &joint = chain.joints[i];
+
+            // Per-joint parameters
+            float stiffness = chain.stiffness_scale * delta * joint_param(chain.stiffness_force, i);
+            float drag = chain.drag_force_scale * joint_param(chain.drag_force, i);
+            float grav_pow = joint_param(chain.gravity_power, i);
+            Vector3 grav_dir = joint_param_vec(chain.gravity_dir, i, chain.gravity_dir_default);
+            float radius = chain.hit_radius_scale * joint_param(chain.hit_radius, i);
+
+            // External forces
+            Vector3 total_gravity = gravity_rotation.xform(grav_dir * grav_pow * gravity_multiplier);
+            Vector3 external = center_rot_inv.xform(total_gravity * delta * chain.gravity_scale) + (add_force * delta);
+
+            // Wind
+            if (wind_strength > 0.0001f) {
+                SpringBoneWind::WindParams wp;
+                wp.direction = wind_direction;
+                wp.strength = wind_strength;
+                wp.turbulence = wind_turbulence;
+                wp.frequency = wind_frequency;
+                Vector3 wind_val = SpringBoneWind::compute_wind_force(wp, joint.current_tail, wind_time, (int)joint.bone_idx + (int)i * 100);
+                external += center_rot_inv.xform(wind_val * delta);
+            }
+
+            // Update global pose from skeleton
+            if (joint.parent_idx == -1) {
+                joint.global_pose = skel->get_bone_pose(joint.bone_idx);
+            } else {
+                joint.global_pose = skel->get_bone_global_pose(joint.parent_idx) * skel->get_bone_pose(joint.bone_idx);
+            }
+
+            Vector3 origin = center_inv.xform(joint.global_pose.origin);
+            Quaternion local_rot_center = center_rot_inv * joint.global_pose.basis.get_rotation_quaternion();
+
+            // Verlet step
+            SpringBonePhysics::VerletState vs{joint.current_tail, joint.prev_tail, joint.length, joint.bone_axis};
+            SpringBonePhysics::ForceParams fp{stiffness, drag, external};
+            Vector3 next_tail = SpringBonePhysics::step_verlet(vs, fp, origin, local_rot_center);
+            next_tail = SpringBonePhysics::apply_length_constraint(next_tail, origin, joint.length);
+
+            // VRM Colliders
+            next_tail = SpringBoneCollision::resolve_all_colliders(next_tail, origin, radius, joint.length, collider_views);
+
+            // Environment collision (optional)
+            if (environment_collision_enabled && chain.enable_environment_collision) {
+                Vector3 env_push;
+                _query_game_object_collisions(skel, center.xform(next_tail), radius, chain.environment_collision_mask, env_push);
+                if (!env_push.is_zero_approx()) {
+                    next_tail += center_inv.basis.xform(env_push);
+                    next_tail = SpringBonePhysics::apply_length_constraint(next_tail, origin, joint.length);
+                }
+            }
+
+            joint.prev_tail = joint.current_tail;
+            joint.current_tail = next_tail;
+
+            // Apply rotation to skeleton
+            Transform3D tf = joint.global_pose;
+            Vector3 local_target_dir = tf.affine_inverse().basis.xform(center.xform(next_tail) - tf.origin).normalized();
+            Quaternion rot_diff = SpringBonePhysics::compute_bone_rotation(joint.bone_axis, local_target_dir);
+            if (rot_diff != Quaternion()) {
+                Quaternion new_rot = tf.basis.get_rotation_quaternion() * rot_diff;
+                joint.global_pose.basis = Basis(new_rot).scaled(tf.basis.get_scale());
+                skel->set_bone_global_pose(joint.bone_idx, joint.global_pose);
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Collider position update
+// ---------------------------------------------------------------------------
 void VRMSpringBoneSimulator::_update_colliders(Skeleton3D *skel) {
-  Transform3D skel_global_inv = skel->get_global_transform().affine_inverse();
-
-  for (auto &c : all_colliders) {
-    if (c.bone_idx != -1) {
-      Transform3D bone_global = skel->get_bone_global_pose(c.bone_idx);
-      c.position = bone_global.xform(c.offset);
-      if (c.is_capsule)
-        c.tail_position = bone_global.xform(c.tail);
-    } else if (c.node) {
-      Transform3D node_global =
-          skel_global_inv * c.node->get_global_transform();
-      c.position = node_global.xform(c.offset);
-      if (c.is_capsule)
-        c.tail_position = node_global.xform(c.tail);
+    Transform3D skel_global_inv = skel->get_global_transform().affine_inverse();
+    for (auto &c : all_colliders) {
+        Transform3D tf;
+        if (c.bone_idx != -1) {
+            tf = skel->get_bone_global_pose(c.bone_idx);
+        } else if (c.node) {
+            tf = skel_global_inv * c.node->get_global_transform();
+        } else {
+            continue;
+        }
+        c.position = tf.xform(c.offset);
+        if (c.is_capsule) {
+            c.tail_position = tf.xform(c.tail);
+        }
     }
-  }
 }
 
-Quaternion VRMSpringBoneSimulator::_from_to_rotation_safe(Vector3 from,
-                                                          Vector3 to) {
-  Vector3 axis = from.cross(to);
-  if (axis.is_zero_approx()) {
-    return Quaternion();
-  }
-  float angle = from.angle_to(to);
-  if (Math::is_equal_approx(angle, 0.0f)) {
-    return Quaternion();
-  }
-  return Quaternion(axis.normalized(), angle);
-}
-
-int VRMSpringBoneSimulator::get_chain_count() const {
-  return (int)chains.size();
-}
+// ---------------------------------------------------------------------------
+// Accessors
+// ---------------------------------------------------------------------------
+int VRMSpringBoneSimulator::get_chain_count() const { return (int)chains.size(); }
 
 int VRMSpringBoneSimulator::get_joint_count(int p_chain_idx) const {
-  if (p_chain_idx < 0 || p_chain_idx >= (int)chains.size()) {
-    return 0;
-  }
-  return (int)chains[p_chain_idx].joints.size();
+    if (p_chain_idx < 0 || p_chain_idx >= (int)chains.size()) return 0;
+    return (int)chains[p_chain_idx].joints.size();
 }
 
-Vector3 VRMSpringBoneSimulator::get_joint_current_tail(int p_chain_idx,
-                                                       int p_joint_idx) const {
-  if (p_chain_idx < 0 || p_chain_idx >= (int)chains.size()) {
-    return Vector3();
-  }
-  const auto &chain = chains[p_chain_idx];
-  if (p_joint_idx < 0 || p_joint_idx >= (int)chain.joints.size()) {
-    return Vector3();
-  }
-  return chain.joints[p_joint_idx].current_tail;
+Vector3 VRMSpringBoneSimulator::get_joint_current_tail(int p_chain_idx, int p_joint_idx) const {
+    if (p_chain_idx < 0 || p_chain_idx >= (int)chains.size()) return Vector3();
+    const auto &chain = chains[p_chain_idx];
+    if (p_joint_idx < 0 || p_joint_idx >= (int)chain.joints.size()) return Vector3();
+    return chain.joints[p_joint_idx].current_tail;
 }
 
-void VRMSpringBoneSimulator::draw_gizmo(Object *p_mesh_obj,
-                                        Transform3D p_skel_to_gizmo,
-                                        Color p_color, bool p_draw_spring_bones,
-                                        bool p_draw_colliders) {
-  ImmediateMesh *mesh = Object::cast_to<ImmediateMesh>(p_mesh_obj);
-  if (!mesh)
-    return;
+void VRMSpringBoneSimulator::draw_gizmo(Object *p_mesh_obj, Transform3D p_skel_to_gizmo,
+                                        Color p_color, bool p_draw_spring_bones, bool p_draw_colliders) {
+    ImmediateMesh *mesh = Object::cast_to<ImmediateMesh>(p_mesh_obj);
+    Skeleton3D *skel = get_skeleton();
+    SpringBoneGizmo::draw_gizmo(mesh, skel, p_skel_to_gizmo, chains, all_colliders, p_color, p_draw_spring_bones, p_draw_colliders);
+}
 
-  mesh->clear_surfaces();
+// ---------------------------------------------------------------------------
+// Wind property accessors
+// ---------------------------------------------------------------------------
+void VRMSpringBoneSimulator::set_wind_direction(Vector3 p_dir) { wind_direction = p_dir; }
+Vector3 VRMSpringBoneSimulator::get_wind_direction() const { return wind_direction; }
+void VRMSpringBoneSimulator::set_wind_strength(float p_strength) { wind_strength = p_strength; }
+float VRMSpringBoneSimulator::get_wind_strength() const { return wind_strength; }
+void VRMSpringBoneSimulator::set_wind_turbulence(float p_turbulence) { wind_turbulence = p_turbulence; }
+float VRMSpringBoneSimulator::get_wind_turbulence() const { return wind_turbulence; }
+void VRMSpringBoneSimulator::set_wind_frequency(float p_frequency) { wind_frequency = p_frequency; }
+float VRMSpringBoneSimulator::get_wind_frequency() const { return wind_frequency; }
 
-  Skeleton3D *skel = get_skeleton();
-  if (!skel)
-    return;
+// ---------------------------------------------------------------------------
+// Environment collision property accessors
+// ---------------------------------------------------------------------------
+void VRMSpringBoneSimulator::set_environment_collision_enabled(bool p_enabled) { environment_collision_enabled = p_enabled; }
+bool VRMSpringBoneSimulator::is_environment_collision_enabled() const { return environment_collision_enabled; }
+void VRMSpringBoneSimulator::set_environment_collision_mask(uint32_t p_mask) { environment_collision_mask = p_mask; }
+uint32_t VRMSpringBoneSimulator::get_environment_collision_mask() const { return environment_collision_mask; }
 
-  Transform3D skel_global_inv = skel->get_global_transform().affine_inverse();
+// ---------------------------------------------------------------------------
+// PhysicsServer3D query for game object collision
+// ---------------------------------------------------------------------------
+void VRMSpringBoneSimulator::_query_game_object_collisions(Skeleton3D *skel,
+                                                            const Vector3 &tail_world,
+                                                            float radius,
+                                                            uint32_t mask,
+                                                            Vector3 &out_push) {
+    out_push = Vector3();
+    if (!skel) return;
 
-  if (p_draw_spring_bones && !chains.empty()) {
-    mesh->surface_begin(Mesh::PRIMITIVE_LINES);
-    for (const auto &chain : chains) {
-      Transform3D center_transform;
-      if (chain.center_bone != -1) {
-        center_transform = skel->get_bone_global_pose(chain.center_bone);
-      } else if (chain.center_node) {
-        center_transform =
-            skel_global_inv * chain.center_node->get_global_transform();
-      }
+    Ref<World3D> world = skel->get_world_3d();
+    if (world.is_null()) return;
 
-      for (const auto &joint : chain.joints) {
-        Vector3 start_skel = joint.global_pose.origin;
-        Vector3 end_skel = center_transform.xform(joint.current_tail);
+    PhysicsDirectSpaceState3D *space_state = world->get_direct_space_state();
+    if (!space_state) return;
 
-        Vector3 start_gizmo = p_skel_to_gizmo.xform(start_skel);
-        Vector3 end_gizmo = p_skel_to_gizmo.xform(end_skel);
+    Ref<SphereShape3D> shape;
+    shape.instantiate();
+    shape->set_radius(radius);
 
-        _draw_line(mesh, start_gizmo, end_gizmo, p_color);
-        _draw_sphere(mesh, Basis(), start_gizmo, 0.015f, p_color);
-      }
-      if (!chain.joints.empty()) {
-        Vector3 end_skel =
-            center_transform.xform(chain.joints.back().current_tail);
-        Vector3 end_gizmo = p_skel_to_gizmo.xform(end_skel);
-        _draw_sphere(mesh, Basis(), end_gizmo, 0.015f, p_color);
-      }
+    Ref<PhysicsShapeQueryParameters3D> params;
+    params.instantiate();
+    params->set_shape(shape);
+    params->set_transform(Transform3D(Basis(), tail_world));
+    params->set_collision_mask(mask);
+
+    // Exclude the model's own collision objects
+    TypedArray<RID> exclude;
+    Node *parent = skel->get_parent();
+    if (parent) {
+        CollisionObject3D *co = Object::cast_to<CollisionObject3D>(parent);
+        if (co) {
+            exclude.push_back(co->get_rid());
+        }
     }
-    mesh->surface_end();
-  }
+    params->set_exclude(exclude);
 
-  if (p_draw_colliders && !all_colliders.empty()) {
-    mesh->surface_begin(Mesh::PRIMITIVE_LINES);
-    for (const auto &c : all_colliders) {
-      Vector3 pos_gizmo = p_skel_to_gizmo.xform(c.position);
-      Color col = c.gizmo_color;
+    TypedArray<Vector3> contacts = space_state->collide_shape(params, 32);
+    if (contacts.size() < 2) return;
 
-      if (c.is_capsule) {
-        Vector3 tail_gizmo = p_skel_to_gizmo.xform(c.tail_position);
-        _draw_line(mesh, pos_gizmo, tail_gizmo, col);
-        _draw_sphere(mesh, Basis(), pos_gizmo, c.radius, col);
-        _draw_sphere(mesh, Basis(), tail_gizmo, c.radius, col);
-      } else {
-        _draw_sphere(mesh, Basis(), pos_gizmo, c.radius, col);
-      }
+    Vector3 total_push;
+    int count = 0;
+    for (int i = 0; i < contacts.size() - 1; i += 2) {
+        total_push += Vector3(contacts[i]) - Vector3(contacts[i + 1]);
+        count++;
     }
-    mesh->surface_end();
-  }
+    if (count > 0) {
+        out_push = total_push / (float)count;
+    }
 }
 
-void VRMSpringBoneSimulator::_draw_sphere(ImmediateMesh *p_mesh,
-                                          const Basis &p_bas,
-                                          const Vector3 &p_center,
-                                          float p_radius, Color p_color) {
-  if (p_radius <= 0.0f)
-    return;
-  const int step = 15;
-  const float sppi = 2.0f * (float)Math_PI / step;
-
-  for (int i = 1; i <= step; i++) {
-    p_mesh->surface_set_color(p_color);
-    p_mesh->surface_add_vertex(
-        p_center + (p_bas.get_column(1) * p_radius)
-                       .rotated(p_bas.get_column(0), sppi * (i - 1)));
-    p_mesh->surface_set_color(p_color);
-    p_mesh->surface_add_vertex(p_center +
-                               (p_bas.get_column(1) * p_radius)
-                                   .rotated(p_bas.get_column(0), sppi * i));
-  }
-  for (int i = 1; i <= step; i++) {
-    p_mesh->surface_set_color(p_color);
-    p_mesh->surface_add_vertex(
-        p_center + (p_bas.get_column(0) * p_radius)
-                       .rotated(p_bas.get_column(2), sppi * (i - 1)));
-    p_mesh->surface_set_color(p_color);
-    p_mesh->surface_add_vertex(p_center +
-                               (p_bas.get_column(0) * p_radius)
-                                   .rotated(p_bas.get_column(2), sppi * i));
-  }
-  for (int i = 1; i <= step; i++) {
-    p_mesh->surface_set_color(p_color);
-    p_mesh->surface_add_vertex(
-        p_center + (p_bas.get_column(2) * p_radius)
-                       .rotated(p_bas.get_column(1), sppi * (i - 1)));
-    p_mesh->surface_set_color(p_color);
-    p_mesh->surface_add_vertex(p_center +
-                               (p_bas.get_column(2) * p_radius)
-                                   .rotated(p_bas.get_column(1), sppi * i));
-  }
-}
-
-void VRMSpringBoneSimulator::_draw_line(ImmediateMesh *p_mesh,
-                                        const Vector3 &p_begin,
-                                        const Vector3 &p_end, Color p_color) {
-  p_mesh->surface_set_color(p_color);
-  p_mesh->surface_add_vertex(p_begin);
-  p_mesh->surface_set_color(p_color);
-  p_mesh->surface_add_vertex(p_end);
-}
+} // namespace godot

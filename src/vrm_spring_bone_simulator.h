@@ -17,7 +17,7 @@
 
 #include <vector>
 
-using namespace godot;
+namespace godot {
 
 class VRMSpringBoneSimulator : public SkeletonModifier3D {
   GDCLASS(VRMSpringBoneSimulator, SkeletonModifier3D);
@@ -70,6 +70,10 @@ public:
 
     Node3D *center_node = nullptr;
     int center_bone = -1;
+
+    // Game Object Collision settings (per chain)
+    bool enable_environment_collision = false;
+    uint32_t environment_collision_mask = 1;
   };
 
 private:
@@ -78,12 +82,21 @@ private:
   std::vector<CPPSpringBoneColliderGroup> all_collider_groups;
   bool is_setup = false;
   bool need_reset = true;
-  bool _debug_logged = false;
-  int _debug_frame = 0;
 
   float gravity_multiplier = 1.0f;
   Quaternion gravity_rotation;
   Vector3 add_force;
+
+  // Wind System Global settings
+  Vector3 wind_direction = Vector3(0, 0, 0);
+  float wind_strength = 0.0f;
+  float wind_turbulence = 0.0f;
+  float wind_frequency = 1.0f;
+  float wind_time = 0.0f;
+
+  // Environment Collision Global switches/options
+  bool environment_collision_enabled = false;
+  uint32_t environment_collision_mask = 1;
 
 protected:
   static void _bind_methods();
@@ -106,13 +119,37 @@ public:
                   Color p_color, bool p_draw_spring_bones,
                   bool p_draw_colliders);
 
+  // Getters/Setters for Wind parameters
+  void set_wind_direction(Vector3 p_dir);
+  Vector3 get_wind_direction() const;
+
+  void set_wind_strength(float p_strength);
+  float get_wind_strength() const;
+
+  void set_wind_turbulence(float p_turbulence);
+  float get_wind_turbulence() const;
+
+  void set_wind_frequency(float p_frequency);
+  float get_wind_frequency() const;
+
+  // Getters/Setters for Environment Collision parameters
+  void set_environment_collision_enabled(bool p_enabled);
+  bool is_environment_collision_enabled() const;
+
+  void set_environment_collision_mask(uint32_t p_mask);
+  uint32_t get_environment_collision_mask() const;
+
 private:
-  void _draw_sphere(ImmediateMesh *p_mesh, const Basis &p_bas,
-                    const Vector3 &p_center, float p_radius, Color p_color);
-  void _draw_line(ImmediateMesh *p_mesh, const Vector3 &p_begin,
-                  const Vector3 &p_end, Color p_color);
   void _update_colliders(Skeleton3D *skel);
-  Quaternion _from_to_rotation_safe(Vector3 from, Vector3 to);
+  void _reset_chains(Skeleton3D *skel, const Transform3D &skel_global_inv);
+  void _simulate_chains(Skeleton3D *skel, const Transform3D &skel_global_inv, float delta);
+  void _query_game_object_collisions(Skeleton3D *skel,
+                                      const Vector3 &tail_world,
+                                      float radius,
+                                      uint32_t mask,
+                                      Vector3 &out_push);
 };
+
+} // namespace godot
 
 #endif // VRM_SPRING_BONE_SIMULATOR_H
