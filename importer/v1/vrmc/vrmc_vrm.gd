@@ -148,6 +148,7 @@ func _import_preflight(
 	if not extensions.has("VRMC_vrm"):
 		return ERR_SKIP
 	_state.set_additional_data(&"vrm/remove_end_bones", true)
+        _state.set_additional_data(&"vrm/use_gdscript", false)
 	return OK
 
 

@@ -35,7 +35,15 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
 	)
 	state.set_additional_data(
 		&"vrm/remove_end_bones",
+        state.set_additional_data(
+                &"vrm/use_gdscript",
+                options.get(&"vrm/use_gdscript", false) as bool
+        )
 		options.get(&"vrm/remove_end_bones", true) as bool
+        state.set_additional_data(
+                &"vrm/use_gdscript",
+                options.get(&"vrm/use_gdscript", false) as bool
+        )
 	)
 	# HANDLE_BINARY_EMBED_AS_BASISU crashes on some files in 4.0 and 4.1
 	state.handle_binary_image = GLTFState.HANDLE_BINARY_EMBED_AS_UNCOMPRESSED # GLTFState.HANDLE_BINARY_EXTRACT_TEXTURES

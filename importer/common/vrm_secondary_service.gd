@@ -246,3 +246,4 @@ static func parse_secondary_node(
 	# Use untyped Array to avoid type-mismatch between preload-const and class_name
 	secondary_node.set("collider_groups", Array(collider_groups))
 	secondary_node.set("collider_library", Array(collider_library))
+        secondary_node.set("use_gdscript_spring_bones", gstate.get_additional_data(&"vrm/use_gdscript"))
