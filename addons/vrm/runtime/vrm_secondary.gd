@@ -137,7 +137,7 @@ func _enter_tree() -> void:
 	_parent_ref = get_parent()
 	if _parent_ref != null and _parent_ref.has_method("is_vrm_root"):
 		is_child_of_vrm = true
-		_parent_ref.set("secondary_node", self)
+		_parent_ref.set("secondary_node", self )
 		# Push data to parent
 		_parent_ref.set("collider_groups", collider_groups)
 		_parent_ref.set("collider_library", collider_library)
@@ -196,7 +196,7 @@ func _setup_spring_bone_adapter() -> void:
 
 func _setup_gizmo() -> void:
 	if _gizmo == null:
-		_gizmo = SecondaryGizmo.new(self)
+		_gizmo = SecondaryGizmo.new(self )
 		add_child(_gizmo, false, Node.INTERNAL_MODE_BACK)
 
 
