@@ -1,5 +1,22 @@
 extends GLTFDocumentExtension
 
+enum DebugMode {
+	None = 0,
+	Normal = 1,
+	LitShadeRate = 2,
+}
+
+enum FirstPersonFlag {
+	Auto, # Create headlessModel
+	Both, # Default layer
+	ThirdPersonOnly,
+	FirstPersonOnly,
+	FirstWithShadow,
+	Layers,
+	LayersWithShadow,
+	Ignore,
+}
+
 const vrm_constants_class = preload("../../core/vrm_constants.gd")
 const vrm_meta_class = preload("../../core/vrm_meta.gd")
 const vrm_secondary = preload("../../runtime/vrm_secondary.gd")
@@ -18,23 +35,6 @@ const vrm_first_person_module = preload("./vrm_first_person.gd")
 const vrm_secondary_setup_module = preload("./vrm_secondary_setup.gd")
 
 var vrm_meta: Resource = null
-
-enum DebugMode {
-	None = 0,
-	Normal = 1,
-	LitShadeRate = 2,
-}
-
-enum FirstPersonFlag {
-	Auto, # Create headlessModel
-	Both, # Default layer
-	ThirdPersonOnly,
-	FirstPersonOnly,
-	FirstWithShadow,
-	Layers,
-	LayersWithShadow,
-	Ignore,
-}
 
 const vrm_resource_factory = preload("../common/vrm_resource_factory.gd")
 

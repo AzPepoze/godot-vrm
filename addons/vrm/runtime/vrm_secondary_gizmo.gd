@@ -58,16 +58,20 @@ func _get_bone_global_position(bone_name: String) -> Vector3:
 
 
 func _get_collider_world_position(collider: Resource, skel: Skeleton3D) -> Vector3:
+	return _get_transformed_position(collider, skel, collider.offset)
+
+
+func _get_transformed_position(collider: Resource, skel: Skeleton3D, local_vec: Vector3) -> Vector3:
 	if collider.node_path and not collider.node_path.is_empty():
 		var node := secondary_node.get_node_or_null(collider.node_path)
 		if node is Node3D:
-			return (node as Node3D).global_transform * collider.offset
+			return (node as Node3D).global_transform * local_vec
 	if not collider.bone.is_empty() and skel != null:
 		return (
-			skel.global_transform * skel.get_bone_global_pose(skel.find_bone(collider.bone)).origin
-			+ collider.offset
+			skel.global_transform
+			* (skel.get_bone_global_pose(skel.find_bone(collider.bone)) * local_vec)
 		)
-	return collider.offset
+	return local_vec
 
 
 func draw_spring_bones(color: Color) -> void:
@@ -161,7 +165,7 @@ func draw_spring_bones(color: Color) -> void:
 				if bone_name.is_empty():
 					continue
 				var joint_pos: Vector3 = secondary_node.to_local(_get_bone_global_position(bone_name))
-				draw_sphere(Basis.IDENTITY, joint_pos, 0.003, color)
+				draw_sphere(Basis.IDENTITY, joint_pos, 0.015, color)
 		mesh.surface_end()
 
 
@@ -185,8 +189,8 @@ func draw_collider_groups() -> void:
 		var pos: Vector3 = secondary_node.to_local(_get_collider_world_position(collider, skel))
 		var col: Color = collider.gizmo_color if collider.gizmo_color else Color.MAGENTA
 		if collider.is_capsule:
-			var tail_pos: Vector3 = (
-				pos + (skel.global_transform.basis * collider.tail if skel else collider.tail)
+			var tail_pos: Vector3 = secondary_node.to_local(
+				_get_transformed_position(collider, skel, collider.tail)
 			)
 			draw_line(pos, tail_pos, col)
 			draw_sphere(Basis.IDENTITY, pos, collider.radius, col)

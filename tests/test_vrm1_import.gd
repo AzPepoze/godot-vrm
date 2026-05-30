@@ -308,6 +308,7 @@ func test_vrm1_collider_groups_are_groups_not_flat_colliders():
 	if collider_groups_raw == null:
 		return
 	var collider_groups: Array = collider_groups_raw
+	print("  [V1 collider_groups]: size=%d" % collider_groups.size())
 	if collider_groups.size() == 0:
 		# No collider groups present — not an error, just skip detailed checks
 		print("  [INFO] VRM 1.0 file has no collider groups (springs without colliders)")
@@ -332,7 +333,48 @@ func test_vrm1_collider_groups_are_groups_not_flat_colliders():
 						)
 
 
-# ── Meshes & materials ───────────────────────────────────────────────────────
+func test_vrm1_collider_groups_consistent_with_spring_bones():
+	"""If any spring bone references a collider group, collider_groups must not be empty."""
+	if not _secondary:
+		return
+	var spring_bones: Array = _secondary.get("spring_bones")
+	if spring_bones.is_empty():
+		return
+
+	var spring_references_colliders := false
+	for sb in spring_bones:
+		if sb == null:
+			continue
+		var cgs = sb.get("collider_groups")
+		if cgs != null:
+			var cg_arr: Array = cgs
+			if cg_arr.size() > 0:
+				spring_references_colliders = true
+				break
+
+	var collider_groups_raw = _secondary.get("collider_groups")
+	assert_not_null(
+		collider_groups_raw,
+		"secondary.collider_groups must exist (import should set it)"
+	)
+
+	if not spring_references_colliders:
+		print("  [INFO] No spring bones reference collider groups — collider_groups may be 0")
+		return
+
+	var collider_groups: Array = collider_groups_raw
+	assert_gt(
+		collider_groups.size(),
+		0,
+		(
+			"collider_groups must not be empty when spring bones reference collider groups. "
+			+"Size: %d. This indicates the import is not assigning collider_groups to secondary."
+			% collider_groups.size()
+		)
+	)
+
+
+# ── Meshes & materials ═══════════════════════════════════════════════════════════
 
 
 func test_vrm1_meshes_have_materials():

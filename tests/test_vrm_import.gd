@@ -94,6 +94,65 @@ func test_load_alicia_spring_bones():
 	GLTFDocument.unregister_gltf_document_extension(vrm_ext)
 
 
+func test_load_alicia_collider_groups():
+	var gltf := GLTFDocument.new()
+	var vrm_ext := VRM_EXTENSION.new()
+	GLTFDocument.register_gltf_document_extension(vrm_ext, true)
+
+	var state := GLTFState.new()
+	var err := gltf.append_from_file("res://vrm_samples/AliciaSolid_vrm-0.51.vrm", state, 8)
+	assert_eq(err, OK, "append_from_file should succeed")
+	if err != OK:
+		GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+		return
+
+	var scene_root := gltf.generate_scene(state)
+	runner.root.add_child(scene_root)
+	await runner.wait_frame
+
+	var secondary := scene_root.get_node_or_null("secondary")
+	assert_not_null(secondary, "secondary node should exist")
+
+	# Check that collider_groups property exists and is accessible
+	var collider_groups_raw = secondary.get("collider_groups")
+	assert_not_null(
+		collider_groups_raw, "secondary.collider_groups must exist (import should set it)"
+	)
+	if collider_groups_raw != null:
+		var cgs_arr: Array = collider_groups_raw
+		print("  [V0 collider_groups]: size=%d" % cgs_arr.size())
+
+	var spring_bones: Array = secondary.get("spring_bones")
+
+	# If spring bones reference colliders, collider_groups must not be empty
+	var has_collider_refs := false
+	for sb in spring_bones:
+		if sb == null:
+			continue
+		var cgs = sb.get("collider_groups")
+		if cgs != null:
+			var cg_arr: Array = cgs
+			if cg_arr.size() > 0:
+				has_collider_refs = true
+				break
+
+	if has_collider_refs:
+		var cgs_arr: Array = collider_groups_raw
+		assert_gt(
+			cgs_arr.size(),
+			0,
+			(
+				"collider_groups must not be empty when spring bones reference collider groups. "
+				+"Size: %d. Import is not assigning collider_groups to secondary."
+				% cgs_arr.size()
+			)
+		)
+
+	scene_root.queue_free()
+	await runner.wait_frame
+	GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+
+
 func test_load_godette_small_file():
 	var gltf := GLTFDocument.new()
 	var vrm_ext := VRM_EXTENSION.new()
