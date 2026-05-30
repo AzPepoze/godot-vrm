@@ -19,7 +19,7 @@ enum Level {
 	NONE = 4,
 }
 
-static var _cached_level: int = 0
+static var _cached_level: int = -1
 
 
 static func _get_log_level() -> int:
