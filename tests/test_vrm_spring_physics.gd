@@ -1,7 +1,7 @@
 extends "res://tests/test_base.gd"
 
 const VRM_INSTANCE = preload("res://addons/vrm/core/vrm_instance.gd")
-const VRM_SECONDARY = preload("res://addons/vrm/runtime/vrm_secondary.gd")
+const VRM_SECONDARY = preload("res://addons/vrm/runtime/vrm_spring_bone_controller.gd")
 
 
 func test_vrm_spring_force_displacement():
@@ -15,7 +15,7 @@ func test_vrm_spring_force_displacement():
 		preload("res://addons/vrm/importer/v1/vrmc/vrmc_materials_mtoon.gd").new(),
 		(
 			preload("res://addons/vrm/importer/v1/vrmc/vrmc_materials_hdr_emissive_multiplier.gd")
-			. new()
+			.new()
 		),
 		preload("res://addons/vrm/importer/v1/vrmc/vrmc_vrm.gd").new(),
 		preload("res://addons/vrm/importer/v1/vrmc/vrmc_vrm_animation.gd").new(),
@@ -40,18 +40,18 @@ func test_vrm_spring_force_displacement():
 	await runner.process_frame
 	await runner.process_frame
 
-	var secondary = scene_root.get_node_or_null("secondary")
-	assert_not_null(secondary, "Secondary node should exist")
-	if secondary == null:
+	var spring_bone_controller = scene_root.get_node_or_null("VRMSpringBoneController")
+	assert_not_null(spring_bone_controller, "SpringBoneController node should exist")
+	if spring_bone_controller == null:
 		return
 
-	var skeleton: Skeleton3D = secondary.skel
+	var skeleton: Skeleton3D = spring_bone_controller.skel
 	if skeleton == null:
 		skeleton = scene_root.find_child("GeneralSkeleton", true, false)
 		if skeleton:
-			secondary.skeleton = secondary.get_path_to(skeleton)
+			spring_bone_controller.skeleton = spring_bone_controller.get_path_to(skeleton)
 			await runner.process_frame
-			skeleton = secondary.skel
+			skeleton = spring_bone_controller.skel
 
 	assert_not_null(skeleton, "Skeleton should be found")
 	if skeleton == null:
@@ -59,8 +59,8 @@ func test_vrm_spring_force_displacement():
 	skeleton.modifier_callback_mode_process = Skeleton3D.MODIFIER_CALLBACK_MODE_PROCESS_MANUAL
 
 	# Enable simulation
-	secondary.disable_colliders = false
-	secondary.update_in_editor = true
+	spring_bone_controller.disable_colliders = false
+	spring_bone_controller.update_in_editor = true
 
 	# Wait for simulation to be added and initialized
 	for i in range(10):
@@ -83,7 +83,7 @@ func test_vrm_spring_force_displacement():
 	var initial_rot = skeleton.get_bone_global_pose(bone_idx).basis.get_rotation_quaternion()
 
 	# Apply force
-	scene_root.settings.springbone_add_force = Vector3(1000, 0, 0)  # Massive force
+	scene_root.settings.springbone_add_force = Vector3(1000, 0, 0) # Massive force
 
 	# Simulate
 	for i in range(30):

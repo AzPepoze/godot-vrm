@@ -1,6 +1,6 @@
 extends GLTFDocumentExtension
 
-const vrm_secondary = preload("../../../runtime/vrm_secondary.gd")
+const vrm_spring_bone_controller = preload("../../../runtime/vrm_spring_bone_controller.gd")
 const vrm_spring_bone_parser = preload("../../common/vrm_spring_bone_parser.gd")
 const vrm_collider_group = preload("../../../runtime/vrm_collider_group.gd")
 const VRMLogger = preload("../../../core/logger.gd")
@@ -16,16 +16,16 @@ func _import_preflight(
 
 func _import_post(gstate: GLTFState, node: Node) -> Error:
 	var vrm_extension: Dictionary = gstate.json["extensions"]["VRMC_springBone"]
-	var secondary_node: Node = node.get_node_or_null("secondary")
-	if secondary_node == null:
-		secondary_node = Node3D.new()
-		secondary_node.name = "secondary"
-		node.add_child(secondary_node, true)
-		secondary_node.owner = node
+	var spring_bone_controller: Node = node.get_node_or_null("VRMSpringBoneController")
+	if spring_bone_controller == null:
+		spring_bone_controller = Node3D.new()
+		spring_bone_controller.name = "VRMSpringBoneController"
+		node.add_child(spring_bone_controller, true)
+		spring_bone_controller.owner = node
 
 	# Parse Colliders (v1 flat list)
 	var colliders = vrm_spring_bone_parser.parse_colliders_v1(
-		vrm_extension.get("colliders", []), gstate, secondary_node
+		vrm_extension.get("colliders", []), gstate, spring_bone_controller
 	)
 
 	# Parse Collider Groups referencing colliders by index
@@ -38,7 +38,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 
 	# Parse Spring Bones
 	var spring_bones = vrm_spring_bone_parser.parse_springs_v1(
-		vrm_extension.get("springs", []), gstate, collider_groups, secondary_node
+		vrm_extension.get("springs", []), gstate, collider_groups, spring_bone_controller
 	)
 
 	# Determine skeleton path from first spring bone
@@ -47,12 +47,12 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 		var first_bone_name = spring_bones[0].joint_nodes[0]
 		var skeleton = node.get_node_or_null("%GeneralSkeleton")
 		if skeleton:
-			skeleton_path = secondary_node.get_path_to(skeleton)
+			skeleton_path = spring_bone_controller.get_path_to(skeleton)
 
-	secondary_node.set_script(vrm_secondary)
-	secondary_node.set("skeleton", skeleton_path)
-	secondary_node.set("spring_bones", Array(spring_bones))
-	secondary_node.set("collider_groups", Array(collider_groups))
-	secondary_node.set("collider_library", Array(colliders))
+	spring_bone_controller.set_script(vrm_spring_bone_controller)
+	spring_bone_controller.set("skeleton", skeleton_path)
+	spring_bone_controller.set("spring_bones", Array(spring_bones))
+	spring_bone_controller.set("collider_groups", Array(collider_groups))
+	spring_bone_controller.set("collider_library", Array(colliders))
 
 	return OK

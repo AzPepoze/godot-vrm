@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="VRMSettings" format=3 uid="uid://co3a34c0yn7yj"]
-
-[ext_resource type="Script" uid="uid://bognse4tffw4p" path="res://addons/vrm/core/vrm_settings.gd" id="1_f0nby"]
-
-[resource]
-script = ExtResource("1_f0nby")
-wind_direction = Vector3(0, 0.305, 0.275)
-wind_strength = 0.44
-metadata/_custom_type_script = "uid://bognse4tffw4p"

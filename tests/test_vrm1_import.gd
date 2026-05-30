@@ -3,7 +3,7 @@ extends "res://tests/test_base.gd"
 # End-to-end VRM 1.0 integration tests using AvatarSample_M.vrm.
 # Registers all 6 V1 GLTF extensions (matching plugin.gd) and imports the VRM file,
 # then verifies the resulting scene tree, skeleton, meta, animations, spring bones,
-# collider groups, materials, and secondary node ownership.
+# collider groups, materials, and spring_bone_controller node ownership.
 
 # Preload all V1 extension classes (matching plugin.gd registration order)
 const VRMC_NODE_CONSTRAINT = preload("res://addons/vrm/importer/v1/vrmc/vrmc_node_constraint.gd")
@@ -22,7 +22,7 @@ var _scene_root: Node = null
 var _gltf: GLTFDocument = null
 var _skeleton: Skeleton3D = null
 var _anim_player: AnimationPlayer = null
-var _secondary: Node = null
+var _spring_bone_controller: Node = null
 var _import_error: Error = OK
 var _extensions := []
 
@@ -64,7 +64,7 @@ func before_each():
 
 			_skeleton = _find_skeleton(_scene_root)
 			_anim_player = _find_animation_player(_scene_root)
-			_secondary = _scene_root.get_node_or_null("secondary")
+			_spring_bone_controller = _scene_root.get_node_or_null("VRMSpringBoneController")
 
 
 func _find_skeleton(root: Node) -> Skeleton3D:
@@ -164,25 +164,28 @@ func test_vrm1_animation_preset_names():
 	)
 
 
-# ── Secondary / spring bones ─────────────────────────────────────────────────
+# ── SpringBoneController / spring bones ─────────────────────────────────────────────────
 
 
-func test_vrm1_secondary_node_exists():
-	assert_not_null(_secondary, "secondary node must exist in scene root")
+func test_vrm1_spring_bone_controller_exists():
+	assert_not_null(_spring_bone_controller, "spring_bone_controller node must exist in scene root")
 
 
-func test_vrm1_secondary_node_has_owner():
-	if not _secondary:
+func test_vrm1_spring_bone_controller_has_owner():
+	if not _spring_bone_controller:
 		return
-	# Bug 3: secondary.owner must not be null
-	assert_not_null(_secondary.owner, "secondary.owner MUST NOT be null (Bug 3 regression)")
+	# Bug 3: spring_bone_controller.owner must not be null
+	assert_not_null(
+		_spring_bone_controller.owner,
+		"spring_bone_controller.owner MUST NOT be null (Bug 3 regression)"
+	)
 
 
-func test_vrm1_secondary_has_spring_bones():
-	if not _secondary:
+func test_vrm1_spring_bone_controller_has_spring_bones():
+	if not _spring_bone_controller:
 		return
-	var spring_bones_raw = _secondary.get("spring_bones")
-	assert_not_null(spring_bones_raw, "spring_bones property must exist on secondary")
+	var spring_bones_raw = _spring_bone_controller.get("spring_bones")
+	assert_not_null(spring_bones_raw, "spring_bones property must exist on spring_bone_controller")
 	if spring_bones_raw == null:
 		return
 	# spring_bones should be an Array
@@ -198,9 +201,9 @@ func test_vrm1_secondary_has_spring_bones():
 
 
 func test_vrm1_spring_bone_group_assigned():
-	if not _secondary:
+	if not _spring_bone_controller:
 		return
-	var spring_bones: Array = _secondary.get("spring_bones")
+	var spring_bones: Array = _spring_bone_controller.get("spring_bones")
 	if spring_bones.is_empty():
 		return
 	for i in spring_bones.size():
@@ -215,9 +218,9 @@ func test_vrm1_spring_bone_group_assigned():
 
 
 func test_vrm1_spring_bone_resource_name_readable():
-	if not _secondary:
+	if not _spring_bone_controller:
 		return
-	var spring_bones: Array = _secondary.get("spring_bones")
+	var spring_bones: Array = _spring_bone_controller.get("spring_bones")
 	if spring_bones.is_empty():
 		return
 	# If comment is set, resource_name should contain both group and bone name
@@ -243,9 +246,9 @@ func test_vrm1_spring_bone_resource_name_readable():
 
 
 func test_vrm1_spring_bones_sorted_by_group():
-	if not _secondary:
+	if not _spring_bone_controller:
 		return
-	var spring_bones: Array = _secondary.get("spring_bones")
+	var spring_bones: Array = _spring_bone_controller.get("spring_bones")
 	if spring_bones.size() < 2:
 		return
 	for i in spring_bones.size() - 1:
@@ -265,9 +268,9 @@ func test_vrm1_spring_bones_sorted_by_group():
 
 func test_vrm1_spring_bone_report():
 	"""Print spring bone count and group breakdown for inspection."""
-	if not _secondary:
+	if not _spring_bone_controller:
 		return
-	var spring_bones: Array = _secondary.get("spring_bones")
+	var spring_bones: Array = _spring_bone_controller.get("spring_bones")
 	if spring_bones.is_empty():
 		return
 	var groups := {}
@@ -286,25 +289,28 @@ func test_vrm1_spring_bone_report():
 	)
 
 
-func test_vrm1_secondary_has_skeleton_path():
-	if not _secondary:
+func test_vrm1_spring_bone_controller_has_skeleton_path():
+	if not _spring_bone_controller:
 		return
-	var skeleton_path = _secondary.get("skeleton")
-	assert_not_null(skeleton_path, "secondary.skeleton must be set")
+	var skeleton_path = _spring_bone_controller.get("skeleton")
+	assert_not_null(skeleton_path, "spring_bone_controller.skeleton must be set")
 	if skeleton_path == null:
 		return
 	# Bug 1: skeleton path must resolve to a valid node
-	var resolved = _secondary.get_node_or_null(skeleton_path)
+	var resolved = _spring_bone_controller.get_node_or_null(skeleton_path)
 	assert_not_null(
-		resolved, "secondary.skeleton path must resolve to a valid Skeleton3D (Bug 1 regression)"
+		resolved,
+		"spring_bone_controller.skeleton path must resolve to a valid Skeleton3D (Bug 1 regression)"
 	)
 
 
 func test_vrm1_collider_groups_are_groups_not_flat_colliders():
-	if not _secondary:
+	if not _spring_bone_controller:
 		return
-	var collider_groups_raw = _secondary.get("collider_groups")
-	assert_not_null(collider_groups_raw, "collider_groups property must exist on secondary")
+	var collider_groups_raw = _spring_bone_controller.get("collider_groups")
+	assert_not_null(
+		collider_groups_raw, "collider_groups property must exist on spring_bone_controller"
+	)
 	if collider_groups_raw == null:
 		return
 	var collider_groups: Array = collider_groups_raw
@@ -335,9 +341,9 @@ func test_vrm1_collider_groups_are_groups_not_flat_colliders():
 
 func test_vrm1_collider_groups_consistent_with_spring_bones():
 	"""If any spring bone references a collider group, collider_groups must not be empty."""
-	if not _secondary:
+	if not _spring_bone_controller:
 		return
-	var spring_bones: Array = _secondary.get("spring_bones")
+	var spring_bones: Array = _spring_bone_controller.get("spring_bones")
 	if spring_bones.is_empty():
 		return
 
@@ -352,9 +358,10 @@ func test_vrm1_collider_groups_consistent_with_spring_bones():
 				spring_references_colliders = true
 				break
 
-	var collider_groups_raw = _secondary.get("collider_groups")
+	var collider_groups_raw = _spring_bone_controller.get("collider_groups")
 	assert_not_null(
-		collider_groups_raw, "secondary.collider_groups must exist (import should set it)"
+		collider_groups_raw,
+		"spring_bone_controller.collider_groups must exist (import should set it)"
 	)
 
 	if not spring_references_colliders:
@@ -368,18 +375,18 @@ func test_vrm1_collider_groups_consistent_with_spring_bones():
 		(
 			"collider_groups must not be empty when spring bones reference collider groups. "
 			+ (
-				"Size: %d. This indicates the import is not assigning collider_groups to secondary."
+				"Size: %d. This indicates the import is not assigning collider_groups to spring_bone_controller."
 				% collider_groups.size()
 			)
 		)
 	)
 
 
-func test_vrm1_spring_collider_group_refs_resolve_to_secondary_groups():
-	if not _secondary:
+func test_vrm1_spring_collider_group_refs_resolve_to_spring_bone_controller_groups():
+	if not _spring_bone_controller:
 		return
 
-	var collider_groups: Array = _secondary.get("collider_groups")
+	var collider_groups: Array = _spring_bone_controller.get("collider_groups")
 	if collider_groups.is_empty():
 		return
 
@@ -388,7 +395,7 @@ func test_vrm1_spring_collider_group_refs_resolve_to_secondary_groups():
 		if group != null:
 			collider_group_ids[group.get_instance_id()] = true
 
-	var spring_bones: Array = _secondary.get("spring_bones")
+	var spring_bones: Array = _spring_bone_controller.get("spring_bones")
 	var referenced_group_count := 0
 	for sb in spring_bones:
 		if sb == null:
@@ -401,7 +408,7 @@ func test_vrm1_spring_collider_group_refs_resolve_to_secondary_groups():
 				continue
 			assert_true(
 				collider_group_ids.has(group.get_instance_id()),
-				"Spring bone collider group reference must resolve to secondary.collider_groups"
+				"Spring bone collider group reference must resolve to spring_bone_controller.collider_groups"
 			)
 
 	assert_gt(
@@ -458,7 +465,7 @@ func test_vrm1_end_bone_nodes_removed():
 		0,
 		(
 			"Skeleton should have zero children named '*_end*' after cleanup, "
-			+ "but found %d: %s" % [end_bone_nodes.size(), str(end_bone_nodes)]
+			+"but found %d: %s" % [end_bone_nodes.size(), str(end_bone_nodes)]
 		)
 	)
 

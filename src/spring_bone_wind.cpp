@@ -19,7 +19,7 @@ Vector3 compute_wind_force(const WindParams &params,
   float pos_phase = joint_position.dot(wind_dir) * 2.0f;
   float base_phase = time * params.frequency + pos_phase + (float)joint_seed;
 
-  // Layered sines: Primary slow sway, and secondary faster flutter
+  // Layered sines: Primary slow sway, and spring_bone_controller faster flutter
   float wave1 = Math::sin(base_phase);
   float wave2 = Math::sin(base_phase * 2.3f + 1.5f) * 0.4f;
   float wave3 = Math::sin(base_phase * 5.7f + 0.7f) * 0.2f;

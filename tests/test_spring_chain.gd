@@ -40,7 +40,7 @@ func test_collider_group_resource():
 	assert_eq(cg.colliders.size(), 1, "Collider group should have 1 collider after append")
 
 
-func test_secondary_service_chain_building():
+func test_spring_bone_service_chain_building():
 	# Create a simple skeleton with a bone chain
 	var skel := Skeleton3D.new()
 	skel.add_bone("Root")

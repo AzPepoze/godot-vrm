@@ -45,7 +45,7 @@ Spring bones are driven by a **C++ GDExtension** (`VRMSpringBoneSimulation`) reg
 
 ```
 VRMInstance (scene root)
-  └─ VRMSecondary (Node3D) — holds spring bone chains & collider groups
+  └─ VRMSpringBoneController (Node3D) — holds spring bone chains & collider groups
        └─ VRMSpringBoneAdapter (GDScript bridge)
             └─ VRMSpringBoneSimulation (C++ SkeletonModifier3D, child of skeleton)
 ```
@@ -53,8 +53,8 @@ VRMInstance (scene root)
 - **Simulation**: Per-frame physics for joint chains with configurable stiffness, gravity, drag, and sphere/capsule collider collision.
 - **Adapter**: Auto-detects if the C++ GDExtension is available; falls back gracefully with a warning if not built.
 - **Per-Joint Settings**: Each spring bone chain supports per-joint overrides for stiffness force, gravity power/direction, drag force, and hit radius (optional `PackedFloat64Array` / `PackedVector3Array` exports).
-- **Gizmo**: Editor visualization of spring bone chains and colliders (`VRMSecondaryGizmo`). Spring bones and colliders have independent toggle controls (`gizmo_spring_bone` and `gizmo_show_colliders`).
-- **Gravity Control**: Exposed on `VRMSecondary` — multiplier, rotation offset, and additive force vector for wind or directional gravity effects.
+- **Gizmo**: Editor visualization of spring bone chains and colliders (`VRMSpringBoneControllerGizmo`). Spring bones and colliders have independent toggle controls (`gizmo_spring_bone` and `gizmo_show_colliders`).
+- **Gravity Control**: Exposed on `VRMSpringBoneController` — multiplier, rotation offset, and additive force vector for wind or directional gravity effects.
 - **Collision**: Sphere and capsule colliders with configurable radius and offset; colliders are organized into groups per the VRM spec.
 
 ## Import Options (Post-Import Plugin)

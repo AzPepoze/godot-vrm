@@ -77,9 +77,14 @@ signal settings_changed
 		settings_changed.emit()
 
 @export_group("Springbone Runtime Settings")
-@export var update_secondary_in_physics: bool = false:
+@export var update_in_editor: bool = false:
 	set(value):
-		update_secondary_in_physics = value
+		update_in_editor = value
+		settings_changed.emit()
+
+@export var update_spring_bone_controller_in_physics: bool = false:
+	set(value):
+		update_spring_bone_controller_in_physics = value
 		settings_changed.emit()
 
 @export var disable_colliders: bool = false:
@@ -92,10 +97,6 @@ signal settings_changed
 		override_springbone_center = value
 		settings_changed.emit()
 
-@export var update_in_editor: bool = false:
-	set(value):
-		update_in_editor = value
-		settings_changed.emit()
 
 @export_group("Springbone Gizmos")
 @export var gizmo_spring_bone: bool = false:

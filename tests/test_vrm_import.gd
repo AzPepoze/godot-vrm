@@ -70,11 +70,13 @@ func test_load_alicia_spring_bones():
 	runner.root.add_child(scene_root)
 	await runner.wait_frame
 
-	# Check secondary spring bone node
-	var secondary := scene_root.get_node_or_null("secondary")
-	assert_not_null(secondary, "secondary node should exist for spring bones")
-	if secondary:
-		var spring_bones: Array = secondary.spring_bones
+	# Check spring_bone_controller spring bone node
+	var spring_bone_controller := scene_root.get_node_or_null("VRMSpringBoneController")
+	assert_not_null(
+		spring_bone_controller, "spring_bone_controller node should exist for spring bones"
+	)
+	if spring_bone_controller:
+		var spring_bones: Array = spring_bone_controller.spring_bones
 		assert_true(
 			spring_bones.size() > 0, "Should have spring bones, got %d" % spring_bones.size()
 		)
@@ -110,19 +112,20 @@ func test_load_alicia_collider_groups():
 	runner.root.add_child(scene_root)
 	await runner.wait_frame
 
-	var secondary := scene_root.get_node_or_null("secondary")
-	assert_not_null(secondary, "secondary node should exist")
+	var spring_bone_controller := scene_root.get_node_or_null("VRMSpringBoneController")
+	assert_not_null(spring_bone_controller, "spring_bone_controller node should exist")
 
 	# Check that collider_groups property exists and is accessible
-	var collider_groups_raw = secondary.get("collider_groups")
+	var collider_groups_raw = spring_bone_controller.get("collider_groups")
 	assert_not_null(
-		collider_groups_raw, "secondary.collider_groups must exist (import should set it)"
+		collider_groups_raw,
+		"spring_bone_controller.collider_groups must exist (import should set it)"
 	)
 	if collider_groups_raw != null:
 		var cgs_arr: Array = collider_groups_raw
 		print("  [V0 collider_groups]: size=%d" % cgs_arr.size())
 
-	var spring_bones: Array = secondary.get("spring_bones")
+	var spring_bones: Array = spring_bone_controller.get("spring_bones")
 
 	# If spring bones reference colliders, collider_groups must not be empty
 	var has_collider_refs := false
@@ -143,7 +146,10 @@ func test_load_alicia_collider_groups():
 			0,
 			(
 				"collider_groups must not be empty when spring bones reference collider groups. "
-				+ "Size: %d. Import is not assigning collider_groups to secondary." % cgs_arr.size()
+				+ (
+					"Size: %d. Import is not assigning collider_groups to spring_bone_controller."
+					% cgs_arr.size()
+				)
 			)
 		)
 
@@ -215,7 +221,7 @@ func test_v0_alicia_end_bones_removed():
 			0,
 			(
 				"Skeleton should have zero *_end children after cleanup, "
-				+ "found %d: %s" % [end_bone_children.size(), str(end_bone_children)]
+				+"found %d: %s" % [end_bone_children.size(), str(end_bone_children)]
 			)
 		)
 		# Skeleton must still have bones (bones != scene-node children)
@@ -258,7 +264,7 @@ func test_v0_godette_end_bones_removed():
 			0,
 			(
 				"Skeleton should have zero *_end children after cleanup, "
-				+ "found %d: %s" % [end_bone_children.size(), str(end_bone_children)]
+				+"found %d: %s" % [end_bone_children.size(), str(end_bone_children)]
 			)
 		)
 		assert_ge(

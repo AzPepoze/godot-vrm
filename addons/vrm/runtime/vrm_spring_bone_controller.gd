@@ -1,21 +1,21 @@
 @tool
-class_name VRMSecondary
+class_name VRMSpringBoneController
 extends Node3D
 
 const VRMLogger = preload("../core/logger.gd")
 const spring_bone_adapter_class = preload("./vrm_spring_bone_adapter.gd")
-const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
+const SecondaryGizmo = preload("./vrm_spring_bone_controller_gizmo.gd")
 
 @export_category("Springbone Settings")
-@export var update_secondary_in_physics: bool:
+@export var update_spring_bone_controller_in_physics: bool:
 	get:
 		if _settings == null:
 			_settings = VRMSettings.new()
-		return _settings.update_secondary_in_physics
+		return _settings.update_spring_bone_controller_in_physics
 	set(value):
 		if _settings == null:
 			_settings = VRMSettings.new()
-		_settings.update_secondary_in_physics = value
+		_settings.update_spring_bone_controller_in_physics = value
 
 @export var disable_colliders: bool:
 	get:
@@ -137,7 +137,7 @@ func _enter_tree() -> void:
 	_parent_ref = get_parent()
 	if _parent_ref != null and _parent_ref.has_method("is_vrm_root"):
 		is_child_of_vrm = true
-		_parent_ref.set("secondary_node", self)
+		_parent_ref.set("VRMSpringBoneController", self )
 		# Pull settings resource
 		var parent_settings = _parent_ref.get("settings")
 		if parent_settings is VRMSettings:
@@ -157,7 +157,9 @@ func _ready() -> void:
 		skel = get_node_or_null(skeleton)
 
 	if skel == null:
-		VRMLogger.warning("vrm_secondary.gd", "_ready: no skeleton found, skipping setup")
+		VRMLogger.warning(
+			"vrm_spring_bone_controller.gd", "_ready: no skeleton found, skipping setup"
+		)
 		return
 
 	spring_bones.sort_custom(func(a, b): return a.group < b.group)
@@ -165,7 +167,8 @@ func _ready() -> void:
 	_setup_spring_bone_adapter()
 	_setup_gizmo()
 	VRMLogger.debug(
-		"vrm_secondary.gd", "_ready: setup complete for %d spring bones" % spring_bones.size()
+		"vrm_spring_bone_controller.gd",
+		"_ready: setup complete for %d spring bones" % spring_bones.size()
 	)
 
 
@@ -196,7 +199,7 @@ func _setup_spring_bone_adapter() -> void:
 
 func _setup_gizmo() -> void:
 	if _gizmo == null:
-		_gizmo = SecondaryGizmo.new(self)
+		_gizmo = SecondaryGizmo.new(self )
 		add_child(_gizmo, false, Node.INTERNAL_MODE_BACK)
 
 
@@ -255,7 +258,7 @@ func _draw_wind_arrow(
 	# Gizmo is in skeleton space because of the skel_to_gizmo transform
 	# Find Head bone for positioning
 	var head_idx = skel.find_bone("Head")
-	var start_pos_skel = Vector3(0, 1.5, 0)  # Fallback
+	var start_pos_skel = Vector3(0, 1.5, 0) # Fallback
 	if head_idx != -1:
 		start_pos_skel = skel.get_bone_global_pose(head_idx).origin
 

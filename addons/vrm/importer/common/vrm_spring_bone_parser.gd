@@ -70,7 +70,7 @@ static func parse_colliders_v0(
 	collider_groups_json: Array,
 	gstate: GLTFState,
 	pose_diffs: Array[Basis],
-	secondary_node: Node,
+	spring_bone_controller: Node,
 	offset_flip: Vector3 = Vector3(-1, 1, 1)
 ) -> Array[VRMColliderGroup]:
 	var nodes = gstate.get_nodes()
@@ -86,7 +86,7 @@ static func parse_colliders_v0(
 
 		if gltfnode.skeleton == -1:
 			var found_node: Node = gstate.get_scene_node(int(cgroup["node"]))
-			node_path = secondary_node.get_path_to(found_node)
+			node_path = spring_bone_controller.get_path_to(found_node)
 		else:
 			var skeleton: Skeleton3D = _get_skel_godot_node(gstate, skeletons, gltfnode.skeleton)
 			bone = nodes[int(cgroup["node"])].resource_name
@@ -116,7 +116,7 @@ static func parse_colliders_v0(
 
 
 static func parse_colliders_v1(
-	colliders_json: Array, gstate: GLTFState, secondary_node: Node
+	colliders_json: Array, gstate: GLTFState, spring_bone_controller: Node
 ) -> Array[VRMCollider]:
 	var nodes = gstate.get_nodes()
 	var skeletons = gstate.get_skeletons()
@@ -131,7 +131,7 @@ static func parse_colliders_v1(
 
 		if gltfnode.skeleton == -1:
 			var found_node: Node = gstate.get_scene_node(int(collider_json["node"]))
-			node_path = secondary_node.get_path_to(found_node)
+			node_path = spring_bone_controller.get_path_to(found_node)
 		else:
 			var skeleton: Skeleton3D = _get_skel_godot_node(gstate, skeletons, gltfnode.skeleton)
 			bone = nodes[int(collider_json["node"])].resource_name
@@ -170,7 +170,7 @@ static func parse_springs_v0(
 	bone_groups_json: Array,
 	gstate: GLTFState,
 	collider_groups: Array[VRMColliderGroup],
-	secondary_node: Node
+	spring_bone_controller: Node
 ) -> Array[VRMSpringBone]:
 	var nodes = gstate.get_nodes()
 	var skeletons = gstate.get_skeletons()
@@ -216,9 +216,9 @@ static func parse_springs_v0(
 				center_bone = bone_name
 			else:
 				var found_node: Node = gstate.get_scene_node(int(center_node_idx))
-				center_node = secondary_node.get_path_to(found_node)
+				center_node = spring_bone_controller.get_path_to(found_node)
 				if center_node == NodePath():
-					center_node = secondary_node.get_path_to(secondary_node)
+					center_node = spring_bone_controller.get_path_to(spring_bone_controller)
 
 		for chain in joint_chains:
 			var spring_bone: vrm_spring_bone = vrm_spring_bone.new()
@@ -247,7 +247,7 @@ static func parse_springs_v1(
 	springs_json: Array,
 	gstate: GLTFState,
 	collider_groups: Array[VRMColliderGroup],
-	secondary_node: Node
+	spring_bone_controller: Node
 ) -> Array[VRMSpringBone]:
 	var nodes = gstate.get_nodes()
 	var skeletons = gstate.get_skeletons()
@@ -303,9 +303,11 @@ static func parse_springs_v1(
 				spring_bone.center_bone = bone_name
 			else:
 				var found_node: Node = gstate.get_scene_node(int(center_node_idx))
-				spring_bone.center_node = secondary_node.get_path_to(found_node)
+				spring_bone.center_node = spring_bone_controller.get_path_to(found_node)
 				if spring_bone.center_node == NodePath():
-					spring_bone.center_node = secondary_node.get_path_to(secondary_node)
+					spring_bone.center_node = spring_bone_controller.get_path_to(
+						spring_bone_controller
+					)
 
 		spring_bone.resource_name = (
 			"%s · %s" % [comment.split("\n")[0], spring_bone.joint_nodes[0]]
