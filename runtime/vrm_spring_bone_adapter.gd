@@ -59,7 +59,7 @@ func _setup_cpp(
 		skeleton.get_node("VRMSpringBoneSimulator").queue_free()
 	simulator = ClassDB.instantiate("VRMSpringBoneSimulator")
 	simulator.name = "VRMSpringBoneSimulator"
-	skeleton.add_child(simulator, false, Node.INTERNAL_MODE_BACK)
+	skeleton.add_child.call_deferred(simulator, false, Node.INTERNAL_MODE_BACK)
 
 	var unique_collider_groups: Array = []
 	for sb in spring_bones:
