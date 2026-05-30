@@ -78,6 +78,8 @@ private:
   std::vector<CPPSpringBoneColliderGroup> all_collider_groups;
   bool is_setup = false;
   bool need_reset = true;
+  bool _debug_logged = false;
+  int _debug_frame = 0;
 
   float gravity_multiplier = 1.0f;
   Quaternion gravity_rotation;

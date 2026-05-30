@@ -54,8 +54,10 @@ func test_avatar_sample_scene_spring_overrides_keep_collider_refs():
 		for group in spring.collider_groups:
 			assert_true(
 				collider_group_ids.has(group.get_instance_id()),
-				"%s collider reference should resolve to AvatarSample_M.collider_groups"
-				% spring.resource_name
+				(
+					"%s collider reference should resolve to AvatarSample_M.collider_groups"
+					% spring.resource_name
+				)
 			)
 
 	assert_gt(checked_springs, 0, "Sample scene should include hair/skirt spring overrides")

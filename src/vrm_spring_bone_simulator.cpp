@@ -3,8 +3,10 @@
 #include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/math.hpp>
+#include <godot_cpp/variant/utility_functions.hpp>
 
 using namespace godot;
+
 
 void VRMSpringBoneSimulator::_bind_methods() {
   ClassDB::bind_method(D_METHOD("setup", "spring_bones", "collider_groups"),
@@ -85,6 +87,7 @@ void VRMSpringBoneSimulator::setup(Array p_spring_bones,
       cpp_group.collider_indices.push_back((int)all_colliders.size());
       all_colliders.push_back(c);
     }
+    UtilityFunctions::print("[VRM_DBG] ColliderGroup ", i, ": ", (int)cpp_group.collider_indices.size(), " colliders");
     all_collider_groups.push_back(cpp_group);
   }
 
@@ -190,6 +193,7 @@ void VRMSpringBoneSimulator::setup(Array p_spring_bones,
       if (c_group_res.is_null())
         continue;
 
+      bool found = false;
       for (int k = 0; k < p_collider_groups.size(); ++k) {
         Ref<Resource> p_group_res = p_collider_groups[k];
         if (p_group_res.is_null())
@@ -197,16 +201,24 @@ void VRMSpringBoneSimulator::setup(Array p_spring_bones,
 
         if (p_group_res->get_instance_id() == c_group_res->get_instance_id()) {
           chain.collider_group_indices.push_back(k);
+          found = true;
           break;
         }
       }
+      if (!found) {
+        UtilityFunctions::print("[VRM_DBG] Chain ", i, ": collider group NOT FOUND! instance_id=", (int64_t)c_group_res->get_instance_id());
+      }
     }
 
+    UtilityFunctions::print("[VRM_DBG] Chain ", i, ": ", (int)chain.joints.size(), " joints, ", (int)chain.collider_group_indices.size(), " collider groups, center_bone=", chain.center_bone);
     chains.push_back(chain);
   }
 
   is_setup = true;
   need_reset = true;
+  _debug_logged = true;  // suppress until frame 60
+  _debug_frame = 0;
+  UtilityFunctions::print("[VRM_DBG] Setup complete: ", (int)chains.size(), " chains, ", (int)all_colliders.size(), " colliders, ", (int)all_collider_groups.size(), " groups");
 }
 
 void VRMSpringBoneSimulator::_process_modification() {
@@ -223,6 +235,12 @@ void VRMSpringBoneSimulator::_process_modification() {
     // Forced mid-frame updates can report zero delta; keep physics state
     // moving.
     delta = 0.016666f;
+  }
+
+  _debug_frame++;
+  // Only log after 60 frames so physics has settled
+  if (_debug_frame == 60) {
+    _debug_logged = false;
   }
 
   _update_colliders(skel);
@@ -354,13 +372,24 @@ void VRMSpringBoneSimulator::_process_modification() {
           Vector3 diff = next_tail - coll_pos;
           float r = radius_val + coll.radius;
 
+          if (!_debug_logged && !chain.collider_group_indices.empty()) {
+            UtilityFunctions::print("[VRM_DBG] Coll: skel=", coll.position, " center=", coll_pos, " tail=", next_tail, " diff=", diff.length(), " r=", r, " jR=", radius_val, " cR=", coll.radius, " bi=", coll.bone_idx);
+          }
+
           if (diff.length_squared() <= r * r) {
+            if (!_debug_logged) {
+              UtilityFunctions::print("[VRM_DBG] HIT!");
+            }
             Vector3 normal = diff.normalized();
             Vector3 pos_from_collider = coll_pos + normal * r;
             next_tail = origin + (pos_from_collider - origin).normalized() *
                                      joint.length;
           }
         }
+      }
+      if (!_debug_logged && !chain.collider_group_indices.empty() && i == 0) {
+        UtilityFunctions::print("[VRM_DBG] Chain origin=", origin, " center=", center_transform, " bone=", joint.bone_idx, " len=", joint.length);
+        _debug_logged = true;
       }
 
       joint.prev_tail = joint.current_tail;
