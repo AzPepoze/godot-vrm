@@ -4,7 +4,7 @@ extends RefCounted
 const ROTATE_180_BASIS = Basis(Vector3(-1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1))
 const ROTATE_180_TRANSFORM = Transform3D(ROTATE_180_BASIS, Vector3.ZERO)
 
-const ImporterMeshAttributes = preload("../importer_mesh_attributes.gd")
+const ImporterMeshAttributes = preload("./importer_mesh_attributes.gd")
 const VRMGLTFLookups = preload("./vrm_gltf_lookups.gd")
 
 

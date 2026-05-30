@@ -3,7 +3,7 @@ extends GLTFDocumentExtension
 const VRMLogger = preload("../../../core/logger.gd")
 const vrm_constants_class = preload("../../../core/vrm_constants.gd")
 const vrm_meta_class = preload("../../../core/vrm_meta.gd")
-const vrm_top_level = preload("../../../core/vrm_toplevel.gd")
+const vrm_instance = preload("../../../core/vrm_instance.gd")
 const vrm_utils = preload("../../../importer/common/vrm_utils.gd")
 
 const importer_mesh_attributes = preload("../../../importer/common/importer_mesh_attributes.gd")
@@ -214,7 +214,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 		animplayer.owner = root_node
 	_create_animation_player(animplayer, vrm_extension, gstate, human_bone_to_idx, pose_diffs)
 
-	root_node.set_script(vrm_top_level)
+	root_node.set_script(vrm_instance)
 
 	var vrm_meta: Resource = _create_meta(
 		root_node,

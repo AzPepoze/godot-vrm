@@ -1,19 +1,9 @@
 @tool
 extends RefCounted
 
-const vrm_secondary_service = preload("../common/vrm_secondary_service.gd")
-
-
-static func create_joints_recursive(
-	joint_chains: Array[PackedStringArray],
-	skeleton: Skeleton3D,
-	bone_idx: int,
-	level: int,
-	current_chain: int
-):
-	vrm_secondary_service.create_joints_recursive(
-		joint_chains, skeleton, bone_idx, level, current_chain
-	)
+const VRMLogger = preload("../../core/logger.gd")
+const vrm_secondary = preload("../../runtime/vrm_secondary.gd")
+const vrm_spring_bone_parser = preload("../common/vrm_spring_bone_parser.gd")
 
 
 static func parse_secondary_node(
@@ -21,8 +11,37 @@ static func parse_secondary_node(
 	vrm_extension: Dictionary,
 	gstate: GLTFState,
 	pose_diffs: Array[Basis],
-	is_vrm_0: bool
+	_is_vrm_0: bool
 ) -> void:
-	vrm_secondary_service.parse_secondary_node(
-		secondary_node, vrm_extension, gstate, pose_diffs, is_vrm_0
+	VRMLogger.debug("vrm_secondary_setup.gd", "parse_secondary_node: parsing secondary animation")
+
+	var skeleton_path: NodePath = secondary_node.get_path_to(
+		secondary_node.get_parent().get_node("%GeneralSkeleton")
 	)
+
+	# Parse Colliders (v0 style)
+	var collider_groups = vrm_spring_bone_parser.parse_colliders_v0(
+		vrm_extension["secondaryAnimation"]["colliderGroups"],
+		gstate,
+		pose_diffs,
+		secondary_node
+	)
+
+	# Parse Spring Bones (v0 style)
+	var spring_bones = vrm_spring_bone_parser.parse_springs_v0(
+		vrm_extension["secondaryAnimation"]["boneGroups"],
+		gstate,
+		collider_groups,
+		secondary_node
+	)
+
+	# Collect all colliders into a flat library
+	var collider_library: Array[VRMCollider] = []
+	for cg in collider_groups:
+		collider_library.append_array(cg.colliders)
+
+	secondary_node.set_script(vrm_secondary)
+	secondary_node.set("skeleton", skeleton_path)
+	secondary_node.set("spring_bones", Array(spring_bones))
+	secondary_node.set("collider_groups", Array(collider_groups))
+	secondary_node.set("collider_library", Array(collider_library))

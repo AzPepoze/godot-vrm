@@ -1,55 +1,62 @@
 @tool
 extends GLTFDocumentExtension
 
-const bone_node_constraint = preload("../../../node_constraint/bone_node_constraint.gd")
-const bone_node_constraint_applier = preload(
-	"../../../node_constraint/bone_node_constraint_applier.gd"
+const vrm_constraint = preload("../../../node_constraint/vrm_constraint.gd")
+const vrm_constraint_applier = preload(
+	"../../../node_constraint/vrm_constraint_applier.gd"
 )
 
 
-func _import_preflight(_state: GLTFState, extensions: PackedStringArray) -> Error:
+func _import_preflight(
+	_state: GLTFState, extensions: PackedStringArray = PackedStringArray()
+) -> Error:
 	if extensions.has("VRMC_node_constraint"):
 		return OK
 	return ERR_SKIP
 
 
-func _parse_node_extensions(
-	gltf_state: GLTFState, gltf_node: GLTFNode, node_extensions: Dictionary
+func _import_post_parse_node(
+	_state: GLTFState, gltf_node: GLTFNode, node_extensions: Dictionary
 ) -> Error:
-	if not node_extensions.has("VRMC_node_constraint"):
-		return OK
-	var constraint_ext: Dictionary = node_extensions["VRMC_node_constraint"]
-	var constraint: bone_node_constraint = bone_node_constraint.from_dictionary(constraint_ext)
+	if node_extensions.has("VRMC_node_constraint"):
+		var constraint_ext: Dictionary = node_extensions["VRMC_node_constraint"]
+		var constraint: vrm_constraint = vrm_constraint.from_dictionary(constraint_ext)
+		gltf_node.set_additional_data(&"vrm_constraint", constraint)
+	return OK
 
-	var node_index = -1
-	var nodes = gltf_state.get_nodes()
+
+func _import_post(gstate: GLTFState, root_node: Node) -> Error:
+	var nodes = gstate.get_nodes()
 	for i in range(nodes.size()):
-		if nodes[i] == gltf_node:
-			node_index = i
-			break
-	var scene_node = gltf_state.get_scene_node(node_index)
-	if scene_node:
-		var applier = bone_node_constraint_applier.new()
-		applier.name = "VRMC_node_constraint"
-		applier.constraint = constraint
-		scene_node.add_child(applier)
-		applier.owner = gltf_state.get_scene_node(0)
-
+		var gltf_node: GLTFNode = nodes[i]
+		var constraint: vrm_constraint = gltf_node.get_additional_data(&"vrm_constraint")
+		if constraint:
+			var applier = vrm_constraint_applier.new()
+			applier.name = "VRM_ConstraintApplier_" + str(i)
+			var node = gstate.get_scene_node(i)
+			node.add_child(applier, true)
+			applier.owner = root_node
+			applier.constraints.append(constraint)
 	return OK
 
 
-func _export_preflight(_state: GLTFState, root: Node) -> Error:
-	var appliers = root.find_children("*", "VRMNodeConstraintApplier", true, false)
-	if appliers.is_empty():
-		return ERR_SKIP
-	return OK
+func _export_preflight(_state: GLTFState, root_node: Node) -> Error:
+	var appliers: Array[Node] = root_node.find_children("*", "VRMConstraintApplier", true, false)
+	if not appliers.is_empty():
+		return OK
+	return ERR_SKIP
 
 
-func _export_node_extensions(
-	state: GLTFState, _gltf_node: GLTFNode, node: Node, node_extensions: Dictionary
+func _export_post_parse_node(
+	state: GLTFState, _root_node: Node, gltf_node: GLTFNode, node_extensions: Dictionary
 ) -> Error:
-	var applier = node.get_node_or_null("VRMC_node_constraint")
-	if applier and applier is bone_node_constraint_applier:
-		node_extensions["VRMC_node_constraint"] = applier.constraint.to_dictionary()
+	var node: Node = state.get_scene_node(gltf_node.index)
+	var applier: Node = null
+	for child in node.get_children():
+		if child is vrm_constraint_applier:
+			applier = child
+			break
+	if applier and applier is vrm_constraint_applier:
+		node_extensions["VRMC_node_constraint"] = applier.constraints[0].to_dictionary()
 		state.add_used_extension("VRMC_node_constraint", false)
 	return OK

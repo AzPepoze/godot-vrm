@@ -1,8 +1,8 @@
 ## Attach this node in the scene and it will process the array of constraint
 ## resources on either bones or nodes, whatever the constraints reference.
 @tool
-@icon("icons/bone_node_constraint_applier.svg")
-class_name BoneNodeConstraintApplier
+@icon("icons/vrm_constraint_applier.svg")
+class_name VRMConstraintApplier
 extends Node
 
 @export_node_path("Skeleton3D") var skeleton: NodePath:
@@ -11,9 +11,9 @@ extends Node
 		if is_inside_tree():
 			_ready()
 
-const bone_node_constraint = preload("./bone_node_constraint.gd")
+const vrm_constraint = preload("./vrm_constraint.gd")
 
-@export var constraints: Array[bone_node_constraint] = []
+@export var constraints: Array[VRMConstraint] = []
 #@export_node_path("Skeleton3D") var skeleton_node_path: NodePath = ^"%GeneralSkeleton"
 #var skeleton: Skeleton3D
 
@@ -27,11 +27,15 @@ func _ready() -> void:
 	if skeleton != NodePath():
 		skel = get_node(skeleton)
 
-	# Try to find VRMTopLevel or VRMSecondary for global config
+	# Try to find VRMInstance or VRMSecondary for global config
 	var parent = get_parent()
 	while parent:
-		if parent.has_method("is_vrm_root") or parent is VRMSecondary:
-			global_weight_multiplier = parent.get("constraint_weight_multiplier")
+		if parent is VRMInstance or parent is VRMSecondary:
+			var settings = parent.get("settings")
+			if settings is VRMSettings:
+				global_weight_multiplier = settings.constraint_weight_multiplier
+			else:
+				global_weight_multiplier = parent.get("constraint_weight_multiplier")
 			break
 		parent = parent.get_parent()
 

@@ -23,7 +23,7 @@ const vrm_secondary = preload("../../runtime/vrm_secondary.gd")
 const vrm_collider_group = preload("../../runtime/vrm_collider_group.gd")
 const vrm_collider = preload("../../runtime/vrm_collider.gd")
 const vrm_spring_bone = preload("../../runtime/vrm_spring_bone.gd")
-const vrm_top_level = preload("../../core/vrm_toplevel.gd")
+const vrm_instance = preload("../../core/vrm_instance.gd")
 
 const importer_mesh_attributes = preload("../common/importer_mesh_attributes.gd")
 
@@ -187,7 +187,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 
 	_create_animation_player(animplayer, vrm_extension, gstate, human_bone_to_idx, pose_diffs)
 
-	root_node.set_script(vrm_top_level)
+	root_node.set_script(vrm_instance)
 
 	if (
 		vrm_extension.has("secondaryAnimation")
