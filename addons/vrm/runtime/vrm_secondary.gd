@@ -183,6 +183,8 @@ func _ready() -> void:
 func _setup_spring_bone_adapter() -> void:
 	if spring_bone_adapter == null:
 		spring_bone_adapter = spring_bone_adapter_class.new(skel)
+	else:
+		spring_bone_adapter.skeleton = skel
 
 	spring_bone_adapter.setup_simulator(
 		spring_bones, collider_groups, disable_colliders, update_in_editor

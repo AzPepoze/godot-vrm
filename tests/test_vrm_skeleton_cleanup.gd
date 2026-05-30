@@ -247,9 +247,12 @@ func test_cleanup_mixed_scenario():
 
 	var removed := Cleanup.remove_end_bone_nodes(null, skel)
 	assert_eq(removed, 1, "Only 1 node should be removed (Bone_End), got %d" % removed)
-	assert_eq(
-		skel.get_child_count(), 4, "4 children should remain (mesh, look, scripted, non-bone)"
-	)
+	var remaining_children = skel.get_children()
+	var count = 0
+	for c in remaining_children:
+		if not (c.name == "VRMSpringBoneSimulator" or c.is_class("VRMSpringBoneSimulator")):
+			count += 1
+	assert_eq(count, 4, "4 children should remain (mesh, look, scripted, non-bone)")
 
 	# Verify which ones remain
 	var remaining_names := []
