@@ -136,7 +136,7 @@ void VRMSpringBoneSimulator::setup(Array p_spring_bones,
           pos = Vector3(local_position.x * sca.x, local_position.y * sca.y,
                         local_position.z * sca.z);
         } else {
-          pos = Vector3(0, 0.07f, 0);
+          pos = Vector3(0, -0.07f, 0);
         }
       }
 
@@ -239,7 +239,7 @@ void VRMSpringBoneSimulator::_process_modification() {
           joint.current_tail +
           (joint.current_tail - joint.prev_tail) * (1.0f - drag) +
           (center_rot.xform(
-              local_rot.xform(joint.bone_axis * stiffness + external)));
+              local_rot.xform(joint.bone_axis * stiffness) + external));
 
       next_tail = origin + (next_tail - origin).normalized() * joint.length;
 
