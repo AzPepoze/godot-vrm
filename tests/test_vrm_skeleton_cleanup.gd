@@ -1,6 +1,6 @@
 extends "res://tests/test_base.gd"
 
-const Cleanup = preload("res://addons/vrm/importer/common/utils/vrm_skeleton_cleanup.gd")
+const Cleanup = preload("res://addons/vrm/importer/common/vrm_skeleton_cleanup.gd")
 
 # ── remove_end_bone_nodes: edge cases ────────────────────────────────────────
 

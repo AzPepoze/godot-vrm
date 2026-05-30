@@ -1,6 +1,6 @@
 extends "res://tests/test_base.gd"
 
-const VRM_TOPLEVEL = preload("res://addons/vrm/core/vrm_toplevel.gd")
+const VRM_INSTANCE = preload("res://addons/vrm/core/vrm_instance.gd")
 const VRM_SECONDARY = preload("res://addons/vrm/runtime/vrm_secondary.gd")
 
 
@@ -83,7 +83,7 @@ func test_vrm_spring_force_displacement():
 	var initial_rot = skeleton.get_bone_global_pose(bone_idx).basis.get_rotation_quaternion()
 
 	# Apply force
-	secondary.springbone_add_force = Vector3(1000, 0, 0)  # Massive force
+	scene_root.settings.springbone_add_force = Vector3(1000, 0, 0)  # Massive force
 
 	# Simulate
 	for i in range(30):
@@ -105,7 +105,7 @@ func test_vrm_spring_force_displacement():
 
 	assert_gt(angle, 0.0001, "Bone should rotate under heavy force")
 
-	secondary.springbone_add_force = Vector3.ZERO
+	scene_root.settings.springbone_add_force = Vector3.ZERO
 	for i in range(20):
 		simulator.step_simulation()
 		await runner.process_frame

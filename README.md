@@ -44,7 +44,7 @@ Import and export of VRM through version 1.0 is supported. Here is a feature bre
 Spring bones are driven by a **C++ GDExtension** (`VRMSpringBoneSimulator`) registered as a `SkeletonModifier3D`:
 
 ```
-VRMTopLevel (scene root)
+VRMInstance (scene root)
   └─ VRMSecondary (Node3D) — holds spring bone chains & collider groups
        └─ VRMSpringBoneAdapter (GDScript bridge)
             └─ VRMSpringBoneSimulator (C++ SkeletonModifier3D, child of skeleton)

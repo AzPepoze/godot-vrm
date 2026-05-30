@@ -25,7 +25,7 @@ const vrm_options_post_import_plugin_class = preload(
 var post_import_plugin_instance: EditorScenePostImportPlugin = null
 
 const vrm_meta_class = preload("./core/vrm_meta.gd")
-const vrm_top_level = preload("./core/vrm_toplevel.gd")
+const vrm_instance = preload("./core/vrm_instance.gd")
 const vrm_secondary = preload("./runtime/vrm_secondary.gd")
 
 const export_as_item: String = "VRM 1.0 Avatar..."

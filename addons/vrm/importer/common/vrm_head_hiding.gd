@@ -1,8 +1,8 @@
 @tool
 extends RefCounted
 
-const VRMConstants = preload("../../../core/vrm_constants.gd")
-const ImporterMeshAttributes = preload("../importer_mesh_attributes.gd")
+const VRMConstants = preload("../../core/vrm_constants.gd")
+const ImporterMeshAttributes = preload("./importer_mesh_attributes.gd")
 const VRMGLTFLookups = preload("./vrm_gltf_lookups.gd")
 
 

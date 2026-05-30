@@ -2,12 +2,12 @@
 extends RefCounted
 
 # Preload all the new modularized utilities
-const VRMMeshOrientation = preload("./utils/vrm_mesh_orientation.gd")
-const VRMSkeletonRetargeting = preload("./utils/vrm_skeleton_retargeting.gd")
-const VRMHeadHiding = preload("./utils/vrm_head_hiding.gd")
-const VRMGLTFLookups = preload("./utils/vrm_gltf_lookups.gd")
-const VRMTransformUtils = preload("./utils/vrm_transform_utils.gd")
-const VRMSkeletonCleanup = preload("./utils/vrm_skeleton_cleanup.gd")
+const VRMMeshOrientation = preload("./vrm_mesh_orientation.gd")
+const VRMSkeletonRetargeting = preload("./vrm_skeleton_retargeting.gd")
+const VRMHeadHiding = preload("./vrm_head_hiding.gd")
+const VRMGLTFLookups = preload("./vrm_gltf_lookups.gd")
+const VRMTransformUtils = preload("./vrm_transform_utils.gd")
+const VRMSkeletonCleanup = preload("./vrm_skeleton_cleanup.gd")
 
 # Re-export constants from VRMMeshOrientation
 const ROTATE_180_BASIS = VRMMeshOrientation.ROTATE_180_BASIS

@@ -1,7 +1,7 @@
 ## Constrains a target bone or node, by reading a source a bone or node.
 @tool
-@icon("icons/bone_node_constraint.svg")
-class_name BoneNodeConstraint
+@icon("icons/vrm_constraint.svg")
+class_name VRMConstraint
 extends Resource
 
 const VRMLogger = preload("../core/logger.gd")
@@ -51,7 +51,6 @@ enum AimRollAxis {
 @export var target_rest_rotation: Quaternion
 @export var target_rest_origin: Vector3
 
-# Compatibility options (for loading old scenes)
 var source_bone_index: int = -1
 var target_bone_index: int = -1
 
@@ -60,10 +59,8 @@ var target_rest_transform: Transform3D:
 		target_rest_rotation = value.basis.get_rotation_quaternion()
 		target_rest_origin = value.origin
 
-# Used during import/export and runtime, but can't be saved, instead a NodePath is saved.
 var source_node: Node3D
 var target_node: Node3D
-# Used during the import/export process, but not exposed or saved.
 var source_node_index: int = -1
 var source_bone: int = -1
 var target_bone: int = -1
@@ -98,7 +95,7 @@ func set_node_paths_from_references(applier: Node) -> void:
 
 
 func evaluate(multiplier: float = 1.0) -> void:
-	VRMLogger.debug("bone_node_constraint.gd", "evaluate: constraint_type=%d" % constraint_type)
+	VRMLogger.debug("vrm_constraint.gd", "evaluate: constraint_type=%d" % constraint_type)
 	if constraint_type == ConstraintType.AIM:
 		evaluate_aim(multiplier)
 	elif constraint_type == ConstraintType.ROLL:
@@ -110,26 +107,27 @@ func evaluate(multiplier: float = 1.0) -> void:
 func evaluate_aim(multiplier: float = 1.0) -> void:
 	if source_node == null or target_node == null:
 		return
-	var source_global_transform: Transform3D = _get_source_global_transform()  # * source_node.get_bone_pose(source_bone).affine_inverse() * Transform3D(source_node.get_bone_rest(source_bone).basis, Vector3())
+	var source_global_transform: Transform3D = _get_source_global_transform() # * source_node.get_bone_pose(source_bone).affine_inverse() * Transform3D(source_node.get_bone_rest(source_bone).basis, Vector3())
 	var target_global_transform: Transform3D = (
 		_get_target_global_transform() * target_node.get_bone_pose(target_bone).affine_inverse()
-	)  # * Transform3D(target_node.get_bone_rest(target_bone).basis, Vector3())
-	var target_rest_transform: Transform3D = target_node.get_bone_rest(target_bone)  # .basis.get_rotation_quaternion()
+	) # * Transform3D(target_node.get_bone_rest(target_bone).basis, Vector3())
+	var target_rest_transform: Transform3D = target_node.get_bone_rest(target_bone) # .basis.get_rotation_quaternion()
 	# var relative_source_transform: Transform3D = target_rest_transform.affine_inverse() * target_global_transform.affine_inverse() * source_global_transform * source_rest_transform
 	var relative_source_transform: Transform3D = (
 		target_global_transform.affine_inverse() * source_global_transform * source_rest_transform
 	)
-	var rest_dir: Vector3 = _aim_get_rest_direction(target_rest_transform.basis)  # Basis(target_rest_rotation))
+	var rest_dir: Vector3 = _aim_get_rest_direction(target_rest_transform.basis) # Basis(target_rest_rotation))
 	#if source_bone_name == 'LeftHand':
 	VRMLogger.debug(
-		"bone_node_constraint.gd",
+		"vrm_constraint.gd"
+,
 		(
 			"evaluate_aim: relative_source_transform.origin.normalized()="
 			+ str(relative_source_transform.origin.normalized())
 		)
 	)
 	#  - target_rest_rotation * target_rest_transform.origin
-	var aim_dir: Vector3 = (relative_source_transform.origin - target_rest_origin).normalized()  # target_global_transform.origin.direction_to(source_global_transform.origin)
+	var aim_dir: Vector3 = (relative_source_transform.origin - target_rest_origin).normalized() # target_global_transform.origin.direction_to(source_global_transform.origin)
 	#if rest_dir.is_zero_approx() or aim_dir.is_zero_approx():
 	#	return
 	var arc := Quaternion(rest_dir, aim_dir).normalized()
@@ -143,7 +141,7 @@ func evaluate_aim(multiplier: float = 1.0) -> void:
 
 	target_node.set_bone_pose_rotation(
 		target_bone, target_rest_transform.basis.get_rotation_quaternion() * arc
-	)  # * arc) #  * arc)
+	) # * arc) #  * arc)
 
 
 func evaluate_roll(multiplier: float = 1.0) -> void:
@@ -151,7 +149,8 @@ func evaluate_roll(multiplier: float = 1.0) -> void:
 		return
 	if aim_or_roll_axis < AimRollAxis.POSITIVE_X or aim_or_roll_axis > AimRollAxis.POSITIVE_Z:
 		VRMLogger.error(
-			"bone_node_constraint.gd", "Roll axis not set! Must be positive X, Y, or Z."
+			"vrm_constraint.gd"
+, "Roll axis not set! Must be positive X, Y, or Z."
 		)
 		return
 	# Gather axis-angle information from the source rotation.
@@ -160,7 +159,7 @@ func evaluate_roll(multiplier: float = 1.0) -> void:
 	var source_axis: Vector3 = source_quat.get_axis()
 	var source_angle: float = source_quat.get_angle()
 	# Calculate what we need to apply to the target.
-	var axis_index: int = aim_or_roll_axis - 1  # Vector3.Axis
+	var axis_index: int = aim_or_roll_axis - 1 # Vector3.Axis
 	var axis_value: float = source_axis[axis_index]
 	var rotation_quat := Quaternion.IDENTITY
 	if not is_zero_approx(axis_value):
@@ -178,8 +177,8 @@ func evaluate_rotation(multiplier: float = 1.0) -> void:
 	_set_weighted_posed_target_rotation(source_quat, multiplier)
 
 
-static func from_dictionary(dict: Dictionary):  # -> BoneNodeConstraint:
-	VRMLogger.debug("bone_node_constraint.gd", "from_dictionary: parsing constraint from dict")
+static func from_dictionary(dict: Dictionary): # -> VRMConstraint:
+	VRMLogger.debug("vrm_constraint.gd", "from_dictionary: parsing constraint from dict")
 	var ret := new()
 	if not dict.has("constraint"):
 		return ret
@@ -196,7 +195,8 @@ static func from_dictionary(dict: Dictionary):  # -> BoneNodeConstraint:
 		ret.constraint_type = ConstraintType.ROTATION
 	else:
 		VRMLogger.error(
-			"bone_node_constraint.gd", "Unknown constraint type: " + constraint_type_string
+			"vrm_constraint.gd"
+, "Unknown constraint type: " + constraint_type_string
 		)
 	# Set up weight and source node index.
 	var constraint_parameters: Dictionary = constraint_dict[constraint_type_string]
@@ -302,9 +302,9 @@ func _set_weighted_global_target_rotation(rotation_quat: Quaternion, multiplier:
 	#rotation_quat = Quaternion(_get_target_global_rest().basis).inverse() * rotation_quat
 	var parent_global_quat = (
 		skeleton
-		. get_bone_global_pose(skeleton.get_bone_parent(target_bone))
-		. basis
-		. get_rotation_quaternion()
+		.get_bone_global_pose(skeleton.get_bone_parent(target_bone))
+		.basis
+		.get_rotation_quaternion()
 	)
 	rotation_quat = target_rest_rotation * parent_global_quat.inverse() * rotation_quat
 	skeleton.set_bone_pose_rotation(target_bone, rotation_quat)
@@ -324,7 +324,7 @@ func _aim_get_rest_direction(rest_basis: Basis) -> Vector3:
 			return -rest_basis.y
 		AimRollAxis.NEGATIVE_Z:
 			return -rest_basis.z
-	VRMLogger.error("bone_node_constraint.gd", "Aim axis not set! Must be a valid value.")
+	VRMLogger.error("vrm_constraint.gd", "Aim axis not set! Must be a valid value.")
 	return Vector3.ZERO
 
 
@@ -342,7 +342,7 @@ static func _from_dictionary_get_aim_axis_from_string(aim_axis: String) -> AimRo
 			return AimRollAxis.NEGATIVE_Y
 		"NegativeZ":
 			return AimRollAxis.NEGATIVE_Z
-	VRMLogger.error("bone_node_constraint.gd", "Unknown aim axis: " + aim_axis)
+	VRMLogger.error("vrm_constraint.gd", "Unknown aim axis: " + aim_axis)
 	return AimRollAxis.NONE
 
 
@@ -354,7 +354,7 @@ static func _from_dictionary_get_roll_axis_from_string(roll_axis: String) -> Aim
 			return AimRollAxis.POSITIVE_Y
 		"Z":
 			return AimRollAxis.POSITIVE_Z
-	VRMLogger.error("bone_node_constraint.gd", "Unknown roll axis: " + roll_axis)
+	VRMLogger.error("vrm_constraint.gd", "Unknown roll axis: " + roll_axis)
 	return AimRollAxis.NONE
 
 
@@ -372,7 +372,7 @@ func _to_dictionary_get_string_from_aim_axis() -> String:
 			return "NegativeY"
 		AimRollAxis.NEGATIVE_Z:
 			return "NegativeZ"
-	VRMLogger.error("bone_node_constraint.gd", "Invalid aim axis: " + str(aim_or_roll_axis))
+	VRMLogger.error("vrm_constraint.gd", "Invalid aim axis: " + str(aim_or_roll_axis))
 	return ""
 
 
@@ -384,5 +384,5 @@ func _to_dictionary_get_string_from_roll_axis() -> String:
 			return "Y"
 		AimRollAxis.POSITIVE_Z:
 			return "Z"
-	VRMLogger.error("bone_node_constraint.gd", "Invalid roll axis: " + str(aim_or_roll_axis))
+	VRMLogger.error("vrm_constraint.gd", "Invalid roll axis: " + str(aim_or_roll_axis))
 	return ""

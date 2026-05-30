@@ -1,6 +1,6 @@
 extends "res://tests/test_base.gd"
 
-const vrm_secondary_service = preload("res://addons/vrm/importer/common/vrm_secondary_service.gd")
+const vrm_spring_bone_parser = preload("res://addons/vrm/importer/common/vrm_spring_bone_parser.gd")
 
 
 func test_spring_bone_resource():
@@ -50,7 +50,7 @@ func test_secondary_service_chain_building():
 	skel.set_bone_parent(2, 1)
 
 	var chains: Array[PackedStringArray] = []
-	vrm_secondary_service.create_joints_recursive(chains, skel, 0, 1, -1)
+	vrm_spring_bone_parser.create_joints_recursive(chains, skel, 0, -1)
 
 	assert_true(chains.size() > 0, "Should create at least one chain")
 	# Root -> Child -> Grandchild chain, terminated by ""

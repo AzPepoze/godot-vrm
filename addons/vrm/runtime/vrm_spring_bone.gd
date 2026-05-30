@@ -32,7 +32,7 @@ const vrm_collider_group = preload("./vrm_collider_group.gd")
 @export var environment_collision_mask: int = 1
 
 # Reference to the vrm_collidergroup for collisions with swaying objects.
-@export var collider_groups: Array[vrm_collider_group]
+@export var collider_groups: Array[VRMColliderGroup]
 
 @export_group("Per-Joint Bone Settings (Optional)")
 # The resilience of the swaying object (the power of returning to the initial pose).
