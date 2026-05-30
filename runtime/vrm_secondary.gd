@@ -7,27 +7,102 @@ const spring_bone_adapter_class = preload("./vrm_spring_bone_adapter.gd")
 const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 
 @export_category("Springbone Settings")
-@export var update_secondary_fixed: bool = false
-@export var disable_colliders: bool = false:
+@export var update_secondary_in_physics: bool:
+	get:
+		if _settings == null:
+			_settings = VRMSettings.new()
+		return _settings.update_secondary_in_physics
 	set(value):
-		disable_colliders = value
+		if _settings == null:
+			_settings = VRMSettings.new()
+		_settings.update_secondary_in_physics = value
+
+@export var disable_colliders: bool:
+	get:
+		if _settings == null:
+			_settings = VRMSettings.new()
+		return _settings.disable_colliders
+	set(value):
+		if _settings == null:
+			_settings = VRMSettings.new()
+		_settings.disable_colliders = value
 		if spring_bone_adapter:
 			spring_bone_adapter.set_active(!value)
-@export var override_springbone_center: bool = false
+
+@export var override_springbone_center: bool:
+	get:
+		if _settings == null:
+			_settings = VRMSettings.new()
+		return _settings.override_springbone_center
+	set(value):
+		if _settings == null:
+			_settings = VRMSettings.new()
+		_settings.override_springbone_center = value
+
 @export var default_springbone_center: Node3D
 
 @export_category("Run in Editor")
-@export var update_in_editor: bool = false:
+@export var update_in_editor: bool:
+	get:
+		if _settings == null:
+			_settings = VRMSettings.new()
+		return _settings.update_in_editor
 	set(value):
-		update_in_editor = value
+		if _settings == null:
+			_settings = VRMSettings.new()
+		_settings.update_in_editor = value
 		if spring_bone_adapter:
 			spring_bone_adapter.set_active(value or not Engine.is_editor_hint())
 
-@export var gizmo_spring_bone: bool = false
-@export var gizmo_spring_bone_color: Color = Color.LIGHT_YELLOW
-@export var gizmo_show_colliders: bool = false
-@export var gizmo_show_wind: bool = false
-@export var gizmo_wind_color: Color = Color.CYAN
+@export var gizmo_spring_bone: bool:
+	get:
+		if _settings == null:
+			_settings = VRMSettings.new()
+		return _settings.gizmo_spring_bone
+	set(value):
+		if _settings == null:
+			_settings = VRMSettings.new()
+		_settings.gizmo_spring_bone = value
+
+@export var gizmo_spring_bone_color: Color:
+	get:
+		if _settings == null:
+			_settings = VRMSettings.new()
+		return _settings.gizmo_spring_bone_color
+	set(value):
+		if _settings == null:
+			_settings = VRMSettings.new()
+		_settings.gizmo_spring_bone_color = value
+
+@export var gizmo_show_colliders: bool:
+	get:
+		if _settings == null:
+			_settings = VRMSettings.new()
+		return _settings.gizmo_show_colliders
+	set(value):
+		if _settings == null:
+			_settings = VRMSettings.new()
+		_settings.gizmo_show_colliders = value
+
+@export var gizmo_show_wind: bool:
+	get:
+		if _settings == null:
+			_settings = VRMSettings.new()
+		return _settings.gizmo_show_wind
+	set(value):
+		if _settings == null:
+			_settings = VRMSettings.new()
+		_settings.gizmo_show_wind = value
+
+@export var gizmo_wind_color: Color:
+	get:
+		if _settings == null:
+			_settings = VRMSettings.new()
+		return _settings.gizmo_wind_color
+	set(value):
+		if _settings == null:
+			_settings = VRMSettings.new()
+		_settings.gizmo_wind_color = value
 
 @export_category("Spring bones")
 @export_node_path("Skeleton3D") var skeleton: NodePath:
@@ -141,6 +216,9 @@ func update_parameters() -> void:
 			_settings.springbone_drag_multiplier,
 			_settings.springbone_hit_radius_multiplier
 		)
+		spring_bone_adapter.set_active(!_settings.disable_colliders)
+		if Engine.is_editor_hint():
+			spring_bone_adapter.set_active(_settings.update_in_editor)
 
 
 func _process(_delta: float):
@@ -160,36 +238,9 @@ func _process(_delta: float):
 			_draw_wind_arrow(_gizmo.mesh, _settings.wind_direction, gizmo_wind_color, skel_to_gizmo)
 
 	if is_child_of_vrm and _parent_ref != null:
-		# Only sync non-physics flags that are not in VRMSettings
-		# Note: In a full cleanup, these should probably move to VRMSettings too
-		# but for now we'll keep them on the node to avoid too many changes at once.
-		var val_update_secondary_fixed = _parent_ref.get("update_secondary_fixed")
-		if val_update_secondary_fixed != null:
-			update_secondary_fixed = val_update_secondary_fixed
-		var val_disable_colliders = _parent_ref.get("disable_colliders")
-		if val_disable_colliders != null:
-			disable_colliders = val_disable_colliders
-		var val_override_springbone_center = _parent_ref.get("override_springbone_center")
-		if val_override_springbone_center != null:
-			override_springbone_center = val_override_springbone_center
 		var val_default_springbone_center = _parent_ref.get("default_springbone_center")
 		if val_default_springbone_center != null:
 			default_springbone_center = val_default_springbone_center
-		var val_gizmo_spring_bone = _parent_ref.get("gizmo_spring_bone")
-		if val_gizmo_spring_bone != null:
-			gizmo_spring_bone = val_gizmo_spring_bone
-		var val_gizmo_spring_bone_color = _parent_ref.get("gizmo_spring_bone_color")
-		if val_gizmo_spring_bone_color != null:
-			gizmo_spring_bone_color = val_gizmo_spring_bone_color
-		var val_gizmo_show_colliders = _parent_ref.get("gizmo_show_colliders")
-		if val_gizmo_show_colliders != null:
-			gizmo_show_colliders = val_gizmo_show_colliders
-		var val_gizmo_show_wind = _parent_ref.get("gizmo_show_wind")
-		if val_gizmo_show_wind != null:
-			gizmo_show_wind = val_gizmo_show_wind
-		var val_gizmo_wind_color = _parent_ref.get("gizmo_wind_color")
-		if val_gizmo_wind_color != null:
-			gizmo_wind_color = val_gizmo_wind_color
 
 
 func _draw_wind_arrow(

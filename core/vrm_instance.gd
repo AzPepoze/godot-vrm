@@ -73,7 +73,8 @@ var secondary_node: Node3D:
 			elif secondary_node.get("collider_library") != value:
 				secondary_node.set("collider_library", value)
 
-@export_tool_button("Recreate Spring Bone Simulation", "Reload") var recreate_spring_bone_simulation: Callable = recreate_simulation
+@export_tool_button("Recreate Spring Bone Simulation", "Reload")
+var recreate_spring_bone_simulation: Callable = recreate_simulation
 
 
 func recreate_simulation() -> void:
@@ -113,23 +114,35 @@ func recreate_simulation() -> void:
 		_on_settings_changed()
 
 @export_category("Springbone Runtime")
-@export var update_secondary_fixed: bool = false:
+@export var update_secondary_in_physics: bool:
+	get:
+		if settings == null:
+			settings = VRMSettings.new()
+		return settings.update_secondary_in_physics
 	set(value):
-		update_secondary_fixed = value
-		if secondary_node:
-			secondary_node.update_secondary_fixed = value
+		if settings == null:
+			settings = VRMSettings.new()
+		settings.update_secondary_in_physics = value
 
-@export var disable_colliders: bool = false:
+@export var disable_colliders: bool:
+	get:
+		if settings == null:
+			settings = VRMSettings.new()
+		return settings.disable_colliders
 	set(value):
-		disable_colliders = value
-		if secondary_node:
-			secondary_node.disable_colliders = value
+		if settings == null:
+			settings = VRMSettings.new()
+		settings.disable_colliders = value
 
-@export var override_springbone_center: bool = false:
+@export var override_springbone_center: bool:
+	get:
+		if settings == null:
+			settings = VRMSettings.new()
+		return settings.override_springbone_center
 	set(value):
-		override_springbone_center = value
-		if secondary_node:
-			secondary_node.override_springbone_center = value
+		if settings == null:
+			settings = VRMSettings.new()
+		settings.override_springbone_center = value
 
 @export var default_springbone_center: Node3D:
 	set(value):
@@ -138,41 +151,65 @@ func recreate_simulation() -> void:
 			secondary_node.default_springbone_center = value
 
 @export_category("Run in Editor")
-@export var update_in_editor: bool = false:
+@export var update_in_editor: bool:
+	get:
+		if settings == null:
+			settings = VRMSettings.new()
+		return settings.update_in_editor
 	set(value):
-		update_in_editor = value
-		if secondary_node:
-			secondary_node.update_in_editor = value
+		if settings == null:
+			settings = VRMSettings.new()
+		settings.update_in_editor = value
 
-@export var gizmo_spring_bone: bool = false:
+@export var gizmo_spring_bone: bool:
+	get:
+		if settings == null:
+			settings = VRMSettings.new()
+		return settings.gizmo_spring_bone
 	set(value):
-		gizmo_spring_bone = value
-		if secondary_node:
-			secondary_node.gizmo_spring_bone = value
+		if settings == null:
+			settings = VRMSettings.new()
+		settings.gizmo_spring_bone = value
 
-@export var gizmo_spring_bone_color: Color = Color.LIGHT_YELLOW:
+@export var gizmo_spring_bone_color: Color:
+	get:
+		if settings == null:
+			settings = VRMSettings.new()
+		return settings.gizmo_spring_bone_color
 	set(value):
-		gizmo_spring_bone_color = value
-		if secondary_node:
-			secondary_node.gizmo_spring_bone_color = value
+		if settings == null:
+			settings = VRMSettings.new()
+		settings.gizmo_spring_bone_color = value
 
-@export var gizmo_show_colliders: bool = false:
+@export var gizmo_show_colliders: bool:
+	get:
+		if settings == null:
+			settings = VRMSettings.new()
+		return settings.gizmo_show_colliders
 	set(value):
-		gizmo_show_colliders = value
-		if secondary_node:
-			secondary_node.gizmo_show_colliders = value
+		if settings == null:
+			settings = VRMSettings.new()
+		settings.gizmo_show_colliders = value
 
-@export var gizmo_show_wind: bool = false:
+@export var gizmo_show_wind: bool:
+	get:
+		if settings == null:
+			settings = VRMSettings.new()
+		return settings.gizmo_show_wind
 	set(value):
-		gizmo_show_wind = value
-		if secondary_node:
-			secondary_node.gizmo_show_wind = value
+		if settings == null:
+			settings = VRMSettings.new()
+		settings.gizmo_show_wind = value
 
-@export var gizmo_wind_color: Color = Color.CYAN:
+@export var gizmo_wind_color: Color:
+	get:
+		if settings == null:
+			settings = VRMSettings.new()
+		return settings.gizmo_wind_color
 	set(value):
-		gizmo_wind_color = value
-		if secondary_node:
-			secondary_node.gizmo_wind_color = value
+		if settings == null:
+			settings = VRMSettings.new()
+		settings.gizmo_wind_color = value
 
 
 func _init() -> void:
