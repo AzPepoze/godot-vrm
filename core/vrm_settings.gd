@@ -76,6 +76,12 @@ signal settings_changed
 		environment_collision_mask = value
 		settings_changed.emit()
 
+## 0 = bouncy, higher = sticks to surface
+@export_range(0.0, 10.0, 0.1) var environment_collision_bounce_damping: float = 0.8:
+	set(value):
+		environment_collision_bounce_damping = value
+		settings_changed.emit()
+
 @export_group("Springbone Runtime Settings")
 @export var update_in_editor: bool = false:
 	set(value):

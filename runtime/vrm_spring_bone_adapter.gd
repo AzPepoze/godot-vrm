@@ -72,6 +72,7 @@ func update_parameters(
 	p_wind_frequency: float = 1.0,
 	p_env_coll_enabled: bool = false,
 	p_env_coll_mask: int = 1,
+	p_env_coll_bounce_damping: float = 0.8,
 	p_stiffness_multiplier: float = 1.0,
 	p_drag_multiplier: float = 1.0,
 	p_hit_radius_multiplier: float = 1.0
@@ -97,6 +98,7 @@ func update_parameters(
 		simulation.set_wind_turbulence(p_wind_turbulence)
 		simulation.set_wind_frequency(p_wind_frequency)
 		simulation.set_environment_collision_enabled(p_env_coll_enabled)
+		simulation.set_environment_collision_bounce_damping(p_env_coll_bounce_damping)
 		simulation.set_environment_collision_mask(p_env_coll_mask)
 
 
