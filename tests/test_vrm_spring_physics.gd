@@ -1,7 +1,6 @@
 extends "res://tests/test_base.gd"
 
 const VRM_INSTANCE = preload("res://addons/vrm/core/vrm_instance.gd")
-const VRM_SECONDARY = preload("res://addons/vrm/runtime/vrm_spring_bone_controller.gd")
 
 
 func test_vrm_spring_force_displacement():
