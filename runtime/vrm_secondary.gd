@@ -85,11 +85,12 @@ const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 
 @export var springbone_gravity_rotation: Quaternion = Quaternion.IDENTITY:
 	set(value):
-		if springbone_gravity_rotation == value:
+		var normalized = value.normalized()
+		if springbone_gravity_rotation.is_equal_approx(normalized):
 			return
-		springbone_gravity_rotation = value
+		springbone_gravity_rotation = normalized
 		if is_child_of_vrm:
-			get_parent().springbone_gravity_rotation = value
+			get_parent().springbone_gravity_rotation = normalized
 		update_parameters()
 @export var springbone_add_force: Vector3 = Vector3.ZERO:
 	set(value):
@@ -107,7 +108,7 @@ const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 			return
 		wind_direction = value
 		if is_child_of_vrm:
-			get_parent().set("wind_direction", value)
+			get_parent().wind_direction = value
 		update_parameters()
 @export var wind_strength: float = 0.0:
 	set(value):
@@ -115,7 +116,7 @@ const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 			return
 		wind_strength = value
 		if is_child_of_vrm:
-			get_parent().set("wind_strength", value)
+			get_parent().wind_strength = value
 		update_parameters()
 @export var wind_turbulence: float = 0.2:
 	set(value):
@@ -123,7 +124,7 @@ const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 			return
 		wind_turbulence = value
 		if is_child_of_vrm:
-			get_parent().set("wind_turbulence", value)
+			get_parent().wind_turbulence = value
 		update_parameters()
 @export var wind_frequency: float = 1.0:
 	set(value):
@@ -131,7 +132,7 @@ const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 			return
 		wind_frequency = value
 		if is_child_of_vrm:
-			get_parent().set("wind_frequency", value)
+			get_parent().wind_frequency = value
 		update_parameters()
 
 @export_group("Environment Collision Settings")
