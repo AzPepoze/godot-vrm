@@ -1,5 +1,5 @@
-#ifndef VRM_SPRING_BONE_SIMULATOR_H
-#define VRM_SPRING_BONE_SIMULATOR_H
+#ifndef VRM_SPRING_BONE_SIMULATION_H
+#define VRM_SPRING_BONE_SIMULATION_H
 
 #include <godot_cpp/classes/immediate_mesh.hpp>
 #include <godot_cpp/classes/mesh.hpp>
@@ -19,8 +19,8 @@
 
 namespace godot {
 
-class VRMSpringBoneSimulator : public SkeletonModifier3D {
-  GDCLASS(VRMSpringBoneSimulator, SkeletonModifier3D);
+class VRMSpringBoneSimulation : public SkeletonModifier3D {
+  GDCLASS(VRMSpringBoneSimulation, SkeletonModifier3D);
 
 public:
   struct CPPSpringBoneJoint {
@@ -105,8 +105,8 @@ protected:
   static void _bind_methods();
 
 public:
-  VRMSpringBoneSimulator();
-  ~VRMSpringBoneSimulator();
+  VRMSpringBoneSimulation();
+  ~VRMSpringBoneSimulation();
 
   void setup(Array p_spring_bones, Array p_collider_groups);
   void update_parameters(float p_gravity_multiplier,
@@ -171,4 +171,4 @@ private:
 
 } // namespace godot
 
-#endif // VRM_SPRING_BONE_SIMULATOR_H
+#endif // VRM_SPRING_BONE_SIMULATION_H

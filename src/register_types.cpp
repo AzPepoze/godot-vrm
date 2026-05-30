@@ -7,7 +7,7 @@
 #include <godot_cpp/godot.hpp>
 
 #include "vrm_constraint_simulator.h"
-#include "vrm_spring_bone_simulator.h"
+#include "vrm_spring_bone_simulation.h"
 
 using namespace godot;
 
@@ -17,7 +17,7 @@ void initialize_vrm_physics_module(ModuleInitializationLevel p_level) {
   }
 
   GDREGISTER_CLASS(VRMConstraintSimulator);
-  GDREGISTER_CLASS(VRMSpringBoneSimulator);
+  GDREGISTER_CLASS(VRMSpringBoneSimulation);
 }
 
 void uninitialize_vrm_physics_module(ModuleInitializationLevel p_level) {

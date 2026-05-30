@@ -73,14 +73,10 @@ var secondary_node: Node3D:
 			elif secondary_node.get("collider_library") != value:
 				secondary_node.set("collider_library", value)
 
-@export var recreate_spring_bone_simulator: bool = false:
-	set(value):
-		if value:
-			recreate_spring_bone_simulator = false
-			recreate_simulator()
+@export_tool_button("Recreate Spring Bone Simulation", "Reload") var recreate_spring_bone_simulation: Callable = recreate_simulation
 
 
-func recreate_simulator() -> void:
+func recreate_simulation() -> void:
 	if secondary_node:
 		# Sync parent arrays to child if child is empty
 		if secondary_node.get("spring_bones").is_empty() and not spring_bones.is_empty():

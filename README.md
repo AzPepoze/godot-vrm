@@ -29,7 +29,7 @@ Import and export of VRM through version 1.0 is supported. Here is a feature bre
 | `VRMC_springBone` in standalone `.gltf` export | ⚠️ Not supported                                                   |
 | `VRMC_materials_mtoon`                         | ✅ Implemented                                                     |
 | `VRMC_node_constraint`                         | ⚠️ Known issues when combined with retargeting                     |
-| `VRMC_springBone`                              | ✅ Implemented (C++ GDExtension simulator)                         |
+| `VRMC_springBone`                              | ✅ Implemented (C++ GDExtension simulation)                         |
 | `VRMC_materials_hdr_emissive`                  | ✅ Implemented                                                     |
 | `VRMC_vrm`                                     | ✅ Implemented                                                     |
 | `firstPerson`                                  | ⚠️ Head hiding via import option (camera layers or runtime script) |
@@ -41,16 +41,16 @@ Import and export of VRM through version 1.0 is supported. Here is a feature bre
 
 ## Runtime Spring Bone System
 
-Spring bones are driven by a **C++ GDExtension** (`VRMSpringBoneSimulator`) registered as a `SkeletonModifier3D`:
+Spring bones are driven by a **C++ GDExtension** (`VRMSpringBoneSimulation`) registered as a `SkeletonModifier3D`:
 
 ```
 VRMInstance (scene root)
   └─ VRMSecondary (Node3D) — holds spring bone chains & collider groups
        └─ VRMSpringBoneAdapter (GDScript bridge)
-            └─ VRMSpringBoneSimulator (C++ SkeletonModifier3D, child of skeleton)
+            └─ VRMSpringBoneSimulation (C++ SkeletonModifier3D, child of skeleton)
 ```
 
-- **Simulator**: Per-frame physics for joint chains with configurable stiffness, gravity, drag, and sphere/capsule collider collision.
+- **Simulation**: Per-frame physics for joint chains with configurable stiffness, gravity, drag, and sphere/capsule collider collision.
 - **Adapter**: Auto-detects if the C++ GDExtension is available; falls back gracefully with a warning if not built.
 - **Per-Joint Settings**: Each spring bone chain supports per-joint overrides for stiffness force, gravity power/direction, drag force, and hit radius (optional `PackedFloat64Array` / `PackedVector3Array` exports).
 - **Gizmo**: Editor visualization of spring bone chains and colliders (`VRMSecondaryGizmo`). Spring bones and colliders have independent toggle controls (`gizmo_spring_bone` and `gizmo_show_colliders`).

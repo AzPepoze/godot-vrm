@@ -65,8 +65,8 @@ func test_avatar_sample_scene_spring_overrides_keep_collider_refs():
 
 
 func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():
-	if not ClassDB.class_exists("VRMSpringBoneSimulator"):
-		print("[SKIP] VRMSpringBoneSimulator not found")
+	if not ClassDB.class_exists("VRMSpringBoneSimulation"):
+		print("[SKIP] VRMSpringBoneSimulation not found")
 		return
 
 	var scene := await _instantiate_sample_scene()
@@ -106,15 +106,15 @@ func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():
 	var group := VRM_COLLIDER_GROUP.new()
 	group.colliders.append(collider)
 
-	var simulator = ClassDB.instantiate("VRMSpringBoneSimulator")
-	simulator.name = "VRMSpringBoneSimulatorSampleTest"
-	skeleton.add_child(simulator)
-	simulator.setup([hair_spring], [group])
-	simulator.active = true
+	var simulation = ClassDB.instantiate("VRMSpringBoneSimulation")
+	simulation.name = "VRMSpringBoneSimulationSampleTest"
+	skeleton.add_child(simulation)
+	simulation.setup([hair_spring], [group])
+	simulation.active = true
 
 	var initial_rot := skeleton.get_bone_global_pose(root_bone_idx).basis.get_rotation_quaternion()
 	for i in range(10):
-		simulator.step_simulation()
+		simulation.step_simulation()
 		await runner.process_frame
 	var moved_rot := skeleton.get_bone_global_pose(root_bone_idx).basis.get_rotation_quaternion()
 	var angle := abs((initial_rot.inverse() * moved_rot).get_angle())

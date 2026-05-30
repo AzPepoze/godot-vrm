@@ -250,7 +250,7 @@ func test_cleanup_mixed_scenario():
 	var remaining_children = skel.get_children()
 	var count = 0
 	for c in remaining_children:
-		if not (c.name == "VRMSpringBoneSimulator" or c.is_class("VRMSpringBoneSimulator")):
+		if not (c.name == "VRMSpringBoneSimulation" or c.is_class("VRMSpringBoneSimulation")):
 			count += 1
 	assert_eq(count, 4, "4 children should remain (mesh, look, scripted, non-bone)")
 

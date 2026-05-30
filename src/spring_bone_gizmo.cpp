@@ -42,8 +42,8 @@ static void draw_wireframe_sphere(ImmediateMesh *mesh, const Vector3 &center,
 
 void draw_gizmo(
     ImmediateMesh *mesh, Skeleton3D *skel, const Transform3D &skel_to_gizmo,
-    const std::vector<VRMSpringBoneSimulator::CPPSpringBoneChain> &chains,
-    const std::vector<VRMSpringBoneSimulator::CPPSpringBoneCollider> &colliders,
+    const std::vector<VRMSpringBoneSimulation::CPPSpringBoneChain> &chains,
+    const std::vector<VRMSpringBoneSimulation::CPPSpringBoneCollider> &colliders,
     Color default_color, bool draw_spring_bones, bool draw_colliders) {
   if (!mesh || !skel) {
     return;

@@ -23,8 +23,8 @@ static void copy_float_array(const Ref<Resource> &res, const StringName &prop,
 
 void parse_collider_groups(
     const Array &p_collider_groups, Skeleton3D *skel, Node *resolver_root,
-    std::vector<VRMSpringBoneSimulator::CPPSpringBoneCollider> &out_colliders,
-    std::vector<VRMSpringBoneSimulator::CPPSpringBoneColliderGroup>
+    std::vector<VRMSpringBoneSimulation::CPPSpringBoneCollider> &out_colliders,
+    std::vector<VRMSpringBoneSimulation::CPPSpringBoneColliderGroup>
         &out_groups) {
 
   for (int i = 0; i < p_collider_groups.size(); ++i) {
@@ -33,7 +33,7 @@ void parse_collider_groups(
       continue;
     }
 
-    VRMSpringBoneSimulator::CPPSpringBoneColliderGroup cpp_group;
+    VRMSpringBoneSimulation::CPPSpringBoneColliderGroup cpp_group;
     Array colliders_arr = group->get("colliders");
 
     for (int j = 0; j < colliders_arr.size(); ++j) {
@@ -42,7 +42,7 @@ void parse_collider_groups(
         continue;
       }
 
-      VRMSpringBoneSimulator::CPPSpringBoneCollider c;
+      VRMSpringBoneSimulation::CPPSpringBoneCollider c;
       String bone_name = coll_res->get("bone");
       if (!bone_name.is_empty()) {
         c.bone_idx = skel->find_bone(bone_name);
@@ -69,7 +69,7 @@ void parse_collider_groups(
 void parse_spring_bones(
     const Array &p_spring_bones, const Array &p_collider_groups,
     Skeleton3D *skel, Node *resolver_root,
-    std::vector<VRMSpringBoneSimulator::CPPSpringBoneChain> &out_chains) {
+    std::vector<VRMSpringBoneSimulation::CPPSpringBoneChain> &out_chains) {
 
   Transform3D skel_global_inv = skel->get_global_transform().affine_inverse();
 
@@ -79,7 +79,7 @@ void parse_spring_bones(
       continue;
     }
 
-    VRMSpringBoneSimulator::CPPSpringBoneChain chain;
+    VRMSpringBoneSimulation::CPPSpringBoneChain chain;
     PackedStringArray joint_nodes = sb_res->get("joint_nodes");
 
     // Scale parameters
@@ -133,7 +133,7 @@ void parse_spring_bones(
 
     // Build joints
     for (int j = 0; j < joint_nodes.size() - 1; ++j) {
-      VRMSpringBoneSimulator::CPPSpringBoneJoint joint;
+      VRMSpringBoneSimulation::CPPSpringBoneJoint joint;
       joint.bone_idx = skel->find_bone(joint_nodes[j]);
       if (joint.bone_idx == -1) {
         continue;
