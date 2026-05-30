@@ -23,7 +23,10 @@ func _init(p_skeleton: Skeleton3D) -> void:
 
 
 func setup_simulator(
-	spring_bones: Array, collider_groups: Array, disable_colliders: bool, update_in_editor: bool
+	spring_bones: Array,
+	collider_groups: Array,
+	disable_colliders: bool,
+	update_in_editor: bool
 ) -> void:
 	if skeleton == null:
 		return
@@ -39,22 +42,11 @@ func _setup_cpp(
 	if not has_simulator:
 		return
 
-	# Remove any existing simulator
-	for child in skeleton.get_children(true):
-		if child.name == "VRMSpringBoneSimulator" or child.is_class("VRMSpringBoneSimulator"):
-			child.queue_free()
-
+	if skeleton.has_node("VRMSpringBoneSimulator"):
+		skeleton.get_node("VRMSpringBoneSimulator").queue_free()
 	simulator = ClassDB.instantiate("VRMSpringBoneSimulator")
-	if simulator == null:
-		VRMLogger.error(
-			"vrm_spring_bone_adapter.gd", "Failed to instantiate VRMSpringBoneSimulator"
-		)
-		return
-
 	simulator.name = "VRMSpringBoneSimulator"
-
-	# Add as internal child to avoid interference with other nodes/tests
-	skeleton.call_deferred(&"add_child", simulator, false, Node.INTERNAL_MODE_BACK)
+	skeleton.add_child(simulator)
 
 	var unique_collider_groups: Array = []
 	for sb in spring_bones:
@@ -64,13 +56,14 @@ func _setup_cpp(
 			if cg != null and cg not in unique_collider_groups:
 				unique_collider_groups.append(cg)
 
-	VRMLogger.info(
+	VRMLogger.debug(
 		"vrm_spring_bone_adapter.gd",
 		(
 			"setup_simulator (CPP): created simulator with %d spring bones, %d collider groups"
 			% [spring_bones.size(), unique_collider_groups.size()]
 		)
 	)
+
 	simulator.setup(spring_bones, unique_collider_groups)
 	simulator.active = !disable_colliders
 	if Engine.is_editor_hint():
@@ -97,8 +90,3 @@ func cleanup() -> void:
 	if simulator != null:
 		simulator.queue_free()
 		simulator = null
-
-	if skeleton != null:
-		for child in skeleton.get_children(true):
-			if child.name == "VRMSpringBoneSimulator" or child.is_class("VRMSpringBoneSimulator"):
-				child.queue_free()
