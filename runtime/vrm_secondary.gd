@@ -116,6 +116,9 @@ func _ready() -> void:
 		VRMLogger.warning("vrm_secondary.gd", "_ready: no skeleton found, skipping setup")
 		return
 
+	# Sort spring bones by group so the inspector shows them organized
+	spring_bones.sort_custom(func(a, b): return a.group < b.group)
+
 	if (
 		_parent_ref != null
 		and _parent_ref.script != null

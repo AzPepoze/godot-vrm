@@ -147,6 +147,7 @@ func _import_preflight(
 ) -> Error:
 	if not extensions.has("VRMC_vrm"):
 		return ERR_SKIP
+	_state.set_additional_data(&"vrm/remove_end_bones", true)
 	return OK
 
 
@@ -226,6 +227,9 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 		pose_diffs
 	)
 	root_node.set("vrm_meta", vrm_meta)
+
+	if gstate.get_additional_data(&"vrm/remove_end_bones"):
+		vrm_utils.remove_end_bone_nodes(root_node, skeleton)
 
 	VRMLogger.info("vrmc_vrm.gd", "_import_post: VRM 1.0 import complete OK")
 	return OK

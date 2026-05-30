@@ -36,44 +36,39 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 		secondary_node = Node3D.new()
 		secondary_node.name = "secondary"
 		node.add_child(secondary_node, true)
+		secondary_node.owner = node
 
 	var nodes = gstate.get_nodes()
 	var skeletons = gstate.get_skeletons()
 
-	# Assume that all SpringBone are part of one skeleton for now.
-	var skeleton_path: NodePath = secondary_node.get_path_to(
-		secondary_node.get_parent().get_node("%GeneralSkeleton")
-	)
-
-	var collider_groups: Array[vrm_collider_group]
-	for cgroup in vrm_extension.get("colliders", []):
-		var gltfnode: GLTFNode = nodes[int(cgroup["node"])]
-		var collider_group: vrm_collider_group = vrm_collider_group.new()
+	# Parse flat colliders list (VRM 1.0 spec: each entry is one collider shape)
+	var colliders: Array[vrm_collider] = []
+	for collider_json in vrm_extension.get("colliders", []):
+		var gltfnode: GLTFNode = nodes[int(collider_json["node"])]
+		var collider: vrm_collider = vrm_collider.new()
 		var node_path: NodePath
 		var bone: String = ""
 		var new_resource_name: String = ""
 		var pose_diff: Basis = Basis()
 		if gltfnode.skeleton == -1:
-			var found_node: Node = gstate.get_scene_node(int(cgroup["node"]))
+			var found_node: Node = gstate.get_scene_node(int(collider_json["node"]))
 			node_path = secondary_node.get_path_to(found_node)
-			bone = ""
 			new_resource_name = found_node.name
 		else:
 			var skeleton: Skeleton3D = _get_skel_godot_node(
 				gstate, nodes, skeletons, gltfnode.skeleton
 			)
-			bone = nodes[int(cgroup["node"])].resource_name
+			bone = nodes[int(collider_json["node"])].resource_name
 			new_resource_name = bone
 			if skeleton != null:
 				var pose_diffs = skeleton.get_meta("vrm_pose_diffs", [])
 				if not pose_diffs.is_empty():
 					pose_diff = pose_diffs[skeleton.find_bone(bone)]
 
-		var collider: vrm_collider = vrm_collider.new()
 		collider.node_path = node_path
 		collider.bone = bone
 		collider.resource_name = new_resource_name
-		var shape = cgroup.get("shape", {})
+		var shape = collider_json.get("shape", {})
 		if shape.has("sphere"):
 			var offset_obj = shape["sphere"].get("offset", [0.0, 0.0, 0.0])
 			var offset_vec = Vector3(offset_obj[0], offset_obj[1], offset_obj[2])
@@ -92,10 +87,18 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 			collider.tail = pose_diff * tail_vec
 			collider.radius = shape["capsule"].get("radius", 0.0)
 			collider.is_capsule = true
-		collider_group.colliders.append(collider)
+		colliders.append(collider)
+
+	# Parse colliderGroups referencing colliders by index (VRM 1.0 spec)
+	var collider_groups: Array[vrm_collider_group] = []
+	for cgroup_json in vrm_extension.get("colliderGroups", []):
+		var collider_group: vrm_collider_group = vrm_collider_group.new()
+		for collider_idx in cgroup_json.get("colliders", []):
+			collider_group.colliders.append(colliders[int(collider_idx)])
 		collider_groups.append(collider_group)
 
 	var spring_bones: Array[vrm_spring_bone]
+	var skeleton_path: NodePath = NodePath()
 	for sbone in vrm_extension.get("springs", []):
 		var comment: String = sbone.get("name", "")
 		var stiffness_force = float(sbone.get("stiffness", 1.0))
@@ -121,6 +124,8 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 			)
 			if skeleton == null:
 				continue
+			if skeleton_path.is_empty():
+				skeleton_path = secondary_node.get_path_to(skeleton)
 			# Build chains recursively by following bone hierarchy.
 			vrm_secondary_service.create_joints_recursive(
 				joint_chains, skeleton, skeleton.find_bone(gltfnode.resource_name), 1, -1
@@ -166,12 +171,17 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 			spring_bone.drag_force_scale = drag_force
 			spring_bone.hit_radius_scale = hit_radius
 
+			# Use a descriptive name combining group and first bone for readability
 			if not comment.is_empty():
-				spring_bone.resource_name = comment.split("\n")[0]
+				spring_bone.resource_name = "%s · %s" % [comment.split("\n")[0], chain[0]]
 			else:
 				spring_bone.resource_name = chain[0]
 
+			spring_bone.group = vrm_secondary_service.detect_group(chain[0], comment)
 			spring_bones.append(spring_bone)
+
+	# Sort by group so same-group bones appear together in the inspector
+	spring_bones.sort_custom(func(a, b): return a.group < b.group)
 
 	secondary_node.set_script(vrm_secondary)
 	secondary_node.set("skeleton", skeleton_path)

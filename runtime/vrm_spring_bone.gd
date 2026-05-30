@@ -7,6 +7,11 @@ const vrm_collider_group = preload("./vrm_collider_group.gd")
 # Annotation comment
 @export var comment: String
 
+# Auto-detected group category (e.g. "Hair", "Skirt", "Bust").
+# Set during import based on bone name prefix or VRM comment.
+# Can be manually edited to regroup bones in the inspector.
+@export var group: String = ""
+
 @export_group("Bone List (End bone may be left blank)")
 # bone name of the root bone of the swaying object, within skeleton.
 @export var joint_nodes: PackedStringArray

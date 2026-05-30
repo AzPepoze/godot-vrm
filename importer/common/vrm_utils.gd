@@ -7,6 +7,7 @@ const VRMSkeletonRetargeting = preload("./utils/vrm_skeleton_retargeting.gd")
 const VRMHeadHiding = preload("./utils/vrm_head_hiding.gd")
 const VRMGLTFLookups = preload("./utils/vrm_gltf_lookups.gd")
 const VRMTransformUtils = preload("./utils/vrm_transform_utils.gd")
+const VRMSkeletonCleanup = preload("./utils/vrm_skeleton_cleanup.gd")
 
 # Re-export constants from VRMMeshOrientation
 const ROTATE_180_BASIS = VRMMeshOrientation.ROTATE_180_BASIS
@@ -95,3 +96,8 @@ static func _extract_blendshape_names(gltf_json: Dictionary) -> Dictionary:
 # Re-export functions from VRMTransformUtils
 static func apply_node_transforms(p_node: Node, p_skeleton: Skeleton3D) -> Vector3:
 	return VRMTransformUtils.apply_node_transforms(p_node, p_skeleton)
+
+
+# Re-export functions from VRMSkeletonCleanup
+static func remove_end_bone_nodes(root_node: Node, skeleton: Skeleton3D) -> int:
+	return VRMSkeletonCleanup.remove_end_bone_nodes(root_node, skeleton)
