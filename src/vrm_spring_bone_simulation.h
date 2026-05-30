@@ -33,6 +33,9 @@ public:
     Vector3 prev_tail;
     Transform3D initial_transform;
     Transform3D global_pose;
+    // Environment collision contact state (center-local space)
+    bool env_in_contact = false;
+    Vector3 env_contact_normal;
   };
 
   struct CPPSpringBoneCollider {

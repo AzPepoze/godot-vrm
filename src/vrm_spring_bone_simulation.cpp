@@ -365,43 +365,81 @@ void VRMSpringBoneSimulation::_simulate_chains(
       next_tail = SpringBonePhysics::apply_length_constraint(next_tail, origin,
                                                              joint.length);
 
+      // Clamp Verlet output to surface tangent plane if in contact from
+      // previous frame. Prevents stiffness from creating new velocity into
+      // the surface each frame — the root cause of perpetual bounce.
+      if (joint.env_in_contact) {
+        Vector3 move = next_tail - joint.current_tail;
+        float mn = move.dot(joint.env_contact_normal);
+        if (mn < 0.0f) {
+          // Tail moved into surface — cancel that component
+          next_tail -= joint.env_contact_normal * mn;
+          next_tail = SpringBonePhysics::apply_length_constraint(
+              next_tail, origin, joint.length);
+        }
+      }
+
       // VRM Colliders
       next_tail = SpringBoneCollision::resolve_all_colliders(
           next_tail, origin, radius, joint.length, collider_views);
 
       // Environment collision (optional)
       bool has_env_collision = false;
+      Vector3 env_normal_local;
       if (environment_collision_enabled && chain.enable_environment_collision) {
-        // Transform to world space: center is in skeleton-local space,
-        // physics queries require world coordinates.
-        Transform3D skel_world = skel->get_global_transform();
-        Vector3 origin_world = skel_world.xform(center.xform(origin));
-        Vector3 tail_world = skel_world.xform(center.xform(next_tail));
+        // Iterative solve: collision projection and length constraint
+        // fight each other (projection pushes away from surface, length
+        // constraint pulls back toward origin). Alternate until converged
+        // so the final position satisfies both.
+        static const int MAX_ITERS = 4;
+        for (int iter = 0; iter < MAX_ITERS; ++iter) {
+          Transform3D skel_world = skel->get_global_transform();
+          Vector3 origin_world = skel_world.xform(center.xform(origin));
+          Vector3 tail_world = skel_world.xform(center.xform(next_tail));
 
-        Vector3 env_push;
-        _query_game_object_collisions(skel, origin_world, tail_world, radius,
-                                      chain.environment_collision_mask,
-                                      env_push);
-        if (!env_push.is_zero_approx()) {
-          // Project to surface: push the tail center to sit at radius
-          // distance from the collided surface (just touching).
+          Vector3 env_push;
+          _query_game_object_collisions(skel, origin_world, tail_world, radius,
+                                        chain.environment_collision_mask,
+                                        env_push);
+          if (env_push.is_zero_approx()) {
+            break; // No penetration — converged
+          }
+
+          // Smooth projection: lerp toward surface instead of snapping.
+          // Spreading the correction across frames prevents the abrupt
+          // position change that causes visible bounce/jitter.
           Vector3 push_local = center_inv.basis.xform(
               skel_world.affine_inverse().basis.xform(env_push));
-          next_tail += push_local;
+          Vector3 target = next_tail + push_local;
+          const float smooth_factor = 0.07f;
+          next_tail = next_tail.lerp(target, smooth_factor);
           next_tail = SpringBonePhysics::apply_length_constraint(
               next_tail, origin, joint.length);
           has_env_collision = true;
+          env_normal_local = push_local.normalized();
         }
       }
 
       joint.prev_tail = joint.current_tail;
       joint.current_tail = next_tail;
 
-      // After standard tail update, pin both tails to kill velocity through
-      // the surface. Must happen AFTER prev_tail = current_tail above,
-      // otherwise the pinning gets overwritten.
+      // Tangent velocity projection + contact state tracking.
+      // Professional engines (PhysX/Havok) split velocity into normal
+      // (discard) and tangent (keep) to prevent bounce while allowing
+      // natural sliding along the surface.
       if (has_env_collision) {
-        joint.prev_tail = next_tail;
+        Vector3 vel = joint.current_tail - joint.prev_tail;
+        float vn = vel.dot(env_normal_local);
+        if (vn < 0.0f) {
+          vel -= env_normal_local * vn;
+          joint.prev_tail = joint.current_tail - vel;
+        }
+        // Store for next frame's Verlet clamp
+        joint.env_in_contact = true;
+        joint.env_contact_normal = env_normal_local;
+      } else {
+        // No collision this frame — clear contact state
+        joint.env_in_contact = false;
       }
 
       // Apply rotation to skeleton
@@ -525,7 +563,8 @@ void VRMSpringBoneSimulation::set_environment_collision_bounce_damping(
     float p_damping) {
   environment_collision_bounce_damping = p_damping;
 }
-float VRMSpringBoneSimulation::get_environment_collision_bounce_damping() const {
+float VRMSpringBoneSimulation::get_environment_collision_bounce_damping()
+    const {
   return environment_collision_bounce_damping;
 }
 

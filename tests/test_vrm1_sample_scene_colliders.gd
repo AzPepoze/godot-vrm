@@ -100,7 +100,6 @@ func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():
 		scene.queue_free()
 		return
 
-
 	# Verify the simulation can be set up and run without errors
 	var collider := VRM_COLLIDER.new()
 	collider.bone = root_bone
@@ -118,8 +117,8 @@ func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():
 		simulation.step_simulation()
 		await runner.process_frame
 
-	assert_true(simulation.get_chain_count() > 0,
-		"Simulation should have at least one chain after setup")
-	assert_gt(simulation.get_joint_count(0), 0,
-		"First chain should have joints")
+	assert_true(
+		simulation.get_chain_count() > 0, "Simulation should have at least one chain after setup"
+	)
+	assert_gt(simulation.get_joint_count(0), 0, "First chain should have joints")
 	scene.queue_free()
