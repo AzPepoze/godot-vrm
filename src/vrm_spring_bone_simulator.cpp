@@ -20,6 +20,10 @@ void VRMSpringBoneSimulator::_bind_methods() {
   ClassDB::bind_method(
       D_METHOD("get_joint_current_tail", "chain_idx", "joint_idx"),
       &VRMSpringBoneSimulator::get_joint_current_tail);
+  ClassDB::bind_method(
+      D_METHOD("draw_gizmo", "mesh", "skel_to_gizmo", "color",
+               "draw_spring_bones", "draw_colliders"),
+      &VRMSpringBoneSimulator::draw_gizmo);
 }
 
 VRMSpringBoneSimulator::VRMSpringBoneSimulator() {}
@@ -38,6 +42,7 @@ void VRMSpringBoneSimulator::setup(Array p_spring_bones,
                                    Array p_collider_groups) {
   chains.clear();
   all_colliders.clear();
+  all_collider_groups.clear();
   is_setup = false;
 
   Skeleton3D *skel = get_skeleton();
@@ -51,6 +56,7 @@ void VRMSpringBoneSimulator::setup(Array p_spring_bones,
     if (group.is_null())
       continue;
 
+    CPPSpringBoneColliderGroup cpp_group;
     Array colliders_arr = group->get("colliders");
     for (int j = 0; j < colliders_arr.size(); ++j) {
       Ref<Resource> coll_res = colliders_arr[j];
@@ -72,9 +78,12 @@ void VRMSpringBoneSimulator::setup(Array p_spring_bones,
       c.tail = coll_res->get("tail");
       c.radius = coll_res->get("radius");
       c.is_capsule = coll_res->get("is_capsule");
+      c.gizmo_color = coll_res->get("gizmo_color");
 
+      cpp_group.collider_indices.push_back((int)all_colliders.size());
       all_colliders.push_back(c);
     }
+    all_collider_groups.push_back(cpp_group);
   }
 
   // 2. Process Spring Bones (Chains)
@@ -193,22 +202,16 @@ void VRMSpringBoneSimulator::setup(Array p_spring_bones,
 void VRMSpringBoneSimulator::_process_modification() {
   Skeleton3D *skel = get_skeleton();
   if (!skel) {
-    // UtilityFunctions::print("CPP_MODIFIER early return: skel is null");
     return;
   }
   if (!is_setup) {
-    // UtilityFunctions::print("CPP_MODIFIER early return: is_setup is false");
     return;
   }
 
   float delta = (float)get_process_delta_time();
   if (delta <= 0.0f) {
-    // UtilityFunctions::print("CPP_MODIFIER early return: delta is ", delta);
     return;
   }
-
-  // UtilityFunctions::print("CPP_MODIFIER processing chains: ",
-  // (int)chains.size(), " delta=", delta);
 
   _update_colliders(skel);
 
@@ -238,10 +241,6 @@ void VRMSpringBoneSimulator::_process_modification() {
         Vector3 world_child_position = joint.initial_transform.xform(pos);
         joint.current_tail = center_transform_inv.xform(world_child_position);
         joint.prev_tail = joint.current_tail;
-        if (joint.bone_idx == 22) {
-          // UtilityFunctions::print("DEBUG_RESET: initial_transform=",
-          // joint.initial_transform, " current_tail=", joint.current_tail);
-        }
       }
     }
     need_reset = false;
@@ -299,14 +298,16 @@ void VRMSpringBoneSimulator::_process_modification() {
                             skel->get_bone_pose(joint.bone_idx);
       }
 
-      Vector3 origin = center_transform.xform(joint.global_pose.origin);
+      // origin in center space
+      Vector3 origin = center_transform_inv.xform(joint.global_pose.origin);
       Quaternion local_rot = joint.global_pose.basis.get_rotation_quaternion();
+      Quaternion local_rot_center = center_rot_inv * local_rot;
 
       Vector3 next_tail =
           joint.current_tail +
           (joint.current_tail - joint.prev_tail) * (1.0f - drag) +
-          (center_rot.xform(local_rot.xform(joint.bone_axis * stiffness) +
-                            external));
+          (local_rot_center.xform(joint.bone_axis * stiffness) +
+                            external);
 
       next_tail = origin + (next_tail - origin).normalized() * joint.length;
 
@@ -317,36 +318,39 @@ void VRMSpringBoneSimulator::_process_modification() {
       }
 
       // Collision
-      for (auto &coll : all_colliders) {
-        Vector3 coll_pos = coll.position;
-        if (coll.is_capsule) {
-          Vector3 P = coll.tail_position - coll.position;
-          Vector3 Q = origin - coll.position;
-          float dot = P.dot(Q);
-          float p_len_sq = P.length_squared();
-          if (dot > 0 && p_len_sq > 0.00001f) {
-            float t = dot / p_len_sq;
-            if (t >= 1.0f)
-              coll_pos += P;
-            else
-              coll_pos += P * t;
+      for (auto &coll_group_idx : chain.collider_group_indices) {
+        if (coll_group_idx < 0 || coll_group_idx >= (int)all_collider_groups.size())
+          continue;
+        
+        const auto &cpp_group = all_collider_groups[coll_group_idx];
+        for (auto &coll_idx : cpp_group.collider_indices) {
+          const auto &coll = all_colliders[coll_idx];
+          Vector3 world_coll_pos = coll.position;
+          Vector3 coll_pos = center_transform_inv.xform(world_coll_pos);
+          
+          if (coll.is_capsule) {
+            Vector3 P = center_transform_inv.xform(coll.tail_position) - coll_pos;
+            Vector3 Q = origin - coll_pos;
+            float dot = P.dot(Q);
+            float p_len_sq = P.length_squared();
+            if (dot > 0 && p_len_sq > 0.00001f) {
+              float t = dot / p_len_sq;
+              if (t >= 1.0f)
+                coll_pos += P;
+              else
+                coll_pos += P * t;
+            }
+          }
+
+          Vector3 diff = next_tail - coll_pos;
+          float r = radius_val + coll.radius;
+          if (diff.length_squared() <= r * r) {
+            Vector3 normal = diff.normalized();
+            Vector3 pos_from_collider = coll_pos + normal * r;
+            next_tail =
+                origin + (pos_from_collider - origin).normalized() * joint.length;
           }
         }
-
-        Vector3 diff = next_tail - coll_pos;
-        float r = radius_val + coll.radius;
-        if (diff.length_squared() <= r * r) {
-          Vector3 normal = diff.normalized();
-          Vector3 pos_from_collider = coll_pos + normal * r;
-          next_tail =
-              origin + (pos_from_collider - origin).normalized() * joint.length;
-        }
-      }
-
-      if (joint.bone_idx == 22) {
-        // UtilityFunctions::print("CPP_BONE: bone_idx=", joint.bone_idx, "
-        // current_tail=", joint.current_tail, " next_tail=", next_tail, "
-        // origin=", origin, " length=", joint.length);
       }
 
       joint.prev_tail = joint.current_tail;
@@ -354,11 +358,8 @@ void VRMSpringBoneSimulator::_process_modification() {
 
       Quaternion ft = _from_to_rotation_safe(
           local_rot.xform(joint.bone_axis),
-          center_transform_inv.basis.xform(next_tail - origin));
-      if (joint.bone_idx == 22) {
-        // UtilityFunctions::print("  ft=", ft, " local_rot=", local_rot, "
-        // bone_axis=", joint.bone_axis);
-      }
+          center_transform.basis.xform(next_tail - origin));
+          
       if (ft != Quaternion()) {
         Quaternion qt = ft * local_rot;
         Vector3 scl = joint.global_pose.basis.get_scale();
@@ -422,4 +423,123 @@ Vector3 VRMSpringBoneSimulator::get_joint_current_tail(int p_chain_idx,
     return Vector3();
   }
   return chain.joints[p_joint_idx].current_tail;
+}
+
+void VRMSpringBoneSimulator::draw_gizmo(Object *p_mesh_obj,
+                                        Transform3D p_skel_to_gizmo,
+                                        Color p_color, bool p_draw_spring_bones,
+                                        bool p_draw_colliders) {
+  ImmediateMesh *mesh = Object::cast_to<ImmediateMesh>(p_mesh_obj);
+  if (!mesh)
+    return;
+
+  mesh->clear_surfaces();
+
+  Skeleton3D *skel = get_skeleton();
+  if (!skel)
+    return;
+
+  Transform3D skel_global_inv = skel->get_global_transform().affine_inverse();
+
+  if (p_draw_spring_bones && !chains.empty()) {
+    mesh->surface_begin(Mesh::PRIMITIVE_LINES);
+    for (const auto &chain : chains) {
+      Transform3D center_transform;
+      if (chain.center_bone != -1) {
+        center_transform = skel->get_bone_global_pose(chain.center_bone);
+      } else if (chain.center_node) {
+        center_transform =
+            skel_global_inv * chain.center_node->get_global_transform();
+      }
+
+      for (const auto &joint : chain.joints) {
+        Vector3 start_skel = joint.global_pose.origin;
+        Vector3 end_skel = center_transform.xform(joint.current_tail);
+
+        Vector3 start_gizmo = p_skel_to_gizmo.xform(start_skel);
+        Vector3 end_gizmo = p_skel_to_gizmo.xform(end_skel);
+
+        _draw_line(mesh, start_gizmo, end_gizmo, p_color);
+        _draw_sphere(mesh, Basis(), start_gizmo, 0.015f, p_color);
+      }
+      if (!chain.joints.empty()) {
+        Vector3 end_skel =
+            center_transform.xform(chain.joints.back().current_tail);
+        Vector3 end_gizmo = p_skel_to_gizmo.xform(end_skel);
+        _draw_sphere(mesh, Basis(), end_gizmo, 0.015f, p_color);
+      }
+    }
+    mesh->surface_end();
+  }
+
+  if (p_draw_colliders && !all_colliders.empty()) {
+    mesh->surface_begin(Mesh::PRIMITIVE_LINES);
+    Transform3D world_to_skel = skel->get_global_transform().affine_inverse();
+    for (const auto &c : all_colliders) {
+      Vector3 pos_skel = world_to_skel.xform(c.position);
+      Vector3 pos_gizmo = p_skel_to_gizmo.xform(pos_skel);
+      Color col = c.gizmo_color;
+
+      if (c.is_capsule) {
+        Vector3 tail_skel = world_to_skel.xform(c.tail_position);
+        Vector3 tail_gizmo = p_skel_to_gizmo.xform(tail_skel);
+        _draw_line(mesh, pos_gizmo, tail_gizmo, col);
+        _draw_sphere(mesh, Basis(), pos_gizmo, c.radius, col);
+        _draw_sphere(mesh, Basis(), tail_gizmo, c.radius, col);
+      } else {
+        _draw_sphere(mesh, Basis(), pos_gizmo, c.radius, col);
+      }
+    }
+    mesh->surface_end();
+  }
+}
+
+void VRMSpringBoneSimulator::_draw_sphere(ImmediateMesh *p_mesh,
+                                          const Basis &p_bas,
+                                          const Vector3 &p_center,
+                                          float p_radius, Color p_color) {
+  if (p_radius <= 0.0f)
+    return;
+  const int step = 15;
+  const float sppi = 2.0f * (float)Math_PI / step;
+
+  for (int i = 1; i <= step; i++) {
+    p_mesh->surface_set_color(p_color);
+    p_mesh->surface_add_vertex(
+        p_center + (p_bas.get_column(1) * p_radius)
+                       .rotated(p_bas.get_column(0), sppi * (i - 1)));
+    p_mesh->surface_set_color(p_color);
+    p_mesh->surface_add_vertex(
+        p_center +
+        (p_bas.get_column(1) * p_radius).rotated(p_bas.get_column(0), sppi * i));
+  }
+  for (int i = 1; i <= step; i++) {
+    p_mesh->surface_set_color(p_color);
+    p_mesh->surface_add_vertex(
+        p_center + (p_bas.get_column(0) * p_radius)
+                       .rotated(p_bas.get_column(2), sppi * (i - 1)));
+    p_mesh->surface_set_color(p_color);
+    p_mesh->surface_add_vertex(
+        p_center +
+        (p_bas.get_column(0) * p_radius).rotated(p_bas.get_column(2), sppi * i));
+  }
+  for (int i = 1; i <= step; i++) {
+    p_mesh->surface_set_color(p_color);
+    p_mesh->surface_add_vertex(
+        p_center + (p_bas.get_column(2) * p_radius)
+                       .rotated(p_bas.get_column(1), sppi * (i - 1)));
+    p_mesh->surface_set_color(p_color);
+    p_mesh->surface_add_vertex(
+        p_center +
+        (p_bas.get_column(2) * p_radius).rotated(p_bas.get_column(1), sppi * i));
+  }
+}
+
+void VRMSpringBoneSimulator::_draw_line(ImmediateMesh *p_mesh,
+                                        const Vector3 &p_begin,
+                                        const Vector3 &p_end, Color p_color) {
+  p_mesh->surface_set_color(p_color);
+  p_mesh->surface_add_vertex(p_begin);
+  p_mesh->surface_set_color(p_color);
+  p_mesh->surface_add_vertex(p_end);
 }

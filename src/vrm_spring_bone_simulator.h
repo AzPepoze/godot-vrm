@@ -9,6 +9,9 @@
 #include <godot_cpp/variant/node_path.hpp>
 #include <godot_cpp/variant/quaternion.hpp>
 #include <godot_cpp/variant/string_name.hpp>
+#include <godot_cpp/classes/immediate_mesh.hpp>
+#include <godot_cpp/classes/mesh.hpp>
+#include <godot_cpp/variant/color.hpp>
 #include <godot_cpp/variant/transform3d.hpp>
 #include <godot_cpp/variant/vector3.hpp>
 
@@ -41,6 +44,11 @@ public:
     bool is_capsule = false;
     Vector3 position;
     Vector3 tail_position;
+    Color gizmo_color;
+  };
+
+  struct CPPSpringBoneColliderGroup {
+    std::vector<int> collider_indices;
   };
 
   struct CPPSpringBoneChain {
@@ -67,6 +75,7 @@ public:
 private:
   std::vector<CPPSpringBoneChain> chains;
   std::vector<CPPSpringBoneCollider> all_colliders;
+  std::vector<CPPSpringBoneColliderGroup> all_collider_groups;
   bool is_setup = false;
   bool need_reset = true;
 
@@ -90,7 +99,14 @@ public:
   int get_joint_count(int p_chain_idx) const;
   Vector3 get_joint_current_tail(int p_chain_idx, int p_joint_idx) const;
 
+  void draw_gizmo(Object *p_mesh_obj, Transform3D p_skel_to_gizmo, Color p_color,
+                  bool p_draw_spring_bones, bool p_draw_colliders);
+
 private:
+  void _draw_sphere(ImmediateMesh *p_mesh, const Basis &p_bas,
+                    const Vector3 &p_center, float p_radius, Color p_color);
+  void _draw_line(ImmediateMesh *p_mesh, const Vector3 &p_begin,
+                  const Vector3 &p_end, Color p_color);
   void _update_colliders(Skeleton3D *skel);
   Quaternion _from_to_rotation_safe(Vector3 from, Vector3 to);
 };

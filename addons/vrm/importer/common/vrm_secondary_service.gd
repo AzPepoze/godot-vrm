@@ -242,7 +242,7 @@ static func parse_secondary_node(
 	)
 	secondary_node.set_script(vrm_secondary)
 	secondary_node.set("skeleton", skeleton_path)
-	secondary_node.set("spring_bones", spring_bones)
+	secondary_node.set("spring_bones", Array(spring_bones))
 	# Use untyped Array to avoid type-mismatch between preload-const and class_name
 	secondary_node.set("collider_groups", Array(collider_groups))
 	secondary_node.set("collider_library", Array(collider_library))
