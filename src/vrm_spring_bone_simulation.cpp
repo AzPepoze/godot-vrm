@@ -370,6 +370,7 @@ void VRMSpringBoneSimulation::_simulate_chains(
           next_tail, origin, radius, joint.length, collider_views);
 
       // Environment collision (optional)
+      bool has_env_collision = false;
       if (environment_collision_enabled && chain.enable_environment_collision) {
         // Transform to world space: center is in skeleton-local space,
         // physics queries require world coordinates.
@@ -389,16 +390,19 @@ void VRMSpringBoneSimulation::_simulate_chains(
           next_tail += push_local;
           next_tail = SpringBonePhysics::apply_length_constraint(
               next_tail, origin, joint.length);
-
-          // Pin prev_tail to the same position to kill bounce.
-          // Verlet velocity = current_tail - prev_tail.
-          // Setting prev_tail = next_tail zeros velocity through the surface.
-          joint.prev_tail = next_tail;
+          has_env_collision = true;
         }
       }
 
       joint.prev_tail = joint.current_tail;
       joint.current_tail = next_tail;
+
+      // After standard tail update, pin both tails to kill velocity through
+      // the surface. Must happen AFTER prev_tail = current_tail above,
+      // otherwise the pinning gets overwritten.
+      if (has_env_collision) {
+        joint.prev_tail = next_tail;
+      }
 
       // Apply rotation to skeleton
       Transform3D tf = joint.global_pose;

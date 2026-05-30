@@ -2249,7 +2249,7 @@ gizmo_show_colliders = true
 gizmo_show_wind = true
 
 [node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=104916327]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.27906728, 0.5485289, 1.2659671)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.27906728, 1.0665742, 1.2659671)
 use_collision = true
 size = Vector3(7.097534, 0.5258179, 3.422989)
 
