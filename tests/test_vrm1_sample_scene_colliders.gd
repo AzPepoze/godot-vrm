@@ -106,7 +106,7 @@ func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():
 	var group := VRM_COLLIDER_GROUP.new()
 	group.colliders.append(collider)
 
-	var simulation = ClassDB.instantiate("VRMSpringBoneSimulation")
+	var simulation: Node = ClassDB.instantiate("VRMSpringBoneSimulation")
 	simulation.name = "VRMSpringBoneSimulationSampleTest"
 	skeleton.add_child(simulation)
 	simulation.setup([hair_spring], [group])
@@ -117,7 +117,7 @@ func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():
 		simulation.step_simulation()
 		await runner.process_frame
 	var moved_rot := skeleton.get_bone_global_pose(root_bone_idx).basis.get_rotation_quaternion()
-	var angle := abs((initial_rot.inverse() * moved_rot).get_angle())
+	var angle: float = abs((initial_rot.inverse() * moved_rot).get_angle())
 
 	assert_gt(angle, 0.001, "Sample hair chain should react to an assigned overlapping collider")
 	scene.queue_free()
