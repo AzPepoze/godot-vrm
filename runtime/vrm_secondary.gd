@@ -65,6 +65,58 @@ const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 			get_parent().springbone_add_force = value
 		update_parameters()
 
+@export_group("Wind Settings")
+@export var wind_direction: Vector3 = Vector3.ZERO:
+	set(value):
+		if wind_direction == value:
+			return
+		wind_direction = value
+		if is_child_of_vrm:
+			get_parent().set("wind_direction", value)
+		update_parameters()
+@export var wind_strength: float = 0.0:
+	set(value):
+		if wind_strength == value:
+			return
+		wind_strength = value
+		if is_child_of_vrm:
+			get_parent().set("wind_strength", value)
+		update_parameters()
+@export var wind_turbulence: float = 0.2:
+	set(value):
+		if wind_turbulence == value:
+			return
+		wind_turbulence = value
+		if is_child_of_vrm:
+			get_parent().set("wind_turbulence", value)
+		update_parameters()
+@export var wind_frequency: float = 1.0:
+	set(value):
+		if wind_frequency == value:
+			return
+		wind_frequency = value
+		if is_child_of_vrm:
+			get_parent().set("wind_frequency", value)
+		update_parameters()
+
+@export_group("Environment Collision Settings")
+@export var environment_collision_enabled: bool = false:
+	set(value):
+		if environment_collision_enabled == value:
+			return
+		environment_collision_enabled = value
+		if is_child_of_vrm:
+			get_parent().set("environment_collision_enabled", value)
+		update_parameters()
+@export var environment_collision_mask: int = 1:
+	set(value):
+		if environment_collision_mask == value:
+			return
+		environment_collision_mask = value
+		if is_child_of_vrm:
+			get_parent().set("environment_collision_mask", value)
+		update_parameters()
+
 @export_category("Run in Editor")
 @export var update_in_editor: bool = false:
 	set(value):
@@ -133,19 +185,41 @@ var _gizmo: MeshInstance3D = null
 			get_parent().set("collider_library", value)
 
 
+# Pull a property from parent with fallback for properties that may not exist on older VRM roots.
+func _pull_parent(prop: StringName, fallback: Variant = null) -> Variant:
+	var val = _parent_ref.get(prop)
+	return val if val != null else fallback
+
+
+# Sync a single property from parent. Returns true if the value changed.
+func _sync_prop(prop: StringName) -> bool:
+	var parent_val = _parent_ref.get(prop)
+	if parent_val == null:
+		return false
+	if get(prop) != parent_val:
+		set(prop, parent_val)
+		return true
+	return false
+
+
 func _enter_tree() -> void:
 	_parent_ref = get_parent()
 	if _parent_ref != null and _parent_ref.has_method("is_vrm_root"):
 		is_child_of_vrm = true
-		_parent_ref.set("secondary_node", self )
+		_parent_ref.set("secondary_node", self)
 		# Push data to parent
-		_parent_ref.set("collider_groups", collider_groups)
-		_parent_ref.set("collider_library", collider_library)
-		_parent_ref.set("spring_bones", spring_bones)
+		for prop in ["collider_groups", "collider_library", "spring_bones"]:
+			_parent_ref.set(prop, get(prop))
 		# Pull initial settings from parent
 		springbone_gravity_multiplier = _parent_ref.get("springbone_gravity_multiplier")
 		springbone_gravity_rotation = _parent_ref.get("springbone_gravity_rotation")
 		springbone_add_force = _parent_ref.get("springbone_add_force")
+		wind_direction = _pull_parent("wind_direction", Vector3.ZERO)
+		wind_strength = _pull_parent("wind_strength", 0.0)
+		wind_turbulence = _pull_parent("wind_turbulence", 0.2)
+		wind_frequency = _pull_parent("wind_frequency", 1.0)
+		environment_collision_enabled = _pull_parent("environment_collision_enabled", false)
+		environment_collision_mask = _pull_parent("environment_collision_mask", 1)
 		update_parameters()
 		gizmo_spring_bone = _parent_ref.get("gizmo_spring_bone")
 		gizmo_spring_bone_color = _parent_ref.get("gizmo_spring_bone_color")
@@ -190,7 +264,9 @@ func _setup_spring_bone_adapter() -> void:
 		spring_bones, collider_groups, disable_colliders, update_in_editor
 	)
 	spring_bone_adapter.update_parameters(
-		springbone_gravity_multiplier, springbone_gravity_rotation, springbone_add_force
+		springbone_gravity_multiplier, springbone_gravity_rotation, springbone_add_force,
+		wind_direction, wind_strength, wind_turbulence, wind_frequency,
+		environment_collision_enabled, environment_collision_mask
 	)
 
 
@@ -203,7 +279,9 @@ func _setup_gizmo() -> void:
 func update_parameters() -> void:
 	if spring_bone_adapter != null:
 		spring_bone_adapter.update_parameters(
-			springbone_gravity_multiplier, springbone_gravity_rotation, springbone_add_force
+			springbone_gravity_multiplier, springbone_gravity_rotation, springbone_add_force,
+			wind_direction, wind_strength, wind_turbulence, wind_frequency,
+			environment_collision_enabled, environment_collision_mask
 		)
 
 
@@ -221,37 +299,31 @@ func _process(_delta: float):
 		)
 
 	if is_child_of_vrm and _parent_ref != null:
-		# Sync from toplevel if changed in editor
-		if _parent_ref.springbone_gravity_multiplier != springbone_gravity_multiplier:
-			springbone_gravity_multiplier = _parent_ref.springbone_gravity_multiplier
-			update_parameters()
-		if _parent_ref.springbone_gravity_rotation != springbone_gravity_rotation:
-			springbone_gravity_rotation = _parent_ref.springbone_gravity_rotation
-			update_parameters()
-		if _parent_ref.springbone_add_force != springbone_add_force:
-			springbone_add_force = _parent_ref.springbone_add_force
-			update_parameters()
-		if _parent_ref.update_secondary_fixed != update_secondary_fixed:
-			update_secondary_fixed = _parent_ref.update_secondary_fixed
-		if _parent_ref.override_springbone_center != override_springbone_center:
-			override_springbone_center = _parent_ref.override_springbone_center
-		if _parent_ref.default_springbone_center != default_springbone_center:
-			default_springbone_center = _parent_ref.default_springbone_center
-		if _parent_ref.gizmo_spring_bone != gizmo_spring_bone:
-			gizmo_spring_bone = _parent_ref.gizmo_spring_bone
-		if _parent_ref.gizmo_spring_bone_color != gizmo_spring_bone_color:
-			gizmo_spring_bone_color = _parent_ref.gizmo_spring_bone_color
-		if _parent_ref.gizmo_show_colliders != gizmo_show_colliders:
-			gizmo_show_colliders = _parent_ref.gizmo_show_colliders
-		if _parent_ref.disable_colliders != disable_colliders:
-			disable_colliders = _parent_ref.disable_colliders
-			if spring_bone_adapter:
-				spring_bone_adapter.set_active(!disable_colliders)
-		if _parent_ref.update_in_editor != update_in_editor:
-			update_in_editor = _parent_ref.update_in_editor
-			if spring_bone_adapter:
-				spring_bone_adapter.set_active(update_in_editor or not Engine.is_editor_hint())
-		if _parent_ref.collider_groups != collider_groups:
-			collider_groups = _parent_ref.collider_groups
-		if _parent_ref.collider_library != collider_library:
-			collider_library = _parent_ref.collider_library
+		_sync_from_parent()
+
+
+func _sync_from_parent() -> void:
+	# Sync physics parameters (trigger update_parameters on change)
+	var needs_update := false
+	for prop in [
+		"springbone_gravity_multiplier", "springbone_gravity_rotation", "springbone_add_force",
+		"wind_direction", "wind_strength", "wind_turbulence", "wind_frequency",
+		"environment_collision_enabled", "environment_collision_mask",
+	]:
+		needs_update = _sync_prop(prop) or needs_update
+	if needs_update:
+		update_parameters()
+
+	# Sync non-physics flags
+	for prop in [
+		"update_secondary_fixed", "override_springbone_center", "default_springbone_center",
+		"gizmo_spring_bone", "gizmo_spring_bone_color", "gizmo_show_colliders",
+		"collider_groups", "collider_library",
+	]:
+		_sync_prop(prop)
+
+	# These have side effects beyond simple assignment
+	if _sync_prop("disable_colliders") and spring_bone_adapter:
+		spring_bone_adapter.set_active(!disable_colliders)
+	if _sync_prop("update_in_editor") and spring_bone_adapter:
+		spring_bone_adapter.set_active(update_in_editor or not Engine.is_editor_hint())
