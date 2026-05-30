@@ -9,11 +9,15 @@ const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 @export_category("Springbone Settings")
 @export var update_secondary_fixed: bool = false:
 	set(value):
+		if update_secondary_fixed == value:
+			return
 		update_secondary_fixed = value
 		if is_child_of_vrm:
 			get_parent().update_secondary_fixed = value
 @export var disable_colliders: bool = false:
 	set(value):
+		if disable_colliders == value:
+			return
 		disable_colliders = value
 		if is_child_of_vrm:
 			get_parent().disable_colliders = value
@@ -21,30 +25,40 @@ const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 			spring_bone_adapter.set_active(!value)
 @export var override_springbone_center: bool = false:
 	set(value):
+		if override_springbone_center == value:
+			return
 		override_springbone_center = value
 		if is_child_of_vrm:
 			get_parent().override_springbone_center = value
 
 @export var default_springbone_center: Node3D:
 	set(value):
+		if default_springbone_center == value:
+			return
 		default_springbone_center = value
 		if is_child_of_vrm:
 			get_parent().default_springbone_center = value
 
 @export var springbone_gravity_multiplier: float = 1.0:
 	set(value):
+		if springbone_gravity_multiplier == value:
+			return
 		springbone_gravity_multiplier = value
 		if is_child_of_vrm:
 			get_parent().springbone_gravity_multiplier = value
 		update_parameters()
 @export var springbone_gravity_rotation: Quaternion = Quaternion.IDENTITY:
 	set(value):
+		if springbone_gravity_rotation == value:
+			return
 		springbone_gravity_rotation = value
 		if is_child_of_vrm:
 			get_parent().springbone_gravity_rotation = value
 		update_parameters()
 @export var springbone_add_force: Vector3 = Vector3.ZERO:
 	set(value):
+		if springbone_add_force == value:
+			return
 		springbone_add_force = value
 		if is_child_of_vrm:
 			get_parent().springbone_add_force = value
@@ -53,6 +67,8 @@ const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 @export_category("Run in Editor")
 @export var update_in_editor: bool = false:
 	set(value):
+		if update_in_editor == value:
+			return
 		update_in_editor = value
 		if is_child_of_vrm:
 			get_parent().update_in_editor = value
@@ -61,16 +77,22 @@ const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 
 @export var gizmo_spring_bone: bool = false:
 	set(value):
+		if gizmo_spring_bone == value:
+			return
 		gizmo_spring_bone = value
 		if is_child_of_vrm:
 			get_parent().gizmo_spring_bone = value
 @export var gizmo_spring_bone_color: Color = Color.LIGHT_YELLOW:
 	set(value):
+		if gizmo_spring_bone_color == value:
+			return
 		gizmo_spring_bone_color = value
 		if is_child_of_vrm:
 			get_parent().gizmo_spring_bone_color = value
 @export var gizmo_show_colliders: bool = false:
 	set(value):
+		if gizmo_show_colliders == value:
+			return
 		gizmo_show_colliders = value
 		if is_child_of_vrm:
 			get_parent().gizmo_show_colliders = value
@@ -112,12 +134,21 @@ var _gizmo: MeshInstance3D = null
 
 func _enter_tree() -> void:
 	_parent_ref = get_parent()
-	if _parent_ref != null and "spring_bones" in _parent_ref:
+	if _parent_ref != null and _parent_ref.has_method("is_vrm_root"):
 		is_child_of_vrm = true
-		# Push data to parent (set during import before is_child_of_vrm was true)
+		_parent_ref.set("secondary_node", self)
+		# Push data to parent
 		_parent_ref.set("collider_groups", collider_groups)
 		_parent_ref.set("collider_library", collider_library)
 		_parent_ref.set("spring_bones", spring_bones)
+		# Pull initial settings from parent
+		springbone_gravity_multiplier = _parent_ref.get("springbone_gravity_multiplier")
+		springbone_gravity_rotation = _parent_ref.get("springbone_gravity_rotation")
+		springbone_add_force = _parent_ref.get("springbone_add_force")
+		update_parameters()
+		gizmo_spring_bone = _parent_ref.get("gizmo_spring_bone")
+		gizmo_spring_bone_color = _parent_ref.get("gizmo_spring_bone_color")
+		gizmo_show_colliders = _parent_ref.get("gizmo_show_colliders")
 
 
 func _ready() -> void:
@@ -190,6 +221,18 @@ func _process(_delta: float):
 		if _parent_ref.springbone_add_force != springbone_add_force:
 			springbone_add_force = _parent_ref.springbone_add_force
 			update_parameters()
+		if _parent_ref.update_secondary_fixed != update_secondary_fixed:
+			update_secondary_fixed = _parent_ref.update_secondary_fixed
+		if _parent_ref.override_springbone_center != override_springbone_center:
+			override_springbone_center = _parent_ref.override_springbone_center
+		if _parent_ref.default_springbone_center != default_springbone_center:
+			default_springbone_center = _parent_ref.default_springbone_center
+		if _parent_ref.gizmo_spring_bone != gizmo_spring_bone:
+			gizmo_spring_bone = _parent_ref.gizmo_spring_bone
+		if _parent_ref.gizmo_spring_bone_color != gizmo_spring_bone_color:
+			gizmo_spring_bone_color = _parent_ref.gizmo_spring_bone_color
+		if _parent_ref.gizmo_show_colliders != gizmo_show_colliders:
+			gizmo_show_colliders = _parent_ref.gizmo_show_colliders
 		if _parent_ref.disable_colliders != disable_colliders:
 			disable_colliders = _parent_ref.disable_colliders
 			if spring_bone_adapter:

@@ -26,9 +26,9 @@ func draw_in_editor(_do_draw_spring_bones: bool = false) -> void:
 			)
 			_logged_missing_condition = true
 		return
-	if secondary_node.get_parent().gizmo_spring_bone:
-		draw_spring_bones(secondary_node.get_parent().gizmo_spring_bone_color)
-	if secondary_node.get_parent().gizmo_show_colliders:
+	if secondary_node.gizmo_spring_bone:
+		draw_spring_bones(secondary_node.gizmo_spring_bone_color)
+	if secondary_node.gizmo_show_colliders:
 		draw_collider_groups()
 
 
@@ -41,9 +41,9 @@ func draw_in_game() -> void:
 			)
 			_logged_missing_condition = true
 		return
-	if secondary_node.get_parent().gizmo_spring_bone:
-		draw_spring_bones(secondary_node.get_parent().gizmo_spring_bone_color)
-	if secondary_node.get_parent().gizmo_show_colliders:
+	if secondary_node.gizmo_spring_bone:
+		draw_spring_bones(secondary_node.gizmo_spring_bone_color)
+	if secondary_node.gizmo_show_colliders:
 		draw_collider_groups()
 
 
