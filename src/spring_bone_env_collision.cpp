@@ -1,0 +1,121 @@
+#include "vrm_spring_bone_simulation.h"
+
+#include <godot_cpp/classes/capsule_shape3d.hpp>
+#include <godot_cpp/classes/collision_object3d.hpp>
+#include <godot_cpp/classes/physics_direct_space_state3d.hpp>
+#include <godot_cpp/classes/physics_shape_query_parameters3d.hpp>
+#include <godot_cpp/classes/world3d.hpp>
+#include <godot_cpp/core/math.hpp>
+
+namespace godot {
+
+// ---------------------------------------------------------------------------
+// Environment collision property accessors
+// ---------------------------------------------------------------------------
+
+void VRMSpringBoneSimulation::set_environment_collision_enabled(bool p_enabled) {
+  environment_collision_enabled = p_enabled;
+}
+bool VRMSpringBoneSimulation::is_environment_collision_enabled() const {
+  return environment_collision_enabled;
+}
+void VRMSpringBoneSimulation::set_environment_collision_mask(uint32_t p_mask) {
+  environment_collision_mask = p_mask;
+}
+uint32_t VRMSpringBoneSimulation::get_environment_collision_mask() const {
+  return environment_collision_mask;
+}
+void VRMSpringBoneSimulation::set_environment_collision_bounce_damping(
+    float p_damping) {
+  environment_collision_bounce_damping = p_damping;
+}
+float VRMSpringBoneSimulation::get_environment_collision_bounce_damping() const {
+  return environment_collision_bounce_damping;
+}
+
+// ---------------------------------------------------------------------------
+// PhysicsServer3D query — capsule shape covering the full bone segment.
+// Returns a world-space push vector that moves the tail out of the collider.
+// ---------------------------------------------------------------------------
+
+void VRMSpringBoneSimulation::_query_game_object_collisions(
+    Skeleton3D *skel, const Vector3 &origin_world, const Vector3 &tail_world,
+    float radius, uint32_t mask, Vector3 &out_push) {
+  out_push = Vector3();
+  if (!skel)
+    return;
+
+  Ref<World3D> world = skel->get_world_3d();
+  if (world.is_null())
+    return;
+
+  PhysicsDirectSpaceState3D *space_state = world->get_direct_space_state();
+  if (!space_state)
+    return;
+
+  // Capsule covers the full bone segment (origin → tail)
+  Vector3 bone_dir = tail_world - origin_world;
+  float bone_length = bone_dir.length();
+  if (bone_length < 0.0001f)
+    return;
+
+  Vector3 mid_point = (origin_world + tail_world) * 0.5f;
+  Vector3 axis = bone_dir / bone_length;
+
+  // Align Y-up (capsule axis) with bone direction
+  Basis rot_basis;
+  if (Math::abs(axis.dot(Vector3(0, 1, 0))) > 0.9999f) {
+    rot_basis = Basis();
+  } else {
+    Vector3 rot_axis = Vector3(0, 1, 0).cross(axis).normalized();
+    float rot_angle = Math::acos(Vector3(0, 1, 0).dot(axis));
+    rot_basis = Basis(rot_axis, rot_angle);
+  }
+
+  Ref<CapsuleShape3D> shape;
+  shape.instantiate();
+  shape->set_radius(radius);
+  shape->set_height(bone_length);
+
+  Ref<PhysicsShapeQueryParameters3D> params;
+  params.instantiate();
+  params->set_shape(shape);
+  params->set_transform(Transform3D(rot_basis, mid_point));
+  params->set_collision_mask(mask);
+
+  // Exclude the model's own collision objects
+  TypedArray<RID> exclude;
+  Node *parent = skel->get_parent();
+  if (parent) {
+    CollisionObject3D *co = Object::cast_to<CollisionObject3D>(parent);
+    if (co) {
+      exclude.push_back(co->get_rid());
+    }
+  }
+  params->set_exclude(exclude);
+
+  TypedArray<Vector3> contacts = space_state->collide_shape(params, 32);
+  if (contacts.size() < 2)
+    return;
+
+  // Deepest penetration → push out to surface
+  float max_depth = 0.0f;
+  Vector3 deepest_push;
+  for (int i = 0; i < contacts.size() - 1; i += 2) {
+    // contacts[i]=our shape, contacts[i+1]=collided surface
+    Vector3 push = Vector3(contacts[i + 1]) - Vector3(contacts[i]);
+    float depth = push.length();
+    if (depth > max_depth) {
+      max_depth = depth;
+      deepest_push = push;
+    }
+  }
+
+  if (max_depth > 0.0f) {
+    Vector3 normal = deepest_push.normalized();
+    float margin = radius * 0.2f;
+    out_push = normal * (max_depth + radius + margin);
+  }
+}
+
+} // namespace godot
