@@ -84,6 +84,9 @@ private:
   bool need_reset = true;
 
   float gravity_multiplier = 1.0f;
+  float stiffness_multiplier = 1.0f;
+  float drag_multiplier = 1.0f;
+  float hit_radius_multiplier = 1.0f;
   Quaternion gravity_rotation;
   Vector3 add_force;
 
@@ -107,7 +110,10 @@ public:
 
   void setup(Array p_spring_bones, Array p_collider_groups);
   void update_parameters(float p_gravity_multiplier,
-                         Quaternion p_gravity_rotation, Vector3 p_add_force);
+                         Quaternion p_gravity_rotation, Vector3 p_add_force,
+                         float p_stiffness_multiplier = 1.0f,
+                         float p_drag_multiplier = 1.0f,
+                         float p_hit_radius_multiplier = 1.0f);
   void step_simulation();
   void _process_modification() override;
 
@@ -118,6 +124,14 @@ public:
   void draw_gizmo(Object *p_mesh_obj, Transform3D p_skel_to_gizmo,
                   Color p_color, bool p_draw_spring_bones,
                   bool p_draw_colliders);
+
+  // Getters/Setters for Multipliers
+  void set_stiffness_multiplier(float p_multiplier) { stiffness_multiplier = p_multiplier; }
+  float get_stiffness_multiplier() const { return stiffness_multiplier; }
+  void set_drag_multiplier(float p_multiplier) { drag_multiplier = p_multiplier; }
+  float get_drag_multiplier() const { return drag_multiplier; }
+  void set_hit_radius_multiplier(float p_multiplier) { hit_radius_multiplier = p_multiplier; }
+  float get_hit_radius_multiplier() const { return hit_radius_multiplier; }
 
   // Getters/Setters for Wind parameters
   void set_wind_direction(Vector3 p_dir);

@@ -81,8 +81,19 @@ static std::vector<SpringBoneCollision::ColliderView> gather_collider_views(
 // ---------------------------------------------------------------------------
 void VRMSpringBoneSimulator::_bind_methods() {
     ClassDB::bind_method(D_METHOD("setup", "spring_bones", "collider_groups"), &VRMSpringBoneSimulator::setup);
-    ClassDB::bind_method(D_METHOD("update_parameters", "gravity_multiplier", "gravity_rotation", "add_force"), &VRMSpringBoneSimulator::update_parameters);
+    ClassDB::bind_method(D_METHOD("update_parameters", "gravity_multiplier", "gravity_rotation", "add_force", "stiffness_multiplier", "drag_multiplier", "hit_radius_multiplier"), &VRMSpringBoneSimulator::update_parameters, DEFVAL(1.0f), DEFVAL(1.0f), DEFVAL(1.0f));
     ClassDB::bind_method(D_METHOD("step_simulation"), &VRMSpringBoneSimulator::step_simulation);
+
+    ClassDB::bind_method(D_METHOD("set_stiffness_multiplier", "multiplier"), &VRMSpringBoneSimulator::set_stiffness_multiplier);
+    ClassDB::bind_method(D_METHOD("get_stiffness_multiplier"), &VRMSpringBoneSimulator::get_stiffness_multiplier);
+    ClassDB::bind_method(D_METHOD("set_drag_multiplier", "multiplier"), &VRMSpringBoneSimulator::set_drag_multiplier);
+    ClassDB::bind_method(D_METHOD("get_drag_multiplier"), &VRMSpringBoneSimulator::get_drag_multiplier);
+    ClassDB::bind_method(D_METHOD("set_hit_radius_multiplier", "multiplier"), &VRMSpringBoneSimulator::set_hit_radius_multiplier);
+    ClassDB::bind_method(D_METHOD("get_hit_radius_multiplier"), &VRMSpringBoneSimulator::get_hit_radius_multiplier);
+
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "stiffness_multiplier"), "set_stiffness_multiplier", "get_stiffness_multiplier");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "drag_multiplier"), "set_drag_multiplier", "get_drag_multiplier");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "hit_radius_multiplier"), "set_hit_radius_multiplier", "get_hit_radius_multiplier");
     ClassDB::bind_method(D_METHOD("get_chain_count"), &VRMSpringBoneSimulator::get_chain_count);
     ClassDB::bind_method(D_METHOD("get_joint_count", "chain_idx"), &VRMSpringBoneSimulator::get_joint_count);
     ClassDB::bind_method(D_METHOD("get_joint_current_tail", "chain_idx", "joint_idx"), &VRMSpringBoneSimulator::get_joint_current_tail);
@@ -123,10 +134,16 @@ VRMSpringBoneSimulator::~VRMSpringBoneSimulator() {}
 // ---------------------------------------------------------------------------
 void VRMSpringBoneSimulator::update_parameters(float p_gravity_multiplier,
                                                Quaternion p_gravity_rotation,
-                                               Vector3 p_add_force) {
+                                               Vector3 p_add_force,
+                                               float p_stiffness_multiplier,
+                                               float p_drag_multiplier,
+                                               float p_hit_radius_multiplier) {
     gravity_multiplier = p_gravity_multiplier;
     gravity_rotation = p_gravity_rotation;
     add_force = p_add_force;
+    stiffness_multiplier = p_stiffness_multiplier;
+    drag_multiplier = p_drag_multiplier;
+    hit_radius_multiplier = p_hit_radius_multiplier;
 }
 
 void VRMSpringBoneSimulator::step_simulation() { _process_modification(); }
@@ -224,11 +241,11 @@ void VRMSpringBoneSimulator::_simulate_chains(Skeleton3D *skel, const Transform3
             auto &joint = chain.joints[i];
 
             // Per-joint parameters
-            float stiffness = chain.stiffness_scale * delta * joint_param(chain.stiffness_force, i);
-            float drag = chain.drag_force_scale * joint_param(chain.drag_force, i);
+            float stiffness = stiffness_multiplier * chain.stiffness_scale * delta * joint_param(chain.stiffness_force, i);
+            float drag = drag_multiplier * chain.drag_force_scale * joint_param(chain.drag_force, i);
             float grav_pow = joint_param(chain.gravity_power, i);
             Vector3 grav_dir = joint_param_vec(chain.gravity_dir, i, chain.gravity_dir_default);
-            float radius = chain.hit_radius_scale * joint_param(chain.hit_radius, i);
+            float radius = hit_radius_multiplier * chain.hit_radius_scale * joint_param(chain.hit_radius, i);
 
             // External forces
             Vector3 total_gravity = gravity_rotation.xform(grav_dir * grav_pow * gravity_multiplier);

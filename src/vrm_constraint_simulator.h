@@ -64,6 +64,7 @@ public:
 private:
   std::vector<CPPConstraint> constraints;
   bool is_setup = false;
+  float weight_multiplier = 1.0f;
 
 protected:
   static void _bind_methods();
@@ -73,6 +74,8 @@ public:
   ~VRMConstraintSimulator();
 
   void setup(Array p_constraints);
+  void set_weight_multiplier(float p_multiplier) { weight_multiplier = p_multiplier; }
+  float get_weight_multiplier() const { return weight_multiplier; }
   void _process_modification() override;
 
 private:

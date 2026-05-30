@@ -8,6 +8,11 @@ using namespace godot;
 void VRMConstraintSimulator::_bind_methods() {
   ClassDB::bind_method(D_METHOD("setup", "constraints"),
                        &VRMConstraintSimulator::setup);
+  ClassDB::bind_method(D_METHOD("set_weight_multiplier", "multiplier"),
+                       &VRMConstraintSimulator::set_weight_multiplier);
+  ClassDB::bind_method(D_METHOD("get_weight_multiplier"),
+                       &VRMConstraintSimulator::get_weight_multiplier);
+  ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "weight_multiplier"), "set_weight_multiplier", "get_weight_multiplier");
 }
 
 VRMConstraintSimulator::VRMConstraintSimulator() {}
@@ -95,6 +100,10 @@ void VRMConstraintSimulator::_process_modification() {
               .normalized();
 
       Quaternion arc = Quaternion(rest_dir, aim_dir).normalized();
+      float final_weight = c.weight * weight_multiplier;
+      if (final_weight != 1.0f) {
+        arc = Quaternion().slerp(arc, final_weight);
+      }
       if (c.target_bone != -1) {
         Skeleton3D *t_skel = Object::cast_to<Skeleton3D>(c.target_node);
         if (t_skel) {
@@ -181,8 +190,9 @@ VRMConstraintSimulator::_get_target_global_transform(const CPPConstraint &c,
 void VRMConstraintSimulator::_set_weighted_posed_target_rotation(
     const CPPConstraint &c, Skeleton3D *skel, Quaternion rotation_quat) {
   Quaternion final_rotation = rotation_quat;
-  if (c.weight != 1.0f) {
-    final_rotation = Quaternion().slerp(rotation_quat, c.weight);
+  float final_weight = c.weight * weight_multiplier;
+  if (final_weight != 1.0f) {
+    final_rotation = Quaternion().slerp(rotation_quat, final_weight);
   }
   if (c.target_bone == -1) {
     Quaternion rest_quat = c.target_rest_rotation;

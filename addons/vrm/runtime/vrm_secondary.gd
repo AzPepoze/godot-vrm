@@ -40,6 +40,23 @@ const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 		if is_child_of_vrm:
 			get_parent().default_springbone_center = value
 
+@export_group("Global Multipliers")
+@export var springbone_stiffness_multiplier: float = 1.0:
+	set(value):
+		if springbone_stiffness_multiplier == value:
+			return
+		springbone_stiffness_multiplier = value
+		if is_child_of_vrm:
+			get_parent().springbone_stiffness_multiplier = value
+		update_parameters()
+@export var springbone_drag_multiplier: float = 1.0:
+	set(value):
+		if springbone_drag_multiplier == value:
+			return
+		springbone_drag_multiplier = value
+		if is_child_of_vrm:
+			get_parent().springbone_drag_multiplier = value
+		update_parameters()
 @export var springbone_gravity_multiplier: float = 1.0:
 	set(value):
 		if springbone_gravity_multiplier == value:
@@ -48,6 +65,24 @@ const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 		if is_child_of_vrm:
 			get_parent().springbone_gravity_multiplier = value
 		update_parameters()
+@export var springbone_hit_radius_multiplier: float = 1.0:
+	set(value):
+		if springbone_hit_radius_multiplier == value:
+			return
+		springbone_hit_radius_multiplier = value
+		if is_child_of_vrm:
+			get_parent().springbone_hit_radius_multiplier = value
+		update_parameters()
+@export var constraint_weight_multiplier: float = 1.0:
+	set(value):
+		if constraint_weight_multiplier == value:
+			return
+		constraint_weight_multiplier = value
+		if is_child_of_vrm:
+			get_parent().constraint_weight_multiplier = value
+		# Notify appliers if they exist
+		_notify_constraint_appliers()
+
 @export var springbone_gravity_rotation: Quaternion = Quaternion.IDENTITY:
 	set(value):
 		if springbone_gravity_rotation == value:
@@ -211,7 +246,11 @@ func _enter_tree() -> void:
 		for prop in ["collider_groups", "collider_library", "spring_bones"]:
 			_parent_ref.set(prop, get(prop))
 		# Pull initial settings from parent
-		springbone_gravity_multiplier = _parent_ref.get("springbone_gravity_multiplier")
+		springbone_stiffness_multiplier = _pull_parent("springbone_stiffness_multiplier", 1.0)
+		springbone_drag_multiplier = _pull_parent("springbone_drag_multiplier", 1.0)
+		springbone_gravity_multiplier = _pull_parent("springbone_gravity_multiplier", 1.0)
+		springbone_hit_radius_multiplier = _pull_parent("springbone_hit_radius_multiplier", 1.0)
+		constraint_weight_multiplier = _pull_parent("constraint_weight_multiplier", 1.0)
 		springbone_gravity_rotation = _parent_ref.get("springbone_gravity_rotation")
 		springbone_add_force = _parent_ref.get("springbone_add_force")
 		wind_direction = _pull_parent("wind_direction", Vector3.ZERO)
@@ -266,7 +305,8 @@ func _setup_spring_bone_adapter() -> void:
 	spring_bone_adapter.update_parameters(
 		springbone_gravity_multiplier, springbone_gravity_rotation, springbone_add_force,
 		wind_direction, wind_strength, wind_turbulence, wind_frequency,
-		environment_collision_enabled, environment_collision_mask
+		environment_collision_enabled, environment_collision_mask,
+		springbone_stiffness_multiplier, springbone_drag_multiplier, springbone_hit_radius_multiplier
 	)
 
 
@@ -281,7 +321,8 @@ func update_parameters() -> void:
 		spring_bone_adapter.update_parameters(
 			springbone_gravity_multiplier, springbone_gravity_rotation, springbone_add_force,
 			wind_direction, wind_strength, wind_turbulence, wind_frequency,
-			environment_collision_enabled, environment_collision_mask
+			environment_collision_enabled, environment_collision_mask,
+			springbone_stiffness_multiplier, springbone_drag_multiplier, springbone_hit_radius_multiplier
 		)
 
 
@@ -306,13 +347,17 @@ func _sync_from_parent() -> void:
 	# Sync physics parameters (trigger update_parameters on change)
 	var needs_update := false
 	for prop in [
-		"springbone_gravity_multiplier", "springbone_gravity_rotation", "springbone_add_force",
+		"springbone_stiffness_multiplier", "springbone_drag_multiplier",
+		"springbone_gravity_multiplier", "springbone_hit_radius_multiplier",
+		"constraint_weight_multiplier",
+		"springbone_gravity_rotation", "springbone_add_force",
 		"wind_direction", "wind_strength", "wind_turbulence", "wind_frequency",
 		"environment_collision_enabled", "environment_collision_mask",
 	]:
 		needs_update = _sync_prop(prop) or needs_update
 	if needs_update:
 		update_parameters()
+		_notify_constraint_appliers()
 
 	# Sync non-physics flags
 	for prop in [
@@ -327,3 +372,15 @@ func _sync_from_parent() -> void:
 		spring_bone_adapter.set_active(!disable_colliders)
 	if _sync_prop("update_in_editor") and spring_bone_adapter:
 		spring_bone_adapter.set_active(update_in_editor or not Engine.is_editor_hint())
+
+
+func _notify_constraint_appliers() -> void:
+	if not is_inside_tree():
+		return
+	# Search for appliers in the same model
+	var root = _parent_ref if is_child_of_vrm else get_parent()
+	if root:
+		var appliers = root.find_children("*", "BoneNodeConstraintApplier", true, false)
+		for applier in appliers:
+			if applier.has_method("set_global_weight_multiplier"):
+				applier.set_global_weight_multiplier(constraint_weight_multiplier)

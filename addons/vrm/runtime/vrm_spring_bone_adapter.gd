@@ -9,6 +9,9 @@ var skeleton: Skeleton3D = null
 var has_simulator: bool = false
 
 var gravity_multiplier: float = 1.0
+var stiffness_multiplier: float = 1.0
+var drag_multiplier: float = 1.0
+var hit_radius_multiplier: float = 1.0
 var gravity_rotation: Quaternion = Quaternion.IDENTITY
 var add_force: Vector3 = Vector3.ZERO
 
@@ -66,14 +69,22 @@ func update_parameters(
 	p_gravity_multiplier: float, p_gravity_rotation: Quaternion, p_add_force: Vector3,
 	p_wind_direction: Vector3 = Vector3.ZERO, p_wind_strength: float = 0.0,
 	p_wind_turbulence: float = 0.2, p_wind_frequency: float = 1.0,
-	p_env_coll_enabled: bool = false, p_env_coll_mask: int = 1
+	p_env_coll_enabled: bool = false, p_env_coll_mask: int = 1,
+	p_stiffness_multiplier: float = 1.0, p_drag_multiplier: float = 1.0,
+	p_hit_radius_multiplier: float = 1.0
 ) -> void:
 	gravity_multiplier = p_gravity_multiplier
+	stiffness_multiplier = p_stiffness_multiplier
+	drag_multiplier = p_drag_multiplier
+	hit_radius_multiplier = p_hit_radius_multiplier
 	gravity_rotation = p_gravity_rotation
 	add_force = p_add_force
 
 	if simulator:
-		simulator.update_parameters(gravity_multiplier, gravity_rotation, add_force)
+		simulator.update_parameters(
+			gravity_multiplier, gravity_rotation, add_force,
+			stiffness_multiplier, drag_multiplier, hit_radius_multiplier
+		)
 		simulator.set_wind_direction(p_wind_direction)
 		simulator.set_wind_strength(p_wind_strength)
 		simulator.set_wind_turbulence(p_wind_turbulence)

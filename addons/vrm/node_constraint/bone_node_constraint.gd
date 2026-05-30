@@ -97,17 +97,17 @@ func set_node_paths_from_references(applier: Node) -> void:
 	target_node_path = applier.get_path_to(target_node)
 
 
-func evaluate() -> void:
+func evaluate(multiplier: float = 1.0) -> void:
 	VRMLogger.debug("bone_node_constraint.gd", "evaluate: constraint_type=%d" % constraint_type)
 	if constraint_type == ConstraintType.AIM:
-		evaluate_aim()
+		evaluate_aim(multiplier)
 	elif constraint_type == ConstraintType.ROLL:
-		evaluate_roll()
+		evaluate_roll(multiplier)
 	elif constraint_type == ConstraintType.ROTATION:
-		evaluate_rotation()
+		evaluate_rotation(multiplier)
 
 
-func evaluate_aim() -> void:
+func evaluate_aim(multiplier: float = 1.0) -> void:
 	if source_node == null or target_node == null:
 		return
 	var source_global_transform: Transform3D = _get_source_global_transform()  # * source_node.get_bone_pose(source_bone).affine_inverse() * Transform3D(source_node.get_bone_rest(source_bone).basis, Vector3())
@@ -136,12 +136,17 @@ func evaluate_aim() -> void:
 	#if source_bone_name == 'LeftHand':
 	#	print(str(rest_dir)+","+str(aim_dir))#print(arc.get_euler())
 	#_set_weighted_global_target_rotation(arc)
+	
+	var final_weight = weight * multiplier
+	if final_weight != 1.0:
+		arc = Quaternion.IDENTITY.slerp(arc, final_weight)
+
 	target_node.set_bone_pose_rotation(
 		target_bone, target_rest_transform.basis.get_rotation_quaternion() * arc
 	)  # * arc) #  * arc)
 
 
-func evaluate_roll() -> void:
+func evaluate_roll(multiplier: float = 1.0) -> void:
 	if source_node == null or target_node == null:
 		return
 	if aim_or_roll_axis < AimRollAxis.POSITIVE_X or aim_or_roll_axis > AimRollAxis.POSITIVE_Z:
@@ -162,15 +167,15 @@ func evaluate_roll() -> void:
 		var target_axis := Vector3.ZERO
 		target_axis[axis_index] = 1.0
 		rotation_quat = Quaternion(target_axis, source_angle * axis_value)
-	_set_weighted_posed_target_rotation(rotation_quat)
+	_set_weighted_posed_target_rotation(rotation_quat, multiplier)
 
 
-func evaluate_rotation() -> void:
+func evaluate_rotation(multiplier: float = 1.0) -> void:
 	if source_node == null or target_node == null:
 		return
 	var source_transform: Transform3D = _get_posed_source_transform()
 	var source_quat: Quaternion = source_transform.basis.get_rotation_quaternion()
-	_set_weighted_posed_target_rotation(source_quat)
+	_set_weighted_posed_target_rotation(source_quat, multiplier)
 
 
 static func from_dictionary(dict: Dictionary):  # -> BoneNodeConstraint:
@@ -267,10 +272,11 @@ func _get_target_global_rest() -> Transform3D:
 	return ret
 
 
-func _set_weighted_posed_target_rotation(rotation_quat: Quaternion) -> void:
+func _set_weighted_posed_target_rotation(rotation_quat: Quaternion, multiplier: float = 1.0) -> void:
 	#print("A!")
-	if weight != 1.0:
-		rotation_quat = Quaternion.IDENTITY.slerp(rotation_quat, weight)
+	var final_weight = weight * multiplier
+	if final_weight != 1.0:
+		rotation_quat = Quaternion.IDENTITY.slerp(rotation_quat, final_weight)
 	if target_bone == -1:
 		var rest_quat: Quaternion = target_rest_rotation
 		target_node.quaternion = rest_quat * rotation_quat
@@ -282,9 +288,10 @@ func _set_weighted_posed_target_rotation(rotation_quat: Quaternion) -> void:
 	skeleton.set_bone_pose_rotation(target_bone, rest_quat * rotation_quat)
 
 
-func _set_weighted_global_target_rotation(rotation_quat: Quaternion) -> void:
-	if weight != 1.0:
-		rotation_quat = Quaternion.IDENTITY.slerp(rotation_quat, weight)
+func _set_weighted_global_target_rotation(rotation_quat: Quaternion, multiplier: float = 1.0) -> void:
+	var final_weight = weight * multiplier
+	if final_weight != 1.0:
+		rotation_quat = Quaternion.IDENTITY.slerp(rotation_quat, final_weight)
 	if target_bone == -1:
 		var target_global_transform: Transform3D = target_node.global_transform
 		var scale_basis: Basis = Basis.from_scale(target_global_transform.basis.get_scale())
