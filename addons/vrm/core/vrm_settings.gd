@@ -75,3 +75,50 @@ signal settings_changed
 	set(value):
 		environment_collision_mask = value
 		settings_changed.emit()
+
+@export_group("Springbone Runtime Settings")
+@export var update_secondary_in_physics: bool = false:
+	set(value):
+		update_secondary_in_physics = value
+		settings_changed.emit()
+
+@export var disable_colliders: bool = false:
+	set(value):
+		disable_colliders = value
+		settings_changed.emit()
+
+@export var override_springbone_center: bool = false:
+	set(value):
+		override_springbone_center = value
+		settings_changed.emit()
+
+@export var update_in_editor: bool = false:
+	set(value):
+		update_in_editor = value
+		settings_changed.emit()
+
+@export_group("Springbone Gizmos")
+@export var gizmo_spring_bone: bool = false:
+	set(value):
+		gizmo_spring_bone = value
+		settings_changed.emit()
+
+@export var gizmo_spring_bone_color: Color = Color.LIGHT_YELLOW:
+	set(value):
+		gizmo_spring_bone_color = value
+		settings_changed.emit()
+
+@export var gizmo_show_colliders: bool = false:
+	set(value):
+		gizmo_show_colliders = value
+		settings_changed.emit()
+
+@export var gizmo_show_wind: bool = false:
+	set(value):
+		gizmo_show_wind = value
+		settings_changed.emit()
+
+@export var gizmo_wind_color: Color = Color.CYAN:
+	set(value):
+		gizmo_wind_color = value
+		settings_changed.emit()

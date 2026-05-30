@@ -91,8 +91,8 @@ void VRMSpringBoneSimulation::_bind_methods() {
                                 "gravity_rotation", "add_force",
                                 "stiffness_multiplier", "drag_multiplier",
                                 "hit_radius_multiplier"),
-                       &VRMSpringBoneSimulation::update_parameters, DEFVAL(1.0f),
-                       DEFVAL(1.0f), DEFVAL(1.0f));
+                       &VRMSpringBoneSimulation::update_parameters,
+                       DEFVAL(1.0f), DEFVAL(1.0f), DEFVAL(1.0f));
   ClassDB::bind_method(D_METHOD("step_simulation"),
                        &VRMSpringBoneSimulation::step_simulation);
 
@@ -151,10 +151,12 @@ void VRMSpringBoneSimulation::_bind_methods() {
   ClassDB::bind_method(
       D_METHOD("is_environment_collision_enabled"),
       &VRMSpringBoneSimulation::is_environment_collision_enabled);
-  ClassDB::bind_method(D_METHOD("set_environment_collision_mask", "mask"),
-                       &VRMSpringBoneSimulation::set_environment_collision_mask);
-  ClassDB::bind_method(D_METHOD("get_environment_collision_mask"),
-                       &VRMSpringBoneSimulation::get_environment_collision_mask);
+  ClassDB::bind_method(
+      D_METHOD("set_environment_collision_mask", "mask"),
+      &VRMSpringBoneSimulation::set_environment_collision_mask);
+  ClassDB::bind_method(
+      D_METHOD("get_environment_collision_mask"),
+      &VRMSpringBoneSimulation::get_environment_collision_mask);
 
   ADD_GROUP("Wind Settings", "wind_");
   ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "wind_direction"),
@@ -182,11 +184,11 @@ VRMSpringBoneSimulation::~VRMSpringBoneSimulation() {}
 // Public API
 // ---------------------------------------------------------------------------
 void VRMSpringBoneSimulation::update_parameters(float p_gravity_multiplier,
-                                               Quaternion p_gravity_rotation,
-                                               Vector3 p_add_force,
-                                               float p_stiffness_multiplier,
-                                               float p_drag_multiplier,
-                                               float p_hit_radius_multiplier) {
+                                                Quaternion p_gravity_rotation,
+                                                Vector3 p_add_force,
+                                                float p_stiffness_multiplier,
+                                                float p_drag_multiplier,
+                                                float p_hit_radius_multiplier) {
   gravity_multiplier = p_gravity_multiplier;
   gravity_rotation = p_gravity_rotation;
   add_force = p_add_force;
@@ -198,7 +200,7 @@ void VRMSpringBoneSimulation::update_parameters(float p_gravity_multiplier,
 void VRMSpringBoneSimulation::step_simulation() { _process_modification(); }
 
 void VRMSpringBoneSimulation::setup(Array p_spring_bones,
-                                   Array p_collider_groups) {
+                                    Array p_collider_groups) {
   chains.clear();
   all_colliders.clear();
   all_collider_groups.clear();
@@ -245,8 +247,8 @@ void VRMSpringBoneSimulation::_process_modification() {
   _simulate_chains(skel, skel_global_inv, delta);
 }
 
-void VRMSpringBoneSimulation::_reset_chains(Skeleton3D *skel,
-                                           const Transform3D &skel_global_inv) {
+void VRMSpringBoneSimulation::_reset_chains(
+    Skeleton3D *skel, const Transform3D &skel_global_inv) {
   static const int PUSH_OUT_PASSES = 4;
 
   for (auto &chain : chains) {
@@ -423,7 +425,7 @@ int VRMSpringBoneSimulation::get_joint_count(int p_chain_idx) const {
 }
 
 Vector3 VRMSpringBoneSimulation::get_joint_current_tail(int p_chain_idx,
-                                                       int p_joint_idx) const {
+                                                        int p_joint_idx) const {
   if (p_chain_idx < 0 || p_chain_idx >= (int)chains.size())
     return Vector3();
   const auto &chain = chains[p_chain_idx];
@@ -433,9 +435,10 @@ Vector3 VRMSpringBoneSimulation::get_joint_current_tail(int p_chain_idx,
 }
 
 void VRMSpringBoneSimulation::draw_gizmo(Object *p_mesh_obj,
-                                        Transform3D p_skel_to_gizmo,
-                                        Color p_color, bool p_draw_spring_bones,
-                                        bool p_draw_colliders) {
+                                         Transform3D p_skel_to_gizmo,
+                                         Color p_color,
+                                         bool p_draw_spring_bones,
+                                         bool p_draw_colliders) {
   ImmediateMesh *mesh = Object::cast_to<ImmediateMesh>(p_mesh_obj);
   Skeleton3D *skel = get_skeleton();
   SpringBoneGizmo::draw_gizmo(mesh, skel, p_skel_to_gizmo, chains,
@@ -474,7 +477,8 @@ float VRMSpringBoneSimulation::get_wind_frequency() const {
 // ---------------------------------------------------------------------------
 // Environment collision property accessors
 // ---------------------------------------------------------------------------
-void VRMSpringBoneSimulation::set_environment_collision_enabled(bool p_enabled) {
+void VRMSpringBoneSimulation::set_environment_collision_enabled(
+    bool p_enabled) {
   environment_collision_enabled = p_enabled;
 }
 bool VRMSpringBoneSimulation::is_environment_collision_enabled() const {
