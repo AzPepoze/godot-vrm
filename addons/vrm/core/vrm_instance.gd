@@ -30,32 +30,34 @@ var _temp_collider_library: Array[VRMCollider] = []
 
 func _get_property_list() -> Array[Dictionary]:
 	var list: Array[Dictionary] = []
-	list.append({
-		"name": "Spring bones",
-		"type": TYPE_NIL,
-		"usage": PROPERTY_USAGE_CATEGORY
-	})
-	list.append({
-		"name": "spring_bones",
-		"type": TYPE_ARRAY,
-		"hint": PROPERTY_HINT_TYPE_STRING,
-		"hint_string": "%d/%d:VRMSpringBone" % [TYPE_OBJECT, TYPE_OBJECT],
-		"usage": PROPERTY_USAGE_DEFAULT
-	})
-	list.append({
-		"name": "collider_groups",
-		"type": TYPE_ARRAY,
-		"hint": PROPERTY_HINT_TYPE_STRING,
-		"hint_string": "%d/%d:VRMColliderGroup" % [TYPE_OBJECT, TYPE_OBJECT],
-		"usage": PROPERTY_USAGE_DEFAULT
-	})
-	list.append({
-		"name": "collider_library",
-		"type": TYPE_ARRAY,
-		"hint": PROPERTY_HINT_TYPE_STRING,
-		"hint_string": "%d/%d:VRMCollider" % [TYPE_OBJECT, TYPE_OBJECT],
-		"usage": PROPERTY_USAGE_DEFAULT
-	})
+	list.append({"name": "Spring bones", "type": TYPE_NIL, "usage": PROPERTY_USAGE_CATEGORY})
+	list.append(
+		{
+			"name": "spring_bones",
+			"type": TYPE_ARRAY,
+			"hint": PROPERTY_HINT_TYPE_STRING,
+			"hint_string": "%d/%d:VRMSpringBone" % [TYPE_OBJECT, TYPE_OBJECT],
+			"usage": PROPERTY_USAGE_DEFAULT
+		}
+	)
+	list.append(
+		{
+			"name": "collider_groups",
+			"type": TYPE_ARRAY,
+			"hint": PROPERTY_HINT_TYPE_STRING,
+			"hint_string": "%d/%d:VRMColliderGroup" % [TYPE_OBJECT, TYPE_OBJECT],
+			"usage": PROPERTY_USAGE_DEFAULT
+		}
+	)
+	list.append(
+		{
+			"name": "collider_library",
+			"type": TYPE_ARRAY,
+			"hint": PROPERTY_HINT_TYPE_STRING,
+			"hint_string": "%d/%d:VRMCollider" % [TYPE_OBJECT, TYPE_OBJECT],
+			"usage": PROPERTY_USAGE_DEFAULT
+		}
+	)
 	return list
 
 
@@ -87,10 +89,15 @@ func _get(property: StringName) -> Variant:
 		&"spring_bones":
 			return secondary_node.get("spring_bones") if secondary_node else _temp_spring_bones
 		&"collider_groups":
-			return secondary_node.get("collider_groups") if secondary_node else _temp_collider_groups
+			return (
+				secondary_node.get("collider_groups") if secondary_node else _temp_collider_groups
+			)
 		&"collider_library":
-			return secondary_node.get("collider_library") if secondary_node else _temp_collider_library
+			return (
+				secondary_node.get("collider_library") if secondary_node else _temp_collider_library
+			)
 	return null
+
 
 @export_category("VRM Settings")
 @export var settings: VRMSettings:
