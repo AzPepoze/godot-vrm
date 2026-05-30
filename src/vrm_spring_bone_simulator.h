@@ -1,17 +1,17 @@
 #ifndef VRM_SPRING_BONE_SIMULATOR_H
 #define VRM_SPRING_BONE_SIMULATOR_H
 
+#include <godot_cpp/classes/immediate_mesh.hpp>
+#include <godot_cpp/classes/mesh.hpp>
 #include <godot_cpp/classes/node3d.hpp>
 #include <godot_cpp/classes/resource.hpp>
 #include <godot_cpp/classes/skeleton3d.hpp>
 #include <godot_cpp/classes/skeleton_modifier3d.hpp>
 #include <godot_cpp/variant/array.hpp>
+#include <godot_cpp/variant/color.hpp>
 #include <godot_cpp/variant/node_path.hpp>
 #include <godot_cpp/variant/quaternion.hpp>
 #include <godot_cpp/variant/string_name.hpp>
-#include <godot_cpp/classes/immediate_mesh.hpp>
-#include <godot_cpp/classes/mesh.hpp>
-#include <godot_cpp/variant/color.hpp>
 #include <godot_cpp/variant/transform3d.hpp>
 #include <godot_cpp/variant/vector3.hpp>
 
@@ -93,14 +93,16 @@ public:
   void setup(Array p_spring_bones, Array p_collider_groups);
   void update_parameters(float p_gravity_multiplier,
                          Quaternion p_gravity_rotation, Vector3 p_add_force);
+  void step_simulation();
   void _process_modification() override;
 
   int get_chain_count() const;
   int get_joint_count(int p_chain_idx) const;
   Vector3 get_joint_current_tail(int p_chain_idx, int p_joint_idx) const;
 
-  void draw_gizmo(Object *p_mesh_obj, Transform3D p_skel_to_gizmo, Color p_color,
-                  bool p_draw_spring_bones, bool p_draw_colliders);
+  void draw_gizmo(Object *p_mesh_obj, Transform3D p_skel_to_gizmo,
+                  Color p_color, bool p_draw_spring_bones,
+                  bool p_draw_colliders);
 
 private:
   void _draw_sphere(ImmediateMesh *p_mesh, const Basis &p_bas,

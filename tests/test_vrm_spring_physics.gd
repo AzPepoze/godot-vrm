@@ -56,6 +56,7 @@ func test_vrm_spring_force_displacement():
 	assert_not_null(skeleton, "Skeleton should be found")
 	if skeleton == null:
 		return
+	skeleton.modifier_callback_mode_process = Skeleton3D.MODIFIER_CALLBACK_MODE_PROCESS_MANUAL
 
 	# Enable simulation
 	secondary.disable_colliders = false
@@ -64,6 +65,10 @@ func test_vrm_spring_force_displacement():
 	# Wait for simulator to be added and initialized
 	for i in range(10):
 		await runner.process_frame
+	var simulator = skeleton.get_node_or_null("VRMSpringBoneSimulator")
+	assert_not_null(simulator, "Spring bone simulator should be attached to the skeleton")
+	if simulator == null:
+		return
 
 	var bone_name = "J_Sec_Hair1_01"
 	var bone_idx = skeleton.find_bone(bone_name)
@@ -82,6 +87,7 @@ func test_vrm_spring_force_displacement():
 
 	# Simulate
 	for i in range(30):
+		simulator.step_simulation()
 		await runner.process_frame
 
 	var forced_rot = skeleton.get_bone_global_pose(bone_idx).basis.get_rotation_quaternion()
@@ -101,6 +107,7 @@ func test_vrm_spring_force_displacement():
 
 	secondary.springbone_add_force = Vector3.ZERO
 	for i in range(20):
+		simulator.step_simulation()
 		await runner.process_frame
 
 	scene_root.free()

@@ -375,6 +375,42 @@ func test_vrm1_collider_groups_consistent_with_spring_bones():
 	)
 
 
+func test_vrm1_spring_collider_group_refs_resolve_to_secondary_groups():
+	if not _secondary:
+		return
+
+	var collider_groups: Array = _secondary.get("collider_groups")
+	if collider_groups.is_empty():
+		return
+
+	var collider_group_ids := {}
+	for group in collider_groups:
+		if group != null:
+			collider_group_ids[group.get_instance_id()] = true
+
+	var spring_bones: Array = _secondary.get("spring_bones")
+	var referenced_group_count := 0
+	for sb in spring_bones:
+		if sb == null:
+			continue
+		var sb_collider_groups: Array = sb.get("collider_groups")
+		for group in sb_collider_groups:
+			referenced_group_count += 1
+			assert_not_null(group, "Spring bone collider group reference must not be null")
+			if group == null:
+				continue
+			assert_true(
+				collider_group_ids.has(group.get_instance_id()),
+				"Spring bone collider group reference must resolve to secondary.collider_groups"
+			)
+
+	assert_gt(
+		referenced_group_count,
+		0,
+		"AvatarSample_M.vrm should import spring bones that reference collider groups"
+	)
+
+
 # ── Meshes & materials ═══════════════════════════════════════════════════════════
 
 

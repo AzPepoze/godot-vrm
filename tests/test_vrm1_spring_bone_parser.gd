@@ -47,7 +47,7 @@ func _make_spring_json(name: String, joints: Array, group_indices: Array) -> Dic
 	return {
 		"name": name,
 		"joints": joints,
-		"colliders": group_indices,
+		"colliderGroups": group_indices,
 		"stiffness": 1.0,
 		"gravityPower": 0.0,
 		"gravityDir": [0.0, -1.0, 0.0],
@@ -89,7 +89,9 @@ func test_vrm1_collider_group_structure():
 	var springs: Array = vrm_spring["springs"]
 	assert_eq(springs.size(), 1, "Should have exactly 1 spring")
 	var spring0: Dictionary = springs[0]
-	assert_eq(spring0["colliders"], [0], "Spring colliders should reference group index 0")
+	assert_eq(
+		spring0["colliderGroups"], [0], "Spring colliderGroups should reference group index 0"
+	)
 
 
 func test_vrm1_collider_flat_vs_group():
