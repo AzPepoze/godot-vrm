@@ -108,7 +108,6 @@ func _import_preflight(
 	gstate.set_additional_data(&"vrm/first_person_layers", 2)
 	gstate.set_additional_data(&"vrm/third_person_layers", 4)
 	gstate.set_additional_data(&"vrm/remove_end_bones", true)
-	gstate.set_additional_data(&"vrm/use_gdscript", false)
 	var gltf_json_parsed: Dictionary = gstate.json
 	var gltf_nodes = gltf_json_parsed["nodes"]
 	if not _add_vrm_nodes_to_skin(gltf_json_parsed):

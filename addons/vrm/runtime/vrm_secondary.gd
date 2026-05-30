@@ -15,16 +15,6 @@ const SecondaryGizmo = preload("./vrm_secondary_gizmo.gd")
 		if is_child_of_vrm:
 			get_parent().update_secondary_fixed = value
 
-@export var use_gdscript_spring_bones: bool = false:
-	set(value):
-		if use_gdscript_spring_bones == value:
-			return
-		use_gdscript_spring_bones = value
-		if is_child_of_vrm:
-			get_parent().set("use_gdscript_spring_bones", value)
-		if is_inside_tree():
-			_setup_spring_bone_adapter()
-
 @export var disable_colliders: bool = false:
 	set(value):
 		if disable_colliders == value:
@@ -156,7 +146,6 @@ func _enter_tree() -> void:
 		springbone_gravity_multiplier = _parent_ref.get("springbone_gravity_multiplier")
 		springbone_gravity_rotation = _parent_ref.get("springbone_gravity_rotation")
 		springbone_add_force = _parent_ref.get("springbone_add_force")
-		use_gdscript_spring_bones = _parent_ref.get("use_gdscript_spring_bones")
 		update_parameters()
 		gizmo_spring_bone = _parent_ref.get("gizmo_spring_bone")
 		gizmo_spring_bone_color = _parent_ref.get("gizmo_spring_bone_color")
@@ -196,11 +185,7 @@ func _setup_spring_bone_adapter() -> void:
 		spring_bone_adapter = spring_bone_adapter_class.new(skel)
 
 	spring_bone_adapter.setup_simulator(
-		spring_bones,
-		collider_groups,
-		disable_colliders,
-		update_in_editor,
-		use_gdscript_spring_bones
+		spring_bones, collider_groups, disable_colliders, update_in_editor
 	)
 	spring_bone_adapter.update_parameters(
 		springbone_gravity_multiplier, springbone_gravity_rotation, springbone_add_force
@@ -220,16 +205,12 @@ func update_parameters() -> void:
 		)
 
 
-func _process(delta: float):
+func _process(_delta: float):
 	if _gizmo != null:
 		if Engine.is_editor_hint():
 			_gizmo.draw_in_editor()
 		else:
 			_gizmo.draw_in_game()
-
-	if spring_bone_adapter != null and use_gdscript_spring_bones:
-		# print("DEBUG: Ticking GDScript logic, delta=", delta)
-		spring_bone_adapter.update(delta)
 
 	if is_child_of_vrm and _parent_ref != null:
 		# Sync from toplevel if changed in editor
@@ -242,8 +223,6 @@ func _process(delta: float):
 		if _parent_ref.springbone_add_force != springbone_add_force:
 			springbone_add_force = _parent_ref.springbone_add_force
 			update_parameters()
-		if _parent_ref.use_gdscript_spring_bones != use_gdscript_spring_bones:
-			use_gdscript_spring_bones = _parent_ref.use_gdscript_spring_bones
 		if _parent_ref.update_secondary_fixed != update_secondary_fixed:
 			update_secondary_fixed = _parent_ref.update_secondary_fixed
 		if _parent_ref.override_springbone_center != override_springbone_center:
