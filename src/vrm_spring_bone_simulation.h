@@ -165,6 +165,7 @@ private:
   void _simulate_chains(Skeleton3D *skel, const Transform3D &skel_global_inv,
                         float delta);
   void _query_game_object_collisions(Skeleton3D *skel,
+                                     const Vector3 &origin_world,
                                      const Vector3 &tail_world, float radius,
                                      uint32_t mask, Vector3 &out_push);
 };

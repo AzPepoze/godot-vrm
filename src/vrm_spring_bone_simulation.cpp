@@ -9,6 +9,7 @@
 #include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/classes/physics_direct_space_state3d.hpp>
 #include <godot_cpp/classes/physics_shape_query_parameters3d.hpp>
+#include <godot_cpp/classes/capsule_shape3d.hpp>
 #include <godot_cpp/classes/sphere_shape3d.hpp>
 #include <godot_cpp/classes/world3d.hpp>
 #include <godot_cpp/core/class_db.hpp>
@@ -360,7 +361,8 @@ void VRMSpringBoneSimulation::_simulate_chains(
       // Environment collision (optional)
       if (environment_collision_enabled && chain.enable_environment_collision) {
         Vector3 env_push;
-        _query_game_object_collisions(skel, center.xform(next_tail), radius,
+        _query_game_object_collisions(skel, center.xform(origin),
+                                      center.xform(next_tail), radius,
                                       chain.environment_collision_mask,
                                       env_push);
         if (!env_push.is_zero_approx()) {
@@ -495,7 +497,8 @@ uint32_t VRMSpringBoneSimulation::get_environment_collision_mask() const {
 // PhysicsServer3D query for game object collision
 // ---------------------------------------------------------------------------
 void VRMSpringBoneSimulation::_query_game_object_collisions(
-    Skeleton3D *skel, const Vector3 &tail_world, float radius, uint32_t mask,
+    Skeleton3D *skel, const Vector3 &origin_world,
+    const Vector3 &tail_world, float radius, uint32_t mask,
     Vector3 &out_push) {
   out_push = Vector3();
   if (!skel)
@@ -509,14 +512,36 @@ void VRMSpringBoneSimulation::_query_game_object_collisions(
   if (!space_state)
     return;
 
-  Ref<SphereShape3D> shape;
+  // Use a capsule to cover the full bone segment (origin → tail),
+  // not just a single sphere at the tail.
+  Vector3 bone_dir = tail_world - origin_world;
+  float bone_length = bone_dir.length();
+  if (bone_length < 0.0001f) {
+    return;
+  }
+
+  Vector3 mid_point = (origin_world + tail_world) * 0.5f;
+  Vector3 axis = bone_dir / bone_length;
+
+  // Build a rotation that aligns Y-up (capsule axis) with the bone direction
+  Basis rot_basis;
+  if (Math::abs(axis.dot(Vector3(0, 1, 0))) > 0.9999f) {
+    rot_basis = Basis(); // Already aligned
+  } else {
+    Vector3 rot_axis = Vector3(0, 1, 0).cross(axis).normalized();
+    float rot_angle = Math::acos(Vector3(0, 1, 0).dot(axis));
+    rot_basis = Basis(rot_axis, rot_angle);
+  }
+
+  Ref<CapsuleShape3D> shape;
   shape.instantiate();
   shape->set_radius(radius);
+  shape->set_height(bone_length);
 
   Ref<PhysicsShapeQueryParameters3D> params;
   params.instantiate();
   params->set_shape(shape);
-  params->set_transform(Transform3D(Basis(), tail_world));
+  params->set_transform(Transform3D(rot_basis, mid_point));
   params->set_collision_mask(mask);
 
   // Exclude the model's own collision objects
@@ -534,14 +559,25 @@ void VRMSpringBoneSimulation::_query_game_object_collisions(
   if (contacts.size() < 2)
     return;
 
-  Vector3 total_push;
-  int count = 0;
+  // Find the deepest penetration along the bone segment and push
+  // fully out to the surface — same robust strategy as VRM collider resolution.
+  float max_depth = 0.0f;
+  Vector3 deepest_push;
   for (int i = 0; i < contacts.size() - 1; i += 2) {
-    total_push += Vector3(contacts[i]) - Vector3(contacts[i + 1]);
-    count++;
+    // contacts[i] is on our shape, contacts[i+1] is on the collided surface.
+    // Push from our interior point toward the surface = out of the collider.
+    Vector3 push = Vector3(contacts[i + 1]) - Vector3(contacts[i]);
+    float depth = push.length();
+    if (depth > max_depth) {
+      max_depth = depth;
+      deepest_push = push;
+    }
   }
-  if (count > 0) {
-    out_push = total_push / (float)count;
+
+  if (max_depth > 0.0f) {
+    Vector3 normal = deepest_push.normalized();
+    float margin = radius * 0.2f;
+    out_push = normal * (max_depth + radius + margin);
   }
 }
 
