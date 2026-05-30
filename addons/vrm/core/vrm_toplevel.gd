@@ -85,11 +85,12 @@ var secondary_node: Node3D
 @export_group("Force & Gravity")
 @export var springbone_gravity_rotation: Quaternion = Quaternion.IDENTITY:
 	set(value):
-		if springbone_gravity_rotation == value:
+		var normalized = value.normalized()
+		if springbone_gravity_rotation.is_equal_approx(normalized):
 			return
-		springbone_gravity_rotation = value
+		springbone_gravity_rotation = normalized
 		if secondary_node:
-			secondary_node.springbone_gravity_rotation = value
+			secondary_node.springbone_gravity_rotation = normalized
 @export var springbone_add_force: Vector3 = Vector3.ZERO:
 	set(value):
 		if springbone_add_force == value:
@@ -97,6 +98,36 @@ var secondary_node: Node3D
 		springbone_add_force = value
 		if secondary_node:
 			secondary_node.springbone_add_force = value
+
+@export_group("Wind Settings")
+@export var wind_direction: Vector3 = Vector3.ZERO:
+	set(value):
+		if wind_direction == value:
+			return
+		wind_direction = value
+		if secondary_node:
+			secondary_node.wind_direction = value
+@export var wind_strength: float = 0.0:
+	set(value):
+		if wind_strength == value:
+			return
+		wind_strength = value
+		if secondary_node:
+			secondary_node.wind_strength = value
+@export var wind_turbulence: float = 0.2:
+	set(value):
+		if wind_turbulence == value:
+			return
+		wind_turbulence = value
+		if secondary_node:
+			secondary_node.wind_turbulence = value
+@export var wind_frequency: float = 1.0:
+	set(value):
+		if wind_frequency == value:
+			return
+		wind_frequency = value
+		if secondary_node:
+			secondary_node.wind_frequency = value
 
 @export_category("Run in Editor")
 @export var update_in_editor: bool = false:
