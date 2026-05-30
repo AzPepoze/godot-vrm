@@ -465,7 +465,7 @@ func test_vrm1_end_bone_nodes_removed():
 		0,
 		(
 			"Skeleton should have zero children named '*_end*' after cleanup, "
-			+"but found %d: %s" % [end_bone_nodes.size(), str(end_bone_nodes)]
+			+ "but found %d: %s" % [end_bone_nodes.size(), str(end_bone_nodes)]
 		)
 	)
 

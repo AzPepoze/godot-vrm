@@ -97,7 +97,6 @@ signal settings_changed
 		override_springbone_center = value
 		settings_changed.emit()
 
-
 @export_group("Springbone Gizmos")
 @export var gizmo_spring_bone: bool = false:
 	set(value):

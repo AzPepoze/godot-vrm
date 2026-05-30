@@ -7,8 +7,8 @@ enum DebugMode {
 }
 
 enum FirstPersonFlag {
-	Auto, # Create headlessModel
-	Both, # Default layer
+	Auto,  # Create headlessModel
+	Both,  # Default layer
 	ThirdPersonOnly,
 	FirstPersonOnly,
 	FirstWithShadow,

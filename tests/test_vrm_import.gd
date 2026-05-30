@@ -221,7 +221,7 @@ func test_v0_alicia_end_bones_removed():
 			0,
 			(
 				"Skeleton should have zero *_end children after cleanup, "
-				+"found %d: %s" % [end_bone_children.size(), str(end_bone_children)]
+				+ "found %d: %s" % [end_bone_children.size(), str(end_bone_children)]
 			)
 		)
 		# Skeleton must still have bones (bones != scene-node children)
@@ -264,7 +264,7 @@ func test_v0_godette_end_bones_removed():
 			0,
 			(
 				"Skeleton should have zero *_end children after cleanup, "
-				+"found %d: %s" % [end_bone_children.size(), str(end_bone_children)]
+				+ "found %d: %s" % [end_bone_children.size(), str(end_bone_children)]
 			)
 		)
 		assert_ge(

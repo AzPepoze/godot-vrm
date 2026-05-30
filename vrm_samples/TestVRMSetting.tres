@@ -6,4 +6,12 @@
 script = ExtResource("1_3aimx")
 wind_direction = Vector3(0, 0.065, 0.275)
 wind_strength = -4.23
+environment_collision_enabled = true
+update_in_editor = true
+update_spring_bone_controller_in_physics = true
+disable_colliders = true
+override_springbone_center = true
+gizmo_spring_bone = true
+gizmo_show_colliders = true
+gizmo_show_wind = true
 metadata/_custom_type_script = "uid://bognse4tffw4p"

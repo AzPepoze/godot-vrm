@@ -15,7 +15,7 @@ func test_vrm_spring_force_displacement():
 		preload("res://addons/vrm/importer/v1/vrmc/vrmc_materials_mtoon.gd").new(),
 		(
 			preload("res://addons/vrm/importer/v1/vrmc/vrmc_materials_hdr_emissive_multiplier.gd")
-			.new()
+			. new()
 		),
 		preload("res://addons/vrm/importer/v1/vrmc/vrmc_vrm.gd").new(),
 		preload("res://addons/vrm/importer/v1/vrmc/vrmc_vrm_animation.gd").new(),
@@ -83,7 +83,7 @@ func test_vrm_spring_force_displacement():
 	var initial_rot = skeleton.get_bone_global_pose(bone_idx).basis.get_rotation_quaternion()
 
 	# Apply force
-	scene_root.settings.springbone_add_force = Vector3(1000, 0, 0) # Massive force
+	scene_root.settings.springbone_add_force = Vector3(1000, 0, 0)  # Massive force
 
 	# Simulate
 	for i in range(30):

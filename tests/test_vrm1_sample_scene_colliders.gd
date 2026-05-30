@@ -83,7 +83,7 @@ func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():
 		scene.queue_free()
 		return
 
-	var hair_spring = null
+	var hair_spring: VRMSpringBone = null
 	for spring in avatar.get("spring_bones"):
 		if spring != null and spring.group == "Hair":
 			hair_spring = spring
