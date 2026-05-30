@@ -37,7 +37,13 @@ import_script/path=""
 materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
-_subresources={}
+_subresources={
+"nodes": {
+"PATH:VRMSpringBoneController": {
+"node/script": null
+}
+}
+}
 vrm/head_hiding_method=0
 vrm/only_if_head_hiding_uses_layers/first_person_layers=2
 vrm/only_if_head_hiding_uses_layers/third_person_layers=4

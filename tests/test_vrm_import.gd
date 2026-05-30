@@ -54,6 +54,121 @@ func test_load_alicia_v0_skeleton():
 	GLTFDocument.unregister_gltf_document_extension(vrm_ext)
 
 
+func test_v0_alicia_secondary_to_springbone_clean_rename():
+	# Verify the v0 secondaryAnimation import produces exactly one VRMSpringBoneController
+	# and no old-style 'secondary' nodes leak into the scene tree.
+	var gltf := GLTFDocument.new()
+	var vrm_ext := VRM_EXTENSION.new()
+	GLTFDocument.register_gltf_document_extension(vrm_ext, true)
+
+	var state := GLTFState.new()
+	var err := gltf.append_from_file("res://vrm_samples/AliciaSolid_vrm-0.51.vrm", state, 8)
+	assert_eq(err, OK, "append_from_file should succeed")
+	if err != OK:
+		GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+		return
+
+	var scene_root := gltf.generate_scene(state)
+	runner.root.add_child(scene_root)
+	await runner.wait_frame
+
+	# 1. Verify scene structure: v0 models have a 'secondary' bone from the
+	# GLTF data (VRM 0.x spec hierarchy parent for spring chains). This is
+	# separate from the VRMSpringBoneController the importer adds for runtime
+	# physics. Both coexist — they serve different purposes and should not conflict.
+	var all_children := scene_root.find_children("*", "", true, false)
+	var secondary_node: Node = null
+	for child in all_children:
+		if child.name == "secondary" and child is Node3D and child.get_script() == null:
+			secondary_node = child
+			break
+	assert_not_null(secondary_node,
+		"v0 VRM should have 'secondary' node (VRM 0.x spec bone hierarchy container)"
+	)
+
+	# Verify it's NOT a VRMSpringBoneController or a scripted controller
+	if secondary_node:
+		assert_null(secondary_node.get_script(),
+			"'secondary' node should be a plain bone-container Node3D, not a scripted controller"
+		)
+		# It should have no spring_bones/collider data (those belong to VRMSpringBoneController)
+		var sec_has_springs = secondary_node.get("spring_bones")
+		assert_true(
+			sec_has_springs == null or (sec_has_springs is Array and sec_has_springs.is_empty()),
+			"'secondary' bone node should not hold spring bone data"
+		)
+
+	# 2. Exactly one VRMSpringBoneController should exist
+	var controllers := scene_root.find_children("VRMSpringBoneController", "", true, false)
+	assert_eq(controllers.size(), 1,
+		"Exactly one VRMSpringBoneController should exist, found %d" % controllers.size()
+	)
+	if controllers.size() != 1:
+		scene_root.queue_free()
+		await runner.wait_frame
+		GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+		return
+
+	var spring_bone_controller: Node = controllers[0]
+
+	# 3. The controller must have the VRMSpringBoneController script attached
+	assert_not_null(spring_bone_controller.get_script(),
+		"VRMSpringBoneController should have its script attached"
+	)
+
+	# 4. Spring bones loaded from secondaryAnimation.boneGroups
+	# Note: 3 boneGroups produce 18 spring bones because each group's bone
+	# list is split into individual joint chains by create_joints_recursive.
+	var spring_bones: Array = spring_bone_controller.get("spring_bones")
+	assert_gt(spring_bones.size(), 0,
+		"Should load spring bones from secondaryAnimation, got %d" % spring_bones.size()
+	)
+
+	# 5. Collider groups loaded from secondaryAnimation.colliderGroups (v0 spec has 6)
+	var collider_groups: Array = spring_bone_controller.get("collider_groups")
+	assert_eq(collider_groups.size(), 6,
+		"v0 Alicia has 6 colliderGroups, got %d" % collider_groups.size()
+	)
+
+	# 6. Collider library must contain all colliders from all groups
+	var collider_library: Array = spring_bone_controller.get("collider_library")
+	assert_true(collider_library.size() > 0,
+		"collider_library should contain colliders, got %d" % collider_library.size()
+	)
+
+	# 7. Each spring bone must have joint nodes (chain of bones)
+	for i in range(spring_bones.size()):
+		var sb = spring_bones[i]
+		assert_not_null(sb, "Spring bone %d should not be null" % i)
+		if sb:
+			assert_true(sb.joint_nodes.size() > 0,
+				"Spring bone %d should have joint nodes, got %d" % [i, sb.joint_nodes.size()]
+			)
+
+	# 8. VRMInstance root should reference the controller (set via _enter_tree)
+	var root_controller = scene_root.get("spring_bone_controller")
+	assert_not_null(root_controller,
+		"VRMInstance.spring_bone_controller should reference the child VRMSpringBoneController"
+	)
+
+	# 9. No duplicate data: root's spring_bones should match controller's
+	var root_spring_bones: Array = scene_root.get("spring_bones")
+	assert_eq(root_spring_bones.size(), spring_bones.size(),
+		"Root spring_bones count should match controller, root=%d controller=%d"
+		% [root_spring_bones.size(), spring_bones.size()]
+	)
+
+	# 10. Skeleton path must be set on the controller
+	var skel_path: NodePath = spring_bone_controller.get("skeleton")
+	assert_true(not skel_path.is_empty(),
+		"VRMSpringBoneController.skeleton path must be set"
+	)
+
+	scene_root.queue_free()
+	await runner.wait_frame
+	GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+
+
 func test_load_alicia_spring_bones():
 	var gltf := GLTFDocument.new()
 	var vrm_ext := VRM_EXTENSION.new()

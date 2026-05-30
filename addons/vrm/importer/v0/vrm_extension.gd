@@ -205,6 +205,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 			spring_bone_controller = Node3D.new()
 			spring_bone_controller.name = "VRMSpringBoneController"
 			root_node.add_child(spring_bone_controller, true)
+			spring_bone_controller.owner = root_node
 
 		vrm_spring_bone_controller_setup_module.parse_spring_bone_controller(
 			spring_bone_controller, vrm_extension, gstate, pose_diffs, true
