@@ -93,6 +93,11 @@ signal settings_changed
 		update_spring_bone_controller_in_physics = value
 		settings_changed.emit()
 
+@export var springbone_simulate_in_local_space: bool = false:
+	set(value):
+		springbone_simulate_in_local_space = value
+		settings_changed.emit()
+
 @export var disable_colliders: bool = false:
 	set(value):
 		disable_colliders = value
