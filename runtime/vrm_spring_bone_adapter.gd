@@ -52,7 +52,22 @@ func _setup_cpp(
 		skeleton.get_node("VRMSpringBoneSimulation").queue_free()
 	simulation = ClassDB.instantiate("VRMSpringBoneSimulation")
 	simulation.name = "VRMSpringBoneSimulation"
-	skeleton.add_child(simulation)
+
+	var setup_func = func():
+		if not is_instance_valid(simulation) or not is_instance_valid(skeleton):
+			return
+		if simulation.get_parent() == null:
+			skeleton.add_child(simulation)
+
+		simulation.setup(spring_bones, collider_groups)
+		simulation.active = true
+		if Engine.is_editor_hint():
+			simulation.active = update_in_editor
+
+	if skeleton.is_inside_tree():
+		setup_func.call_deferred()
+	else:
+		setup_func.call()
 
 	VRMLogger.debug(
 		"vrm_spring_bone_adapter.gd",
@@ -61,11 +76,6 @@ func _setup_cpp(
 			% [spring_bones.size(), collider_groups.size()]
 		)
 	)
-
-	simulation.setup(spring_bones, collider_groups)
-	simulation.active = true
-	if Engine.is_editor_hint():
-		simulation.active = update_in_editor
 
 
 # gdlint: ignore=function-arguments-number
