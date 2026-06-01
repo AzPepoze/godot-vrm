@@ -9,6 +9,7 @@ wind_strength = 0.77
 wind_turbulence = 0.565
 wind_frequency = 3.43
 environment_collision_enabled = true
+gizmo_display_mode = 1
 gizmo_spring_bone = true
 gizmo_show_body_collisions = true
 gizmo_show_wind = true

@@ -8,12 +8,7 @@ var simulation: SkeletonModifier3D = null
 var skeleton: Skeleton3D = null
 var has_simulation: bool = false
 
-var gravity_multiplier: float = 1.0
-var stiffness_multiplier: float = 1.0
-var drag_multiplier: float = 1.0
-var hit_radius_multiplier: float = 1.0
-var gravity_rotation: Quaternion = Quaternion.IDENTITY
-var add_force: Vector3 = Vector3.ZERO
+var _settings: VRMSettings = null
 
 
 func _init(p_skeleton: Skeleton3D) -> void:
@@ -42,7 +37,7 @@ func setup_simulation(
 func _setup_cpp(
 	spring_bones: Array,
 	collider_groups: Array,
-	disable_body_collisions: bool,
+	_disable_body_collisions: bool,
 	update_in_editor: bool
 ) -> void:
 	if not has_simulation:
@@ -60,9 +55,12 @@ func _setup_cpp(
 			skeleton.add_child(simulation)
 
 		simulation.setup(spring_bones, collider_groups)
-		simulation.active = true
-		if Engine.is_editor_hint():
-			simulation.active = update_in_editor
+		if _settings:
+			update_parameters(_settings)
+		else:
+			simulation.active = true
+			if Engine.is_editor_hint():
+				simulation.active = update_in_editor
 
 	if skeleton.is_inside_tree():
 		setup_func.call_deferred()
@@ -79,57 +77,43 @@ func _setup_cpp(
 
 
 # gdlint: ignore=function-arguments-number
-func update_parameters(
-	p_gravity_multiplier: float,
-	p_gravity_rotation: Quaternion,
-	p_add_force: Vector3,
-	p_wind_direction: Vector3 = Vector3.ZERO,
-	p_wind_strength: float = 0.0,
-	p_wind_turbulence: float = 0.2,
-	p_wind_frequency: float = 1.0,
-	p_env_coll_enabled: bool = false,
-	p_env_coll_mask: int = 1,
-	p_env_coll_bounce_damping: float = 0.8,
-	p_env_coll_debug: bool = false,
-	p_stiffness_multiplier: float = 1.0,
-	p_drag_multiplier: float = 1.0,
-	p_hit_radius_multiplier: float = 1.0,
-	p_body_collider_radius_multiplier: float = 1.0,
-	p_simulate_in_local_space: bool = false,
-	p_disable_body_collisions: bool = false
-) -> void:
-	gravity_multiplier = p_gravity_multiplier
-	stiffness_multiplier = p_stiffness_multiplier
-	drag_multiplier = p_drag_multiplier
-	hit_radius_multiplier = p_hit_radius_multiplier
-	gravity_rotation = p_gravity_rotation
-	add_force = p_add_force
+func update_parameters(p_settings: VRMSettings) -> void:
+	_settings = p_settings
 
-	if simulation:
+	if simulation and _settings:
+		simulation.set_gizmo_display_mode(_settings.gizmo_display_mode)
 		simulation.update_parameters(
-			gravity_multiplier,
-			gravity_rotation,
-			add_force,
-			stiffness_multiplier,
-			drag_multiplier,
-			hit_radius_multiplier,
-			p_body_collider_radius_multiplier
+			_settings.springbone_gravity_multiplier,
+			_settings.springbone_gravity_rotation,
+			_settings.springbone_add_force,
+			_settings.springbone_stiffness_multiplier,
+			_settings.springbone_drag_multiplier,
+			(
+				_settings.springbone_hit_radius_multiplier
+				if not _settings.disable_spring_bone_collisions
+				else 0.0
+			),
+			_settings.body_collision_radius_multiplier
 		)
-		simulation.set_enable_body_collisions(!p_disable_body_collisions)
-		simulation.set_wind_direction(p_wind_direction)
-		simulation.set_simulate_in_local_space(p_simulate_in_local_space)
-		simulation.set_wind_strength(p_wind_strength)
-		simulation.set_wind_turbulence(p_wind_turbulence)
-		simulation.set_wind_frequency(p_wind_frequency)
-		simulation.set_environment_collision_enabled(p_env_coll_enabled)
-		simulation.set_environment_collision_bounce_damping(p_env_coll_bounce_damping)
-		simulation.set_environment_collision_mask(p_env_coll_mask)
-		simulation.set_debug_collision(p_env_coll_debug)
+		simulation.set_enable_body_collisions(!_settings.disable_body_collisions)
+		simulation.set_wind_direction(_settings.wind_direction)
+		simulation.set_simulate_in_local_space(_settings.springbone_simulate_in_local_space)
+		simulation.set_wind_strength(_settings.wind_strength)
+		simulation.set_wind_turbulence(_settings.wind_turbulence)
+		simulation.set_wind_frequency(_settings.wind_frequency)
+		simulation.set_environment_collision_enabled(_settings.environment_collision_enabled)
+		simulation.set_environment_collision_bounce_damping(_settings.environment_collision_bounce_damping)
+		simulation.set_environment_collision_mask(_settings.environment_collision_mask)
+		simulation.set_debug_collision(_settings.environment_collision_debug)
+
+		simulation.set_active(true)
+		if Engine.is_editor_hint():
+			simulation.set_active(_settings.update_in_editor)
 
 
-func set_active(active: bool) -> void:
+func set_gizmo_display_mode(mode: int) -> void:
 	if simulation:
-		simulation.active = active
+		simulation.set_gizmo_display_mode(mode)
 
 
 func draw_gizmo(
