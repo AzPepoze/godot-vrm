@@ -58,7 +58,7 @@ func test_vrm_spring_force_displacement():
 	skeleton.modifier_callback_mode_process = Skeleton3D.MODIFIER_CALLBACK_MODE_PROCESS_MANUAL
 
 	# Enable simulation
-	spring_bone_controller.disable_colliders = false
+	spring_bone_controller.disable_body_colliders = false
 	spring_bone_controller.update_in_editor = true
 
 	# Wait for simulation to be added and initialized

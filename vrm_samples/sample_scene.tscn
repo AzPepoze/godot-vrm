@@ -159,7 +159,6 @@ wind_strength = 1.37
 wind_frequency = 2.595
 update_in_editor = true
 gizmo_spring_bone = true
-gizmo_show_colliders = true
 
 [sub_resource type="Resource" id="Resource_2q1eb"]
 resource_name = "LeftHand"
@@ -1259,7 +1258,6 @@ center_bone = "Root"
 script = ExtResource("7_1hec4")
 update_in_editor = true
 gizmo_spring_bone = true
-gizmo_show_colliders = true
 gizmo_show_wind = true
 
 [sub_resource type="Resource" id="Resource_5kuih"]
@@ -1996,7 +1994,6 @@ environment_collision_enabled = true
 environment_collision_bounce_damping = 10.0
 update_in_editor = true
 gizmo_spring_bone = true
-gizmo_show_colliders = true
 gizmo_show_wind = true
 
 [node name="Spatial" type="Node3D" unique_id=2048687081]
@@ -2109,12 +2106,12 @@ collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_tj4in"),
 settings = SubResource("Resource_f77ra")
 
 [node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=104916327]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5461206, -0.20387568, 2.2974734)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5461206, -0.18793118, 2.4402323)
 use_collision = true
-size = Vector3(1.4467163, 0.001, 1.3415527)
+size = Vector3(1.4467163, 0.09913281, 1.3415527)
 
 [node name="CSGBox3D2" type="CSGBox3D" parent="." unique_id=1002423303]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.7202208, 0.7116835, 0.86244047)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.7202208, 0.7191782, 0.7234481)
 use_collision = true
 size = Vector3(2.0281372, 0.5258179, 1.1353226)
 

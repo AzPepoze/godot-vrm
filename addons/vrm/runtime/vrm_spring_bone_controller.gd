@@ -29,15 +29,15 @@ const SpringBoneGizmo = preload("./vrm_spring_bone_controller_gizmo.gd")
 		if spring_bone_adapter:
 			spring_bone_adapter.set_active(!value)
 
-@export var disable_colliders: bool:
+@export var disable_body_colliders: bool:
 	get:
 		if _settings == null:
 			_settings = VRMSettings.new()
-		return _settings.disable_colliders
+		return _settings.disable_body_colliders
 	set(value):
 		if _settings == null:
 			_settings = VRMSettings.new()
-		_settings.disable_colliders = value
+		_settings.disable_body_colliders = value
 		if spring_bone_adapter:
 			spring_bone_adapter.update_parameters(
 				_settings.springbone_gravity_multiplier,
@@ -53,9 +53,9 @@ const SpringBoneGizmo = preload("./vrm_spring_bone_controller_gizmo.gd")
 				_settings.springbone_stiffness_multiplier,
 				_settings.springbone_drag_multiplier,
 				_settings.springbone_hit_radius_multiplier,
-				_settings.collider_radius_multiplier,
+				_settings.body_collider_radius_multiplier,
 				_settings.springbone_simulate_in_local_space,
-				_settings.disable_colliders
+				_settings.disable_body_colliders
 			)
 
 @export var override_springbone_center: bool:
@@ -103,15 +103,15 @@ const SpringBoneGizmo = preload("./vrm_spring_bone_controller_gizmo.gd")
 			_settings = VRMSettings.new()
 		_settings.gizmo_spring_bone_color = value
 
-@export var gizmo_show_colliders: bool:
+@export var gizmo_show_body_colliders: bool:
 	get:
 		if _settings == null:
 			_settings = VRMSettings.new()
-		return _settings.gizmo_show_colliders
+		return _settings.gizmo_show_body_colliders
 	set(value):
 		if _settings == null:
 			_settings = VRMSettings.new()
-		_settings.gizmo_show_colliders = value
+		_settings.gizmo_show_body_colliders = value
 
 @export var gizmo_show_wind: bool:
 	get:
@@ -221,7 +221,7 @@ func _setup_spring_bone_adapter() -> void:
 		spring_bone_adapter.skeleton = skel
 
 	spring_bone_adapter.setup_simulation(
-		spring_bones, collider_groups, disable_colliders, update_in_editor
+		spring_bones, collider_groups, disable_body_colliders, update_in_editor
 	)
 	update_parameters()
 
@@ -248,9 +248,9 @@ func update_parameters() -> void:
 			_settings.springbone_stiffness_multiplier,
 			_settings.springbone_drag_multiplier,
 			_settings.springbone_hit_radius_multiplier,
-			_settings.collider_radius_multiplier,
+			_settings.body_collider_radius_multiplier,
 			_settings.springbone_simulate_in_local_space,
-			_settings.disable_colliders
+			_settings.disable_body_colliders
 		)
 		spring_bone_adapter.set_active(!_settings.disable_spring_bones)
 		if Engine.is_editor_hint():
@@ -267,7 +267,7 @@ func _process(_delta: float):
 			skel_to_gizmo,
 			gizmo_spring_bone_color,
 			gizmo_spring_bone,
-			gizmo_show_colliders
+			gizmo_show_body_colliders
 		)
 
 		if gizmo_show_wind and _settings != null:

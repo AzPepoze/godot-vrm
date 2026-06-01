@@ -21,7 +21,7 @@ void draw_gizmo(
         &colliders,
     Color default_color, bool draw_spring_bones, bool draw_colliders,
     bool p_simulate_in_local_space = false, float hit_radius_multiplier = 1.0f,
-    float collider_radius_multiplier = 1.0f);
+    float body_collider_radius_multiplier = 1.0f);
 
 } // namespace SpringBoneGizmo
 

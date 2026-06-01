@@ -82,7 +82,7 @@ void draw_gizmo(
         &colliders,
     Color default_color, bool draw_spring_bones, bool draw_colliders,
     bool p_simulate_in_local_space, float hit_radius_multiplier,
-    float collider_radius_multiplier) {
+    float body_collider_radius_multiplier) {
   if (!mesh || !skel) {
     return;
   }
@@ -125,7 +125,7 @@ void draw_gizmo(
     mesh->surface_begin(Mesh::PRIMITIVE_LINES);
     for (const auto &c : colliders) {
       Vector3 pos_gizmo = skel_to_gizmo.xform(c.position);
-      float coll_radius = c.radius * collider_radius_multiplier;
+      float coll_radius = c.radius * body_collider_radius_multiplier;
       if (c.is_capsule) {
         Vector3 tail_gizmo = skel_to_gizmo.xform(c.tail_position);
         draw_wireframe_capsule(mesh, pos_gizmo, tail_gizmo, coll_radius,

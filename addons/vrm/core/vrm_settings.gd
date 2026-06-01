@@ -32,9 +32,9 @@ signal settings_changed
 		settings_changed.emit()
 
 @export_group("Body Colliders")
-@export var collider_radius_multiplier: float = 1.0:
+@export var body_collider_radius_multiplier: float = 1.0:
 	set(value):
-		collider_radius_multiplier = value
+		body_collider_radius_multiplier = value
 		settings_changed.emit()
 
 @export var constraint_weight_multiplier: float = 1.0:
@@ -110,9 +110,9 @@ signal settings_changed
 		springbone_simulate_in_local_space = value
 		settings_changed.emit()
 
-@export var disable_colliders: bool = false:
+@export var disable_body_colliders: bool = false:
 	set(value):
-		disable_colliders = value
+		disable_body_colliders = value
 		settings_changed.emit()
 
 @export var override_springbone_center: bool = false:
@@ -131,9 +131,9 @@ signal settings_changed
 		gizmo_spring_bone_color = value
 		settings_changed.emit()
 
-@export var gizmo_show_colliders: bool = false:
+@export var gizmo_show_body_colliders: bool = false:
 	set(value):
-		gizmo_show_colliders = value
+		gizmo_show_body_colliders = value
 		settings_changed.emit()
 
 @export var gizmo_show_wind: bool = false:
