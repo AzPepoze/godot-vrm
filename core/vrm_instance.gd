@@ -119,7 +119,8 @@ func recreate_simulation() -> void:
 		settings = value
 
 		if settings != null:
-			settings.settings_changed.connect(_on_settings_changed)
+			if not settings.settings_changed.is_connected(_on_settings_changed):
+				settings.settings_changed.connect(_on_settings_changed)
 		_on_settings_changed()
 
 @export var default_springbone_center: Node3D:
