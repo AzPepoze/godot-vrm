@@ -17,6 +17,18 @@ const SpringBoneGizmo = preload("./vrm_spring_bone_controller_gizmo.gd")
 			_settings = VRMSettings.new()
 		_settings.update_spring_bone_controller_in_physics = value
 
+@export var disable_spring_bones: bool:
+	get:
+		if _settings == null:
+			_settings = VRMSettings.new()
+		return _settings.disable_spring_bones
+	set(value):
+		if _settings == null:
+			_settings = VRMSettings.new()
+		_settings.disable_spring_bones = value
+		if spring_bone_adapter:
+			spring_bone_adapter.set_active(!value)
+
 @export var disable_colliders: bool:
 	get:
 		if _settings == null:
@@ -27,7 +39,24 @@ const SpringBoneGizmo = preload("./vrm_spring_bone_controller_gizmo.gd")
 			_settings = VRMSettings.new()
 		_settings.disable_colliders = value
 		if spring_bone_adapter:
-			spring_bone_adapter.set_active(!value)
+			spring_bone_adapter.update_parameters(
+				_settings.springbone_gravity_multiplier,
+				_settings.springbone_gravity_rotation,
+				_settings.springbone_add_force,
+				_settings.wind_direction,
+				_settings.wind_strength,
+				_settings.wind_turbulence,
+				_settings.wind_frequency,
+				_settings.environment_collision_enabled,
+				_settings.environment_collision_mask,
+				_settings.environment_collision_bounce_damping,
+				_settings.springbone_stiffness_multiplier,
+				_settings.springbone_drag_multiplier,
+				_settings.springbone_hit_radius_multiplier,
+				_settings.collider_radius_multiplier,
+				_settings.springbone_simulate_in_local_space,
+				_settings.disable_colliders
+			)
 
 @export var override_springbone_center: bool:
 	get:
@@ -219,9 +248,11 @@ func update_parameters() -> void:
 			_settings.springbone_stiffness_multiplier,
 			_settings.springbone_drag_multiplier,
 			_settings.springbone_hit_radius_multiplier,
-			_settings.springbone_simulate_in_local_space
+			_settings.collider_radius_multiplier,
+			_settings.springbone_simulate_in_local_space,
+			_settings.disable_colliders
 		)
-		spring_bone_adapter.set_active(!_settings.disable_colliders)
+		spring_bone_adapter.set_active(!_settings.disable_spring_bones)
 		if Engine.is_editor_hint():
 			spring_bone_adapter.set_active(_settings.update_in_editor)
 
