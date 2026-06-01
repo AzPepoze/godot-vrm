@@ -516,7 +516,8 @@ void VRMSpringBoneSimulation::draw_gizmo(Object *p_mesh_obj,
   Skeleton3D *skel = get_skeleton();
   SpringBoneGizmo::draw_gizmo(mesh, skel, p_skel_to_gizmo, chains,
                               all_colliders, p_color, p_draw_spring_bones,
-                              p_draw_colliders, simulate_in_local_space);
+                              p_draw_colliders, simulate_in_local_space,
+                              hit_radius_multiplier);
 }
 
 // ---------------------------------------------------------------------------

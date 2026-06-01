@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_3aimx")
+springbone_hit_radius_multiplier = 0.995
 wind_direction = Vector3(0, 0.065, 0.275)
 wind_strength = 0.77
 wind_turbulence = 0.565

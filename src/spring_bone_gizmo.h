@@ -20,7 +20,7 @@ void draw_gizmo(
     const std::vector<VRMSpringBoneSimulation::CPPSpringBoneCollider>
         &colliders,
     Color default_color, bool draw_spring_bones, bool draw_colliders,
-    bool p_simulate_in_local_space = false);
+    bool p_simulate_in_local_space = false, float hit_radius_multiplier = 1.0f);
 
 } // namespace SpringBoneGizmo
 

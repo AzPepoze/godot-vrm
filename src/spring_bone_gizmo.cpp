@@ -40,13 +40,48 @@ static void draw_wireframe_sphere(ImmediateMesh *mesh, const Vector3 &center,
   }
 }
 
+static void draw_wireframe_capsule(ImmediateMesh *mesh, const Vector3 &a,
+                                   const Vector3 &b, float radius,
+                                   Color color) {
+  draw_wireframe_sphere(mesh, a, radius, color);
+  draw_wireframe_sphere(mesh, b, radius, color);
+
+  Vector3 dir = b - a;
+  if (dir.length_squared() > 0.0001f) {
+    dir.normalize();
+    Vector3 up = Vector3(0, 1, 0);
+    if (Math::abs(dir.dot(up)) > 0.99f) {
+      up = Vector3(1, 0, 0);
+    }
+    Vector3 right = dir.cross(up).normalized();
+    up = right.cross(dir).normalized();
+
+    for (int i = 0; i < 4; ++i) {
+      float angle = i * Math_PI / 2.0f;
+      Vector3 offset =
+          (right * Math::cos(angle) + up * Math::sin(angle)) * radius;
+      draw_line(mesh, a + offset, b + offset, color);
+    }
+  } else {
+    draw_line(mesh, a, b, color);
+  }
+}
+
+static float joint_param(const std::vector<float> &arr, size_t idx,
+                         float default_val = 1.0f) {
+  if (arr.empty()) {
+    return default_val;
+  }
+  return (idx < arr.size()) ? arr[idx] : arr.back();
+}
+
 void draw_gizmo(
     ImmediateMesh *mesh, Skeleton3D *skel, const Transform3D &skel_to_gizmo,
     const std::vector<VRMSpringBoneSimulation::CPPSpringBoneChain> &chains,
     const std::vector<VRMSpringBoneSimulation::CPPSpringBoneCollider>
         &colliders,
     Color default_color, bool draw_spring_bones, bool draw_colliders,
-    bool p_simulate_in_local_space) {
+    bool p_simulate_in_local_space, float hit_radius_multiplier) {
   if (!mesh || !skel) {
     return;
   }
@@ -69,18 +104,16 @@ void draw_gizmo(
             p_simulate_in_local_space ? Transform3D() : skel_global_inv;
       }
 
-      for (const auto &joint : chain.joints) {
+      for (size_t i = 0; i < chain.joints.size(); ++i) {
+        const auto &joint = chain.joints[i];
         Vector3 start_gizmo = skel_to_gizmo.xform(joint.global_pose.origin);
         Vector3 end_gizmo =
             skel_to_gizmo.xform(center_transform.xform(joint.current_tail));
 
-        draw_line(mesh, start_gizmo, end_gizmo, default_color);
-        draw_wireframe_sphere(mesh, start_gizmo, 0.015f, default_color);
-      }
-      if (!chain.joints.empty()) {
-        Vector3 end_gizmo = skel_to_gizmo.xform(
-            center_transform.xform(chain.joints.back().current_tail));
-        draw_wireframe_sphere(mesh, end_gizmo, 0.015f, default_color);
+        float radius = hit_radius_multiplier * chain.hit_radius_scale *
+                       joint_param(chain.hit_radius, i);
+        
+        draw_wireframe_capsule(mesh, start_gizmo, end_gizmo, radius, default_color);
       }
     }
     mesh->surface_end();
@@ -92,9 +125,8 @@ void draw_gizmo(
       Vector3 pos_gizmo = skel_to_gizmo.xform(c.position);
       if (c.is_capsule) {
         Vector3 tail_gizmo = skel_to_gizmo.xform(c.tail_position);
-        draw_line(mesh, pos_gizmo, tail_gizmo, c.gizmo_color);
-        draw_wireframe_sphere(mesh, pos_gizmo, c.radius, c.gizmo_color);
-        draw_wireframe_sphere(mesh, tail_gizmo, c.radius, c.gizmo_color);
+        draw_wireframe_capsule(mesh, pos_gizmo, tail_gizmo, c.radius,
+                               c.gizmo_color);
       } else {
         draw_wireframe_sphere(mesh, pos_gizmo, c.radius, c.gizmo_color);
       }
