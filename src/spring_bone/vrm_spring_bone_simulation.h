@@ -23,6 +23,11 @@ class VRMSpringBoneSimulation : public SkeletonModifier3D {
   GDCLASS(VRMSpringBoneSimulation, SkeletonModifier3D);
 
 public:
+  enum GizmoDisplayMode {
+    GIZMO_LINE_CIRCLE = 0,
+    GIZMO_CAPSULE = 1,
+  };
+
   struct CPPSpringBoneJoint {
     int bone_idx = -1;
     int parent_idx = -1;
@@ -117,6 +122,8 @@ private:
   uint32_t environment_collision_mask = 1;
   float environment_collision_bounce_damping = 0.8f;
 
+  GizmoDisplayMode gizmo_display_mode = GIZMO_LINE_CIRCLE;
+
 protected:
   static void _bind_methods();
 
@@ -197,6 +204,11 @@ public:
   void set_debug_collision(bool p_enabled) { debug_collision = p_enabled; }
   bool is_debug_collision_enabled() const { return debug_collision; }
 
+  void set_gizmo_display_mode(int p_mode) {
+    gizmo_display_mode = (GizmoDisplayMode)p_mode;
+  }
+  int get_gizmo_display_mode() const { return (int)gizmo_display_mode; }
+
 private:
   void _update_colliders(Skeleton3D *skel);
   void _reset_chains(Skeleton3D *skel, const Transform3D &skel_global_inv);
@@ -210,5 +222,7 @@ private:
 };
 
 } // namespace godot
+
+VARIANT_ENUM_CAST(VRMSpringBoneSimulation::GizmoDisplayMode);
 
 #endif // VRM_SPRING_BONE_SIMULATION_H

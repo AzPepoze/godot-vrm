@@ -135,6 +135,16 @@ const SpringBoneGizmo = preload("./vrm_spring_bone_controller_gizmo.gd")
 			_settings = VRMSettings.new()
 		_settings.gizmo_spring_bone_color = value
 
+@export_enum("Line Circle", "Capsule") var gizmo_display_mode: int:
+	get:
+		if _settings == null:
+			_settings = VRMSettings.new()
+		return _settings.gizmo_display_mode
+	set(value):
+		if _settings == null:
+			_settings = VRMSettings.new()
+		_settings.gizmo_display_mode = value
+
 @export var gizmo_show_body_collisions: bool:
 	get:
 		if _settings == null:
@@ -304,7 +314,8 @@ func _process(_delta: float):
 			skel_to_gizmo,
 			gizmo_spring_bone_color,
 			gizmo_spring_bone,
-			gizmo_show_body_collisions
+			gizmo_show_body_collisions,
+			_settings.gizmo_display_mode
 		)
 
 		if gizmo_show_wind and _settings != null:

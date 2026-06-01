@@ -82,6 +82,7 @@ void draw_gizmo(
         &colliders,
     const std::vector<VRMSpringBoneSimulation::CPPCollisionImpact> &impacts,
     Color default_color, bool draw_spring_bones, bool draw_colliders,
+    VRMSpringBoneSimulation::GizmoDisplayMode gizmo_display_mode,
     bool p_simulate_in_local_space, float hit_radius_multiplier,
     float body_collider_radius_multiplier) {
   if (!mesh || !skel) {
@@ -115,8 +116,14 @@ void draw_gizmo(
         float radius = hit_radius_multiplier * chain.hit_radius_scale *
                        joint_param(chain.hit_radius, i);
 
-        draw_wireframe_capsule(mesh, start_gizmo, end_gizmo, radius,
-                               default_color);
+        if (gizmo_display_mode == VRMSpringBoneSimulation::GIZMO_CAPSULE) {
+            draw_wireframe_capsule(mesh, start_gizmo, end_gizmo, radius,
+                                   default_color);
+        } else {
+            draw_wireframe_sphere(mesh, start_gizmo, radius, default_color);
+            draw_wireframe_sphere(mesh, end_gizmo, radius, default_color);
+            draw_line(mesh, start_gizmo, end_gizmo, default_color);
+        }
       }
     }
     mesh->surface_end();

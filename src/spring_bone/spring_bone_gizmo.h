@@ -21,6 +21,7 @@ void draw_gizmo(
         &colliders,
     const std::vector<VRMSpringBoneSimulation::CPPCollisionImpact> &impacts,
     Color default_color, bool draw_spring_bones, bool draw_colliders,
+    VRMSpringBoneSimulation::GizmoDisplayMode gizmo_display_mode,
     bool p_simulate_in_local_space = false, float hit_radius_multiplier = 1.0f,
     float body_collider_radius_multiplier = 1.0f);
 

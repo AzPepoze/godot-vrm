@@ -6,8 +6,8 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
 
-#include "vrm_constraint_simulator.h"
-#include "vrm_spring_bone_simulation.h"
+#include "constraints/vrm_constraint_simulator.h"
+#include "spring_bone/vrm_spring_bone_simulation.h"
 
 using namespace godot;
 
