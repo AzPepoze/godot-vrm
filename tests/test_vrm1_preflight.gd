@@ -25,6 +25,7 @@ func test_mtoon_preflight_skips_when_extension_absent():
 	assert_eq(
 		err, ERR_SKIP, "MToon preflight MUST return ERR_SKIP when VRMC_materials_mtoon absent"
 	)
+	test_completed = true
 
 
 func test_mtoon_preflight_ok_when_extension_present():
@@ -32,6 +33,7 @@ func test_mtoon_preflight_ok_when_extension_present():
 	var state := _fresh_state()
 	var err := ext._import_preflight(state, PackedStringArray(["VRMC_materials_mtoon"]))
 	assert_eq(err, OK, "MToon preflight MUST return OK when VRMC_materials_mtoon present")
+	test_completed = true
 
 
 func test_vrmc_vrm_preflight_skips_when_absent():
@@ -39,6 +41,7 @@ func test_vrmc_vrm_preflight_skips_when_absent():
 	var state := _fresh_state()
 	var err := ext._import_preflight(state, PackedStringArray([]))
 	assert_eq(err, ERR_SKIP, "vrmc_vrm preflight MUST return ERR_SKIP when VRMC_vrm absent")
+	test_completed = true
 
 
 func test_vrmc_spring_bone_preflight_skips_when_absent():
@@ -48,6 +51,7 @@ func test_vrmc_spring_bone_preflight_skips_when_absent():
 	assert_eq(
 		err, ERR_SKIP, "vrmc_spring_bone preflight MUST return ERR_SKIP when VRMC_springBone absent"
 	)
+	test_completed = true
 
 
 func test_vrmc_node_constraint_preflight_skips_when_absent():
@@ -59,6 +63,7 @@ func test_vrmc_node_constraint_preflight_skips_when_absent():
 		ERR_SKIP,
 		"vrmc_node_constraint preflight MUST return ERR_SKIP when VRMC_node_constraint absent"
 	)
+	test_completed = true
 
 
 func test_vrmc_vrm_animation_preflight_skips_when_absent():
@@ -70,6 +75,7 @@ func test_vrmc_vrm_animation_preflight_skips_when_absent():
 		ERR_SKIP,
 		"vrmc_vrm_animation preflight MUST return ERR_SKIP when VRMC_vrm_animation absent"
 	)
+	test_completed = true
 
 
 func test_vrmc_hdr_emissive_preflight_invalid_when_both_absent():
@@ -84,6 +90,7 @@ func test_vrmc_hdr_emissive_preflight_invalid_when_both_absent():
 		ERR_INVALID_DATA,
 		"HDR emissive preflight MUST return ERR_INVALID_DATA when neither extension present"
 	)
+	test_completed = true
 
 
 func test_vrmc_hdr_emissive_preflight_ok_when_extension_present():

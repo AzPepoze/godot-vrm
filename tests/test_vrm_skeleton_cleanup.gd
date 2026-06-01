@@ -1,5 +1,6 @@
 extends "res://tests/test_base.gd"
 
+var allow_errors = true
 const Cleanup = preload("res://addons/vrm/importer/common/vrm_skeleton_cleanup.gd")
 
 # ── remove_end_bone_nodes: edge cases ────────────────────────────────────────
@@ -7,6 +8,7 @@ const Cleanup = preload("res://addons/vrm/importer/common/vrm_skeleton_cleanup.g
 
 func test_cleanup_null_skeleton():
 	assert_eq(Cleanup.remove_end_bone_nodes(null, null), 0, "null skeleton → 0")
+	test_completed = true
 
 
 func test_cleanup_empty_skeleton():
@@ -16,9 +18,11 @@ func test_cleanup_empty_skeleton():
 	assert_eq(Cleanup.remove_end_bone_nodes(null, skel), 0, "empty skeleton → 0")
 	skel.queue_free()
 	await runner.process_frame
+	test_completed = true
 
 
 # ── remove_end_bone_nodes: basic removal ─────────────────────────────────────
+	test_completed = true
 
 
 func test_cleanup_removes_bare_node3d_matching_bone():
@@ -39,9 +43,11 @@ func test_cleanup_removes_bare_node3d_matching_bone():
 	assert_eq(skel.get_child_count(), 0, "Skeleton should have 0 children after cleanup")
 	skel.queue_free()
 	await runner.process_frame
+	test_completed = true
 
 
 # ── remove_end_bone_nodes: keeps non-bone-named Node3D ───────────────────────
+	test_completed = true
 
 
 func test_cleanup_keeps_non_bone_node3d():
@@ -58,9 +64,11 @@ func test_cleanup_keeps_non_bone_node3d():
 	assert_eq(skel.get_child_count(), 1, "Skeleton should keep 1 child")
 	skel.queue_free()
 	await runner.process_frame
+	test_completed = true
 
 
 # ── remove_end_bone_nodes: keeps MeshInstance3D children ─────────────────────
+	test_completed = true
 
 
 func test_cleanup_keeps_mesh_instance():
@@ -76,9 +84,11 @@ func test_cleanup_keeps_mesh_instance():
 	assert_eq(removed, 0, "Should not remove MeshInstance3D")
 	skel.queue_free()
 	await runner.process_frame
+	test_completed = true
 
 
 # ── remove_end_bone_nodes: keeps nodes with meaningful descendants ───────────
+	test_completed = true
 
 
 func test_cleanup_keeps_node_with_mesh_descendant():
@@ -97,6 +107,7 @@ func test_cleanup_keeps_node_with_mesh_descendant():
 	assert_eq(removed, 0, "Should keep bone-matching node that has MeshInstance3D descendant")
 	skel.queue_free()
 	await runner.process_frame
+	test_completed = true
 
 
 func test_cleanup_keeps_node_with_unique_name_descendant():
@@ -116,6 +127,7 @@ func test_cleanup_keeps_node_with_unique_name_descendant():
 	assert_eq(removed, 0, "Should keep node with unique_name_in_owner descendant (e.g. LookOffset)")
 	skel.queue_free()
 	await runner.process_frame
+	test_completed = true
 
 
 func test_cleanup_keeps_node_with_scripted_descendant():
@@ -135,6 +147,7 @@ func test_cleanup_keeps_node_with_scripted_descendant():
 	assert_eq(removed, 0, "Should keep node with scripted descendant")
 	skel.queue_free()
 	await runner.process_frame
+	test_completed = true
 
 
 func test_cleanup_keeps_nested_meaningful_descendant():
@@ -159,9 +172,11 @@ func test_cleanup_keeps_nested_meaningful_descendant():
 	assert_eq(removed, 0, "Should keep node with deeply nested meaningful descendant")
 	skel.queue_free()
 	await runner.process_frame
+	test_completed = true
 
 
 # ── remove_end_bone_nodes: BoneAttachment3D handling ─────────────────────────
+	test_completed = true
 
 
 func test_cleanup_removes_bare_bone_attachment():
@@ -177,9 +192,11 @@ func test_cleanup_removes_bare_bone_attachment():
 	assert_eq(removed, 1, "Should remove bare BoneAttachment3D matching bone name")
 	skel.queue_free()
 	await runner.process_frame
+	test_completed = true
 
 
 # ── remove_end_bone_nodes: scripted nodes are kept ───────────────────────────
+	test_completed = true
 
 
 func test_cleanup_keeps_scripted_node():
@@ -196,9 +213,11 @@ func test_cleanup_keeps_scripted_node():
 	assert_eq(removed, 0, "Should not remove scripted nodes")
 	skel.queue_free()
 	await runner.process_frame
+	test_completed = true
 
 
 # ── remove_end_bone_nodes: mixed cleanup ─────────────────────────────────────
+	test_completed = true
 
 
 func test_cleanup_mixed_scenario():
@@ -266,15 +285,18 @@ func test_cleanup_mixed_scenario():
 
 	skel.queue_free()
 	await runner.process_frame
+	test_completed = true
 
 
 # ── _has_meaningful_descendant: direct tests ─────────────────────────────────
+	test_completed = true
 
 
 func test_has_meaningful_descendant_empty():
 	var node := Node3D.new()
 	assert_false(Cleanup._has_meaningful_descendant(node), "Empty node → false")
 	node.queue_free()
+	test_completed = true
 
 
 func test_has_meaningful_descendant_mesh_instance():
@@ -284,6 +306,7 @@ func test_has_meaningful_descendant_mesh_instance():
 	parent.add_child(mesh)
 	assert_true(Cleanup._has_meaningful_descendant(parent), "MeshInstance3D child → true")
 	parent.queue_free()
+	test_completed = true
 
 
 func test_has_meaningful_descendant_importer_mesh():
@@ -293,6 +316,7 @@ func test_has_meaningful_descendant_importer_mesh():
 	parent.add_child(mesh)
 	assert_true(Cleanup._has_meaningful_descendant(parent), "ImporterMeshInstance3D child → true")
 	parent.queue_free()
+	test_completed = true
 
 
 func test_has_meaningful_descendant_unique_name():
@@ -303,6 +327,7 @@ func test_has_meaningful_descendant_unique_name():
 	parent.add_child(child)
 	assert_true(Cleanup._has_meaningful_descendant(parent), "unique_name_in_owner child → true")
 	parent.queue_free()
+	test_completed = true
 
 
 func test_has_meaningful_descendant_scripted():
@@ -313,6 +338,7 @@ func test_has_meaningful_descendant_scripted():
 	parent.add_child(child)
 	assert_true(Cleanup._has_meaningful_descendant(parent), "Scripted child → true")
 	parent.queue_free()
+	test_completed = true
 
 
 func test_has_meaningful_descendant_nested_empty():
@@ -323,6 +349,7 @@ func test_has_meaningful_descendant_nested_empty():
 	l1.add_child(l2)
 	assert_false(Cleanup._has_meaningful_descendant(l1), "Nested empty nodes → false")
 	l1.queue_free()
+	test_completed = true
 
 
 func test_has_meaningful_descendant_deeply_nested_mesh():

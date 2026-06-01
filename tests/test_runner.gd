@@ -6,6 +6,7 @@ var assertions_passed = 0
 var current_failed = false
 var current_error_message = ""
 
+const VRMLogger = preload("res://addons/vrm/core/logger.gd")
 
 func _init():
 	print("=========================================")
@@ -71,13 +72,18 @@ func run_test_file(path: String):
 			current_error_message = ""
 			test_obj.current_test_name = name
 			test_obj.test_completed = false
+			VRMLogger.error_happened = false
 
 			# Run optional setup
 			if test_obj.has_method("before_each"):
 				await test_obj.before_each()
 
 			await test_obj.call(name)
-			test_obj.test_completed = true
+
+			if VRMLogger.error_happened and not current_failed:
+				var allow_errors = test_obj.get("allow_errors") if "allow_errors" in test_obj else false
+				if not allow_errors:
+					fail_test(name, "VRMLogger recorded an error or warning during test.")
 
 			if not test_obj.test_completed and not current_failed:
 				fail_test(

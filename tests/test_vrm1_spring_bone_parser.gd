@@ -92,6 +92,7 @@ func test_vrm1_collider_group_structure():
 	assert_eq(
 		spring0["colliderGroups"], [0], "Spring colliderGroups should reference group index 0"
 	)
+	test_completed = true
 
 
 func test_vrm1_collider_flat_vs_group():
@@ -120,6 +121,7 @@ func test_vrm1_collider_flat_vs_group():
 	# Count of flat colliders
 	var colliders: Array = vrm_spring["colliders"]
 	assert_eq(colliders.size(), 2, "Should have 2 flat colliders")
+	test_completed = true
 
 
 func test_vrm1_collider_multiple_groups():

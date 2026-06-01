@@ -3,24 +3,26 @@ extends "res://tests/test_base.gd"
 const VRM_INSTANCE = preload("res://addons/vrm/core/vrm_instance.gd")
 
 
+static var _extensions_registered = false
+
+
 func test_vrm_spring_force_displacement():
 	var gltf := GLTFDocument.new()
 	var state := GLTFState.new()
 
 	# Register extensions manually
-	var extensions = [
-		preload("res://addons/vrm/importer/v1/vrmc/vrmc_node_constraint.gd").new(),
-		preload("res://addons/vrm/importer/v1/vrmc/vrmc_spring_bone.gd").new(),
-		preload("res://addons/vrm/importer/v1/vrmc/vrmc_materials_mtoon.gd").new(),
-		(
-			preload("res://addons/vrm/importer/v1/vrmc/vrmc_materials_hdr_emissive_multiplier.gd")
-			. new()
-		),
-		preload("res://addons/vrm/importer/v1/vrmc/vrmc_vrm.gd").new(),
-		preload("res://addons/vrm/importer/v1/vrmc/vrmc_vrm_animation.gd").new(),
-	]
-	for ext in extensions:
-		GLTFDocument.register_gltf_document_extension(ext, true)
+	if not _extensions_registered:
+		var extensions = [
+			"res://addons/vrm/importer/v1/vrmc/vrmc_node_constraint.gd",
+			"res://addons/vrm/importer/v1/vrmc/vrmc_spring_bone.gd",
+			"res://addons/vrm/importer/v1/vrmc/vrmc_materials_mtoon.gd",
+			"res://addons/vrm/importer/v1/vrmc/vrmc_materials_hdr_emissive_multiplier.gd",
+			"res://addons/vrm/importer/v1/vrmc/vrmc_vrm.gd",
+			"res://addons/vrm/importer/v1/vrmc/vrmc_vrm_animation.gd",
+		]
+		for ext_path in extensions:
+			GLTFDocument.register_gltf_document_extension(load(ext_path).new(), true)
+		_extensions_registered = true
 
 	const VRMConstants = preload("res://addons/vrm/core/vrm_constants.gd")
 	state.set_additional_data(

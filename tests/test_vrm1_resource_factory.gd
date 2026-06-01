@@ -35,6 +35,7 @@ func test_create_meta_v1_title():
 	var meta = vrm_resource_factory.create_meta_v1(vrm_ext, _fresh_state(), _make_bone_map())
 	assert_not_null(meta, "Meta resource should not be null")
 	assert_eq(meta.title, "TestAvatar", "Title should match input")
+	test_completed = true
 
 
 func test_create_meta_v1_authors():
@@ -42,12 +43,14 @@ func test_create_meta_v1_authors():
 	var meta = vrm_resource_factory.create_meta_v1(vrm_ext, _fresh_state(), _make_bone_map())
 	assert_eq(meta.authors.size(), 1, "Should have 1 author")
 	assert_eq(meta.authors[0], "Author1", "Author name should match input")
+	test_completed = true
 
 
 func test_create_meta_v1_spec_version():
 	var vrm_ext := _make_base_vrm_extension()
 	var meta = vrm_resource_factory.create_meta_v1(vrm_ext, _fresh_state(), _make_bone_map())
 	assert_eq(meta.spec_version, "1.0", "Spec version should be 1.0")
+	test_completed = true
 
 
 func test_create_meta_v1_avatar_permission_map():
@@ -69,6 +72,7 @@ func test_create_meta_v1_avatar_permission_map():
 	vrm_ext["meta"]["avatarPermission"] = "unknownValue"
 	meta = vrm_resource_factory.create_meta_v1(vrm_ext, state, bm)
 	assert_eq(meta.allowed_user_name, "", "Unknown value should map to empty string")
+	test_completed = true
 
 
 func test_create_meta_v1_commercial_usage_map():
@@ -87,6 +91,7 @@ func test_create_meta_v1_commercial_usage_map():
 	assert_eq(
 		meta.commercial_usage_type, "AllowCorporation", "corporation should map to AllowCorporation"
 	)
+	test_completed = true
 
 
 func test_create_meta_v1_violent_usage():
@@ -101,6 +106,7 @@ func test_create_meta_v1_violent_usage():
 	vrm_ext["meta"]["allowExcessivelyViolentUsage"] = false
 	meta = vrm_resource_factory.create_meta_v1(vrm_ext, state, bm)
 	assert_eq(meta.violent_usage, "Disallow", "false should map to Disallow")
+	test_completed = true
 
 
 func test_create_meta_v1_sexual_usage():
@@ -115,6 +121,7 @@ func test_create_meta_v1_sexual_usage():
 	vrm_ext["meta"]["allowExcessivelySexualUsage"] = false
 	meta = vrm_resource_factory.create_meta_v1(vrm_ext, state, bm)
 	assert_eq(meta.sexual_usage, "Disallow", "false should map to Disallow")
+	test_completed = true
 
 
 func test_create_meta_v1_missing_meta_key():
@@ -123,6 +130,7 @@ func test_create_meta_v1_missing_meta_key():
 	var meta = vrm_resource_factory.create_meta_v1(vrm_ext, _fresh_state(), _make_bone_map())
 	assert_not_null(meta, "Meta resource should still be created")
 	assert_eq(meta.title, "", "Title should default to empty string when meta key missing")
+	test_completed = true
 
 
 func test_create_meta_v1_humanoid_bone_mapping():

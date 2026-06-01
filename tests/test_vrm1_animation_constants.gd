@@ -21,6 +21,7 @@ func test_vrm0_to_vrm1_preset_keys():
 	assert_eq(presets["lookleft"], "lookLeft", "'lookleft' should map to 'lookLeft'")
 	assert_eq(presets["lookright"], "lookRight", "'lookright' should map to 'lookRight'")
 	assert_eq(presets["neutral"], "neutral", "'neutral' should map to 'neutral'")
+	test_completed = true
 
 
 func test_vrm_animation_to_look_at_keys():
@@ -35,6 +36,7 @@ func test_vrm_animation_to_look_at_keys():
 	assert_false(str(look_at["lookDown"]).is_empty(), "lookDown value must be non-empty")
 	assert_false(str(look_at["lookLeft"]).is_empty(), "lookLeft value must be non-empty")
 	assert_false(str(look_at["lookRight"]).is_empty(), "lookRight value must be non-empty")
+	test_completed = true
 
 
 func test_vrm_animation_presets_completeness():
@@ -73,6 +75,7 @@ func test_vrm_animation_presets_completeness():
 	# No unexpected keys
 	for key in presets.keys():
 		assert_true(key in expected, "Unexpected preset key: %s" % key)
+	test_completed = true
 
 
 func test_look_at_presets_subset_of_all_presets():

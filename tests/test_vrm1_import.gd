@@ -83,13 +83,16 @@ func _find_animation_player(root: Node) -> AnimationPlayer:
 
 func test_vrm1_import_succeeds():
 	assert_eq(_import_error, OK, "VRM 1.0 import (append_from_file) must not error")
+	test_completed = true
 
 
 func test_vrm1_scene_generated():
 	assert_not_null(_scene_root, "generate_scene must return a non-null root node")
+	test_completed = true
 
 
 # ── Skeleton ─────────────────────────────────────────────────────────────────
+	test_completed = true
 
 
 func test_vrm1_scene_has_skeleton():
@@ -102,9 +105,11 @@ func test_vrm1_scene_has_skeleton():
 		)
 		assert_ge(_skeleton.find_bone("Hips"), 0, "Hips bone must exist")
 		assert_ge(_skeleton.find_bone("Head"), 0, "Head bone must exist")
+	test_completed = true
 
 
 # ── Root node ────────────────────────────────────────────────────────────────
+	test_completed = true
 
 
 func test_vrm1_scene_root_is_vrm_toplevel():
@@ -112,9 +117,11 @@ func test_vrm1_scene_root_is_vrm_toplevel():
 	if _scene_root:
 		var meta = _scene_root.get("vrm_meta")
 		assert_not_null(meta, "Root node must have vrm_meta property set")
+	test_completed = true
 
 
 # ── Meta ─────────────────────────────────────────────────────────────────────
+	test_completed = true
 
 
 func test_vrm1_meta_fields():
@@ -131,6 +138,7 @@ func test_vrm1_meta_fields():
 
 
 # ── AnimationPlayer ──────────────────────────────────────────────────────────
+	test_completed = true
 
 
 func test_vrm1_animation_player_exists():
@@ -138,6 +146,7 @@ func test_vrm1_animation_player_exists():
 	if _anim_player:
 		var anim_list: PackedStringArray = _anim_player.get_animation_list()
 		assert_gt(anim_list.size(), 0, "Must have at least 1 animation, got %d" % anim_list.size())
+	test_completed = true
 
 
 func test_vrm1_animation_has_reset():
@@ -145,6 +154,7 @@ func test_vrm1_animation_has_reset():
 		test_completed = true
 		return
 	assert_true(_anim_player.has_animation(&"RESET"), "AnimationPlayer must have RESET animation")
+	test_completed = true
 
 
 func test_vrm1_animation_preset_names():
@@ -168,10 +178,12 @@ func test_vrm1_animation_preset_names():
 
 
 # ── SpringBoneController / spring bones ─────────────────────────────────────────────────
+	test_completed = true
 
 
 func test_vrm1_spring_bone_controller_exists():
 	assert_not_null(_spring_bone_controller, "spring_bone_controller node must exist in scene root")
+	test_completed = true
 
 
 func test_vrm1_spring_bone_controller_has_owner():
@@ -183,6 +195,7 @@ func test_vrm1_spring_bone_controller_has_owner():
 		_spring_bone_controller.owner,
 		"spring_bone_controller.owner MUST NOT be null (Bug 3 regression)"
 	)
+	test_completed = true
 
 
 func test_vrm1_spring_bone_controller_has_spring_bones():
@@ -204,6 +217,7 @@ func test_vrm1_spring_bone_controller_has_spring_bones():
 		assert_not_null(sb, "First spring bone must not be null")
 		if sb:
 			assert_gt(sb.joint_nodes.size(), 0, "Spring bone must have at least 1 joint node")
+	test_completed = true
 
 
 func test_vrm1_spring_bone_group_assigned():
@@ -223,6 +237,7 @@ func test_vrm1_spring_bone_group_assigned():
 			sb.group.is_empty(),
 			"Spring bone %d (%s) must have non-empty group, got ''" % [i, sb.resource_name]
 		)
+	test_completed = true
 
 
 func test_vrm1_spring_bone_resource_name_readable():
@@ -253,6 +268,7 @@ func test_vrm1_spring_bone_resource_name_readable():
 				% [i, sb.resource_name, sb.comment]
 			)
 		)
+	test_completed = true
 
 
 func test_vrm1_spring_bones_sorted_by_group():
@@ -276,6 +292,7 @@ func test_vrm1_spring_bones_sorted_by_group():
 				% [i, a.group, i + 1, b.group]
 			)
 		)
+	test_completed = true
 
 
 func test_vrm1_spring_bone_report():
@@ -301,6 +318,7 @@ func test_vrm1_spring_bone_report():
 	assert_lt(
 		spring_bones.size(), 300, "Spring bone count %d seems excessive" % spring_bones.size()
 	)
+	test_completed = true
 
 
 func test_vrm1_spring_bone_controller_has_skeleton_path():
@@ -318,6 +336,7 @@ func test_vrm1_spring_bone_controller_has_skeleton_path():
 		resolved,
 		"spring_bone_controller.skeleton path must resolve to a valid Skeleton3D (Bug 1 regression)"
 	)
+	test_completed = true
 
 
 func test_vrm1_collider_groups_are_groups_not_flat_colliders():
@@ -356,6 +375,7 @@ func test_vrm1_collider_groups_are_groups_not_flat_colliders():
 						assert_ge(
 							col.radius, 0.0, "Collider radius must be >= 0, got %f" % col.radius
 						)
+	test_completed = true
 
 
 func test_vrm1_collider_groups_consistent_with_spring_bones():
@@ -402,6 +422,7 @@ func test_vrm1_collider_groups_consistent_with_spring_bones():
 			)
 		)
 	)
+	test_completed = true
 
 
 func test_vrm1_spring_collider_group_refs_resolve_to_spring_bone_controller_groups():
@@ -443,6 +464,7 @@ func test_vrm1_spring_collider_group_refs_resolve_to_spring_bone_controller_grou
 
 
 # ── Meshes & materials ═══════════════════════════════════════════════════════════
+	test_completed = true
 
 
 func test_vrm1_meshes_have_materials():
@@ -471,6 +493,7 @@ func test_vrm1_meshes_have_materials():
 
 
 # ── End bone cleanup ─────────────────────────────────────────────────────────
+	test_completed = true
 
 
 func test_vrm1_end_bone_nodes_removed():
@@ -494,6 +517,7 @@ func test_vrm1_end_bone_nodes_removed():
 			+ "but found %d: %s" % [end_bone_nodes.size(), str(end_bone_nodes)]
 		)
 	)
+	test_completed = true
 
 
 func test_vrm1_end_bone_removal_keeps_skeleton_bones():

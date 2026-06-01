@@ -53,6 +53,7 @@ func test_load_alicia_v0_skeleton():
 	scene_root.queue_free()
 	await runner.wait_frame
 	GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+	test_completed = true
 
 
 func test_v0_alicia_secondary_to_springbone_clean_rename():
@@ -182,6 +183,7 @@ func test_v0_alicia_secondary_to_springbone_clean_rename():
 	scene_root.queue_free()
 	await runner.wait_frame
 	GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+	test_completed = true
 
 
 func test_load_alicia_spring_bones():
@@ -225,6 +227,7 @@ func test_load_alicia_spring_bones():
 	scene_root.queue_free()
 	await runner.wait_frame
 	GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+	test_completed = true
 
 
 func test_load_alicia_collider_groups():
@@ -288,6 +291,7 @@ func test_load_alicia_collider_groups():
 	scene_root.queue_free()
 	await runner.wait_frame
 	GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+	test_completed = true
 
 
 func test_load_godette_small_file():
@@ -325,6 +329,7 @@ func _find_skeleton(root: Node) -> Skeleton3D:
 
 
 # ── End-bone cleanup (v0 path) ──────────────────────────────────────────────
+	test_completed = true
 
 
 func test_v0_alicia_end_bones_removed():
@@ -370,6 +375,7 @@ func test_v0_alicia_end_bones_removed():
 	scene_root.queue_free()
 	await runner.wait_frame
 	GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+	test_completed = true
 
 
 func test_v0_godette_end_bones_removed():

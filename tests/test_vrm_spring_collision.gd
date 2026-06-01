@@ -57,6 +57,7 @@ func test_vrm_spring_collision_interaction():
 	var angle := await _run_collision_case(Vector3.ZERO)
 	print("[COLLISION TEST] origin angle: ", angle)
 	assert_gt(angle, 0.1, "Bone should rotate significantly due to collision")
+	test_completed = true
 
 
 func test_vrm_spring_collision_with_translated_skeleton():

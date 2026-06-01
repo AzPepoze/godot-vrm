@@ -91,6 +91,7 @@ func test_env_collision_pushes_tail_out_of_box():
 	skeleton.queue_free()
 	runner.root.remove_child(box)
 	box.queue_free()
+	test_completed = true
 
 
 func test_env_collision_tail_settles_without_bounce():

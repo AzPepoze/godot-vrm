@@ -14,6 +14,7 @@ func test_logger_class_exists():
 		ProjectSettings.has_setting(&"vrm/logger/log_level"),
 		"register_settings should create the project setting"
 	)
+	test_completed = true
 
 
 func test_logger_level_constants():
@@ -22,6 +23,7 @@ func test_logger_level_constants():
 	assert_eq(VRMLogger.Level.WARNING, 2, "WARNING should be 2")
 	assert_eq(VRMLogger.Level.ERROR, 3, "ERROR should be 3")
 	assert_eq(VRMLogger.Level.NONE, 4, "NONE should be 4")
+	test_completed = true
 
 
 func test_logger_register_settings():
@@ -32,6 +34,7 @@ func test_logger_register_settings():
 	)
 	var val = ProjectSettings.get_setting(&"vrm/logger/log_level")
 	assert_true(val >= 0 and val <= 4, "Log level should be in range 0-4, got " + str(val))
+	test_completed = true
 
 
 func test_logger_refresh_level():

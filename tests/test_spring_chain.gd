@@ -12,6 +12,7 @@ func test_spring_bone_resource():
 	assert_eq(sb.hit_radius_scale, 1.0, "Default hit_radius_scale should be 1.0")
 	assert_eq(sb.gravity_scale, 1.0, "Default gravity_scale should be 1.0")
 	assert_eq(sb.gravity_dir_default, Vector3(0, -1, 0), "Default gravity_dir should be (0,-1,0)")
+	test_completed = true
 
 
 func test_spring_bone_joint_nodes():
@@ -19,6 +20,7 @@ func test_spring_bone_joint_nodes():
 	sb.joint_nodes = PackedStringArray(["Hips", "Spine", "Chest", ""])
 	assert_eq(sb.joint_nodes.size(), 4, "joint_nodes should have 4 entries")
 	assert_eq(sb.joint_nodes[0], "Hips", "First joint should be Hips")
+	test_completed = true
 
 
 func test_collider_resource():
@@ -28,6 +30,7 @@ func test_collider_resource():
 	assert_eq(c.offset, Vector3.ZERO, "Default offset should be zero")
 	assert_eq(c.is_capsule, false, "Default is_capsule should be false")
 	assert_eq(c.gizmo_color, Color.MAGENTA, "Default gizmo_color should be MAGENTA")
+	test_completed = true
 
 
 func test_collider_group_resource():
@@ -38,6 +41,7 @@ func test_collider_group_resource():
 	var c := VRMCollider.new()
 	cg.colliders.append(c)
 	assert_eq(cg.colliders.size(), 1, "Collider group should have 1 collider after append")
+	test_completed = true
 
 
 func test_spring_bone_service_chain_building():

@@ -64,6 +64,7 @@ func test_avatar_sample_scene_spring_overrides_keep_collider_refs():
 
 	assert_gt(checked_springs, 0, "Sample scene should include hair/skirt spring overrides")
 	scene.queue_free()
+	test_completed = true
 
 
 func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():

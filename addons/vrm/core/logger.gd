@@ -20,6 +20,7 @@ enum Level {
 }
 
 static var _cached_level: int = -1
+static var error_happened: bool = false
 
 
 static func _get_log_level() -> int:
@@ -53,12 +54,14 @@ static func info(tag: String, message: String) -> void:
 
 
 static func warning(tag: String, message: String) -> void:
+	error_happened = true
 	if not _should_log(Level.WARNING):
 		return
 	push_warning(_format("WARN", tag, message))
 
 
 static func error(tag: String, message: String) -> void:
+	error_happened = true
 	if not _should_log(Level.ERROR):
 		return
 	push_error(_format("ERROR", tag, message))
