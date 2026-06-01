@@ -8,16 +8,25 @@ on:
 
 jobs:
      build:
-          name: Build and Commit Binaries
+          name: Build (${{ matrix.platform }})
           runs-on: ubuntu-latest
-          permissions:
-               contents: write
+          strategy:
+               fail-fast: false
+               matrix:
+                    include:
+                         - platform: linux
+                           scons-args: platform=linux target=template_release
+                           artifact-path: addons/vrm/bin/libvrm_physics.linux.template_release.x86_64.so
+
+                         - platform: windows
+                           scons-args: platform=windows target=template_release use_mingw=yes
+                           artifact-path: addons/vrm/bin/libvrm_physics.windows.template_release.x86_64.dll
+
           steps:
                - name: Checkout
                  uses: actions/checkout@v4
                  with:
                       submodules: recursive
-                      token: ${{ secrets.GITHUB_TOKEN }}
 
                - name: Setup Python
                  uses: actions/setup-python@v5
@@ -28,16 +37,44 @@ jobs:
                - name: Install Dependencies
                  run: |
                       sudo apt-get update -qq
-                      sudo apt-get install -y mingw-w64
+                      [[ "${{ matrix.platform }}" == "windows" ]] && sudo apt-get install -y mingw-w64
                       pip install scons
 
-               - name: Build Linux
-                 run: scons platform=linux target=template_release -j$(nproc)
+               - name: Build (${{ matrix.platform }})
+                 run: scons ${{ matrix.scons-args }} -j$(nproc)
 
-               - name: Build Windows
-                 run: scons platform=windows target=template_release use_mingw=yes -j$(nproc)
+               - name: Upload artifact
+                 uses: actions/upload-artifact@v4
+                 with:
+                      name: ${{ matrix.platform }}-binary
+                      path: ${{ matrix.artifact-path }}
+                      retention-days: 1
 
-               - name: Commit and Push Binaries
+     commit:
+          name: Commit Binaries
+          needs: build
+          if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+          runs-on: ubuntu-latest
+          permissions:
+               contents: write
+          steps:
+               - name: Checkout
+                 uses: actions/checkout@v4
+                 with:
+                      token: ${{ secrets.GITHUB_TOKEN }}
+
+               - name: Download artifacts
+                 uses: actions/download-artifact@v4
+                 with:
+                      path: artifacts
+
+               - name: Move binaries to addon
+                 run: |
+                      mkdir -p addons/vrm/bin
+                      find artifacts -name "*.so" -exec cp {} addons/vrm/bin/ \;
+                      find artifacts -name "*.dll" -exec cp {} addons/vrm/bin/ \;
+
+               - name: Commit and Push
                  run: |
                       git config --global user.name "github-actions[bot]"
                       git config --global user.email "github-actions[bot]@users.noreply.github.com"
