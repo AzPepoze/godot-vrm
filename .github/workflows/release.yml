@@ -11,21 +11,17 @@ permissions:
 jobs:
   build:
     name: Build (${{ matrix.platform }})
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
           - platform: linux
-            os: ubuntu-24.04
             scons-args: platform=linux target=template_release
-            artifact-name: libvrm_physics.linux.template_release.x86_64.so
             artifact-path: addons/vrm/bin/libvrm_physics.linux.template_release.x86_64.so
 
           - platform: windows
-            os: windows-2022
-            scons-args: platform=windows target=template_release
-            artifact-name: libvrm_physics.windows.template_release.x86_64.dll
+            scons-args: platform=windows target=template_release use_mingw=yes
             artifact-path: addons/vrm/bin/libvrm_physics.windows.template_release.x86_64.dll
 
     steps:
@@ -38,12 +34,16 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
-      - name: Install SCons
-        run: pip install scons
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update -qq
+          [[ "${{ matrix.platform }}" == "windows" ]] && sudo apt-get install -y mingw-w64
+          pip install scons
 
       - name: Build (${{ matrix.platform }})
-        run: scons ${{ matrix.scons-args }} -j$(nproc 2>/dev/null || sysctl -n hw.logicalcpu 2>/dev/null || echo 4)
+        run: scons ${{ matrix.scons-args }} -j$(nproc)
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -55,40 +55,25 @@ jobs:
   release:
     name: Create Release
     needs: build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download all artifacts
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
 
-      - name: Copy binaries into addon
-        run: |
-          cp artifacts/linux-binary/libvrm_physics.linux.template_release.x86_64.so addons/vrm/bin/
-          cp artifacts/windows-binary/libvrm_physics.windows.template_release.x86_64.dll addons/vrm/bin/
-
       - name: Package addon
         run: |
-          zip -r godot-vrm-${{ github.ref_name }}.zip addons/ vrm_samples/ -x "*.import" -x "*.unwrap_cache" -x "addons/vrm/bin/*.template_debug*"
+          mkdir -p addons/vrm/bin
+          find artifacts -name "*.so" -exec cp {} addons/vrm/bin/ \;
+          find artifacts -name "*.dll" -exec cp {} addons/vrm/bin/ \;
+          zip -r godot-vrm-${{ github.ref_name }}.zip addons/ vrm_samples/ -x "*.import" -x "*.unwrap_cache"
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          name: ${{ github.ref_name }}
-          body: |
-            ## godot-vrm ${{ github.ref_name }}
-
-            VRM importer and spring bone physics for Godot 4.3+.
-
-            ### Installation
-            1. Copy the `addons/` folder into your Godot project
-            2. Enable the plugin in Project Settings → Plugins
-
-            ### Supported platforms
-            - Linux (x86_64)
-            - Windows (x86_64)
           files: godot-vrm-${{ github.ref_name }}.zip
           generate_release_notes: true

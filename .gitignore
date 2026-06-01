@@ -30,6 +30,9 @@ addons/*/bin/*.dll
 addons/*/bin/*.dylib
 addons/*/bin/*.wasm
 
+# BUT allow the release versions to be committed by the workflow
+!addons/*/bin/*.template_release.*
+
 # VS Code
 .vscode/
 
