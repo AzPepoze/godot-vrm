@@ -137,7 +137,8 @@ func draw_gizmo(
 	skel_to_gizmo: Transform3D,
 	color: Color,
 	draw_spring_bones: bool,
-	draw_body_collisions: bool
+	draw_body_collisions: bool,
+	gizmo_display_mode: int = 0
 ) -> void:
 	if simulation:
 		simulation.draw_gizmo(mesh, skel_to_gizmo, color, draw_spring_bones, draw_body_collisions)

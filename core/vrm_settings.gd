@@ -105,6 +105,11 @@ signal settings_changed
 		settings_changed.emit()
 
 @export_group("Springbone Gizmos")
+@export_enum("Line Circle", "Capsule") var gizmo_display_mode: int = 0:
+	set(value):
+		gizmo_display_mode = value
+		settings_changed.emit()
+
 @export var gizmo_spring_bone: bool = false:
 	set(value):
 		gizmo_spring_bone = value
