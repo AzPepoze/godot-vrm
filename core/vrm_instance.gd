@@ -122,103 +122,11 @@ func recreate_simulation() -> void:
 			settings.settings_changed.connect(_on_settings_changed)
 		_on_settings_changed()
 
-@export_category("Springbone Runtime")
-@export var update_spring_bone_controller_in_physics: bool:
-	get:
-		if settings == null:
-			settings = VRMSettings.new()
-		return settings.update_spring_bone_controller_in_physics
-	set(value):
-		if settings == null:
-			settings = VRMSettings.new()
-		settings.update_spring_bone_controller_in_physics = value
-
-@export var disable_colliders: bool:
-	get:
-		if settings == null:
-			settings = VRMSettings.new()
-		return settings.disable_colliders
-	set(value):
-		if settings == null:
-			settings = VRMSettings.new()
-		settings.disable_colliders = value
-
-@export var override_springbone_center: bool:
-	get:
-		if settings == null:
-			settings = VRMSettings.new()
-		return settings.override_springbone_center
-	set(value):
-		if settings == null:
-			settings = VRMSettings.new()
-		settings.override_springbone_center = value
-
 @export var default_springbone_center: Node3D:
 	set(value):
 		default_springbone_center = value
 		if spring_bone_controller:
 			spring_bone_controller.default_springbone_center = value
-
-@export_category("Run in Editor")
-@export var update_in_editor: bool:
-	get:
-		if settings == null:
-			settings = VRMSettings.new()
-		return settings.update_in_editor
-	set(value):
-		if settings == null:
-			settings = VRMSettings.new()
-		settings.update_in_editor = value
-
-@export var gizmo_spring_bone: bool:
-	get:
-		if settings == null:
-			settings = VRMSettings.new()
-		return settings.gizmo_spring_bone
-	set(value):
-		if settings == null:
-			settings = VRMSettings.new()
-		settings.gizmo_spring_bone = value
-
-@export var gizmo_spring_bone_color: Color:
-	get:
-		if settings == null:
-			settings = VRMSettings.new()
-		return settings.gizmo_spring_bone_color
-	set(value):
-		if settings == null:
-			settings = VRMSettings.new()
-		settings.gizmo_spring_bone_color = value
-
-@export var gizmo_show_colliders: bool:
-	get:
-		if settings == null:
-			settings = VRMSettings.new()
-		return settings.gizmo_show_colliders
-	set(value):
-		if settings == null:
-			settings = VRMSettings.new()
-		settings.gizmo_show_colliders = value
-
-@export var gizmo_show_wind: bool:
-	get:
-		if settings == null:
-			settings = VRMSettings.new()
-		return settings.gizmo_show_wind
-	set(value):
-		if settings == null:
-			settings = VRMSettings.new()
-		settings.gizmo_show_wind = value
-
-@export var gizmo_wind_color: Color:
-	get:
-		if settings == null:
-			settings = VRMSettings.new()
-		return settings.gizmo_wind_color
-	set(value):
-		if settings == null:
-			settings = VRMSettings.new()
-		settings.gizmo_wind_color = value
 
 
 func _init() -> void:
