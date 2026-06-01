@@ -81,7 +81,8 @@ void draw_gizmo(
     const std::vector<VRMSpringBoneSimulation::CPPSpringBoneCollider>
         &colliders,
     Color default_color, bool draw_spring_bones, bool draw_colliders,
-    bool p_simulate_in_local_space, float hit_radius_multiplier) {
+    bool p_simulate_in_local_space, float hit_radius_multiplier,
+    float collider_radius_multiplier) {
   if (!mesh || !skel) {
     return;
   }
@@ -112,8 +113,9 @@ void draw_gizmo(
 
         float radius = hit_radius_multiplier * chain.hit_radius_scale *
                        joint_param(chain.hit_radius, i);
-        
-        draw_wireframe_capsule(mesh, start_gizmo, end_gizmo, radius, default_color);
+
+        draw_wireframe_capsule(mesh, start_gizmo, end_gizmo, radius,
+                               default_color);
       }
     }
     mesh->surface_end();
@@ -123,12 +125,13 @@ void draw_gizmo(
     mesh->surface_begin(Mesh::PRIMITIVE_LINES);
     for (const auto &c : colliders) {
       Vector3 pos_gizmo = skel_to_gizmo.xform(c.position);
+      float coll_radius = c.radius * collider_radius_multiplier;
       if (c.is_capsule) {
         Vector3 tail_gizmo = skel_to_gizmo.xform(c.tail_position);
-        draw_wireframe_capsule(mesh, pos_gizmo, tail_gizmo, c.radius,
+        draw_wireframe_capsule(mesh, pos_gizmo, tail_gizmo, coll_radius,
                                c.gizmo_color);
       } else {
-        draw_wireframe_sphere(mesh, pos_gizmo, c.radius, c.gizmo_color);
+        draw_wireframe_sphere(mesh, pos_gizmo, coll_radius, c.gizmo_color);
       }
     }
     mesh->surface_end();

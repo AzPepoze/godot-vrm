@@ -90,6 +90,8 @@ private:
   float stiffness_multiplier = 1.0f;
   float drag_multiplier = 1.0f;
   float hit_radius_multiplier = 1.0f;
+  float collider_radius_multiplier = 1.0f;
+  bool enable_colliders = true;
   bool simulate_in_local_space = false;
   Quaternion gravity_rotation;
   Vector3 add_force;
@@ -118,7 +120,8 @@ public:
                          Quaternion p_gravity_rotation, Vector3 p_add_force,
                          float p_stiffness_multiplier = 1.0f,
                          float p_drag_multiplier = 1.0f,
-                         float p_hit_radius_multiplier = 1.0f);
+                         float p_hit_radius_multiplier = 1.0f,
+                         float p_collider_radius_multiplier = 1.0f);
   void step_simulation();
   void _process_modification() override;
 
@@ -143,6 +146,15 @@ public:
     hit_radius_multiplier = p_multiplier;
   }
   float get_hit_radius_multiplier() const { return hit_radius_multiplier; }
+  void set_collider_radius_multiplier(float p_multiplier) {
+    collider_radius_multiplier = p_multiplier;
+  }
+  float get_collider_radius_multiplier() const {
+    return collider_radius_multiplier;
+  }
+
+  void set_enable_colliders(bool p_enabled) { enable_colliders = p_enabled; }
+  bool get_enable_colliders() const { return enable_colliders; }
 
   void set_simulate_in_local_space(bool p_enabled) {
     simulate_in_local_space = p_enabled;

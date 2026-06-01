@@ -20,9 +20,21 @@ signal settings_changed
 		springbone_gravity_multiplier = value
 		settings_changed.emit()
 
+@export_group("Spring Bone Collisions")
 @export var springbone_hit_radius_multiplier: float = 1.0:
 	set(value):
 		springbone_hit_radius_multiplier = value
+		settings_changed.emit()
+
+@export var disable_spring_bones: bool = false:
+	set(value):
+		disable_spring_bones = value
+		settings_changed.emit()
+
+@export_group("Body Colliders")
+@export var collider_radius_multiplier: float = 1.0:
+	set(value):
+		collider_radius_multiplier = value
 		settings_changed.emit()
 
 @export var constraint_weight_multiplier: float = 1.0:

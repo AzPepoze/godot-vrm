@@ -62,6 +62,7 @@ func _setup_cpp(
 		simulation.active = update_in_editor
 
 
+# gdlint: ignore=function-arguments-number
 func update_parameters(
 	p_gravity_multiplier: float,
 	p_gravity_rotation: Quaternion,
@@ -76,7 +77,9 @@ func update_parameters(
 	p_stiffness_multiplier: float = 1.0,
 	p_drag_multiplier: float = 1.0,
 	p_hit_radius_multiplier: float = 1.0,
-	p_simulate_in_local_space: bool = false
+	p_collider_radius_multiplier: float = 1.0,
+	p_simulate_in_local_space: bool = false,
+	p_disable_colliders: bool = false
 ) -> void:
 	gravity_multiplier = p_gravity_multiplier
 	stiffness_multiplier = p_stiffness_multiplier
@@ -92,8 +95,10 @@ func update_parameters(
 			add_force,
 			stiffness_multiplier,
 			drag_multiplier,
-			hit_radius_multiplier
+			hit_radius_multiplier,
+			p_collider_radius_multiplier
 		)
+		simulation.set_enable_colliders(!p_disable_colliders)
 		simulation.set_wind_direction(p_wind_direction)
 		simulation.set_simulate_in_local_space(p_simulate_in_local_space)
 		simulation.set_wind_strength(p_wind_strength)

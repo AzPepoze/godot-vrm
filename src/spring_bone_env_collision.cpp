@@ -13,7 +13,8 @@ namespace godot {
 // Environment collision property accessors
 // ---------------------------------------------------------------------------
 
-void VRMSpringBoneSimulation::set_environment_collision_enabled(bool p_enabled) {
+void VRMSpringBoneSimulation::set_environment_collision_enabled(
+    bool p_enabled) {
   environment_collision_enabled = p_enabled;
 }
 bool VRMSpringBoneSimulation::is_environment_collision_enabled() const {
@@ -29,7 +30,8 @@ void VRMSpringBoneSimulation::set_environment_collision_bounce_damping(
     float p_damping) {
   environment_collision_bounce_damping = p_damping;
 }
-float VRMSpringBoneSimulation::get_environment_collision_bounce_damping() const {
+float VRMSpringBoneSimulation::get_environment_collision_bounce_damping()
+    const {
   return environment_collision_bounce_damping;
 }
 

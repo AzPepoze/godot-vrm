@@ -54,7 +54,7 @@ static std::vector<SpringBoneCollision::ColliderView> gather_collider_views(
         &all_colliders,
     const std::vector<VRMSpringBoneSimulation::CPPSpringBoneColliderGroup>
         &all_groups,
-    const Transform3D &center_inv) {
+    const Transform3D &center_inv, float collider_radius_multiplier) {
 
   std::vector<SpringBoneCollision::ColliderView> views;
   for (int group_idx : chain.collider_group_indices) {
@@ -65,7 +65,7 @@ static std::vector<SpringBoneCollision::ColliderView> gather_collider_views(
       const auto &coll = all_colliders[coll_idx];
       SpringBoneCollision::ColliderView cv;
       cv.position = center_inv.xform(coll.position);
-      cv.radius = coll.radius;
+      cv.radius = coll.radius * collider_radius_multiplier;
       cv.is_capsule = coll.is_capsule;
       if (coll.is_capsule) {
         cv.tail_position = center_inv.xform(coll.tail_position);
@@ -82,12 +82,12 @@ static std::vector<SpringBoneCollision::ColliderView> gather_collider_views(
 void VRMSpringBoneSimulation::_bind_methods() {
   ClassDB::bind_method(D_METHOD("setup", "spring_bones", "collider_groups"),
                        &VRMSpringBoneSimulation::setup);
-  ClassDB::bind_method(D_METHOD("update_parameters", "gravity_multiplier",
-                                "gravity_rotation", "add_force",
-                                "stiffness_multiplier", "drag_multiplier",
-                                "hit_radius_multiplier"),
-                       &VRMSpringBoneSimulation::update_parameters,
-                       DEFVAL(1.0f), DEFVAL(1.0f), DEFVAL(1.0f));
+  ClassDB::bind_method(
+      D_METHOD("update_parameters", "gravity_multiplier", "gravity_rotation",
+               "add_force", "stiffness_multiplier", "drag_multiplier",
+               "hit_radius_multiplier", "collider_radius_multiplier"),
+      &VRMSpringBoneSimulation::update_parameters, DEFVAL(1.0f), DEFVAL(1.0f),
+      DEFVAL(1.0f), DEFVAL(1.0f));
   ClassDB::bind_method(D_METHOD("step_simulation"),
                        &VRMSpringBoneSimulation::step_simulation);
 
@@ -108,6 +108,16 @@ void VRMSpringBoneSimulation::_bind_methods() {
                        &VRMSpringBoneSimulation::set_simulate_in_local_space);
   ClassDB::bind_method(D_METHOD("get_simulate_in_local_space"),
                        &VRMSpringBoneSimulation::get_simulate_in_local_space);
+  ClassDB::bind_method(
+      D_METHOD("set_collider_radius_multiplier", "multiplier"),
+      &VRMSpringBoneSimulation::set_collider_radius_multiplier);
+  ClassDB::bind_method(
+      D_METHOD("get_collider_radius_multiplier"),
+      &VRMSpringBoneSimulation::get_collider_radius_multiplier);
+  ClassDB::bind_method(D_METHOD("set_enable_colliders", "enabled"),
+                       &VRMSpringBoneSimulation::set_enable_colliders);
+  ClassDB::bind_method(D_METHOD("get_enable_colliders"),
+                       &VRMSpringBoneSimulation::get_enable_colliders);
 
   ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "stiffness_multiplier",
                             PROPERTY_HINT_RANGE, "0.0,10.0,0.01"),
@@ -118,6 +128,12 @@ void VRMSpringBoneSimulation::_bind_methods() {
   ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "hit_radius_multiplier",
                             PROPERTY_HINT_RANGE, "0.0,10.0,0.01"),
                "set_hit_radius_multiplier", "get_hit_radius_multiplier");
+  ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "collider_radius_multiplier",
+                            PROPERTY_HINT_RANGE, "0.0,10.0,0.01"),
+               "set_collider_radius_multiplier",
+               "get_collider_radius_multiplier");
+  ADD_PROPERTY(PropertyInfo(Variant::BOOL, "enable_colliders"),
+               "set_enable_colliders", "get_enable_colliders");
   ADD_PROPERTY(PropertyInfo(Variant::BOOL, "simulate_in_local_space"),
                "set_simulate_in_local_space", "get_simulate_in_local_space");
   ClassDB::bind_method(D_METHOD("get_chain_count"),
@@ -199,18 +215,17 @@ VRMSpringBoneSimulation::~VRMSpringBoneSimulation() {}
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
-void VRMSpringBoneSimulation::update_parameters(float p_gravity_multiplier,
-                                                Quaternion p_gravity_rotation,
-                                                Vector3 p_add_force,
-                                                float p_stiffness_multiplier,
-                                                float p_drag_multiplier,
-                                                float p_hit_radius_multiplier) {
+void VRMSpringBoneSimulation::update_parameters(
+    float p_gravity_multiplier, Quaternion p_gravity_rotation,
+    Vector3 p_add_force, float p_stiffness_multiplier, float p_drag_multiplier,
+    float p_hit_radius_multiplier, float p_collider_radius_multiplier) {
   gravity_multiplier = p_gravity_multiplier;
   gravity_rotation = p_gravity_rotation;
   add_force = p_add_force;
   stiffness_multiplier = p_stiffness_multiplier;
   drag_multiplier = p_drag_multiplier;
   hit_radius_multiplier = p_hit_radius_multiplier;
+  collider_radius_multiplier = p_collider_radius_multiplier;
 }
 
 void VRMSpringBoneSimulation::step_simulation() { _process_modification(); }
@@ -288,8 +303,9 @@ void VRMSpringBoneSimulation::_reset_chains(
     }
 
     // Push-out pass: resolve initial collider penetration
-    auto collider_views = gather_collider_views(
-        chain, all_colliders, all_collider_groups, center_inv);
+    auto collider_views =
+        gather_collider_views(chain, all_colliders, all_collider_groups,
+                              center_inv, collider_radius_multiplier);
     for (int pass = 0; pass < PUSH_OUT_PASSES; ++pass) {
       for (size_t i = 0; i < chain.joints.size(); ++i) {
         auto &joint = chain.joints[i];
@@ -313,8 +329,9 @@ void VRMSpringBoneSimulation::_simulate_chains(
     Quaternion center_rot = center.basis.get_rotation_quaternion();
     Quaternion center_rot_inv = center_rot.inverse();
 
-    auto collider_views = gather_collider_views(
-        chain, all_colliders, all_collider_groups, center_inv);
+    auto collider_views =
+        gather_collider_views(chain, all_colliders, all_collider_groups,
+                              center_inv, collider_radius_multiplier);
 
     for (size_t i = 0; i < chain.joints.size(); ++i) {
       auto &joint = chain.joints[i];
@@ -393,11 +410,14 @@ void VRMSpringBoneSimulation::_simulate_chains(
         Vector3 iter_start = next_tail;
 
         // 1. VRM Colliders (Spheres and Capsules attached to the body)
-        next_tail = SpringBoneCollision::resolve_all_colliders(
-            next_tail, origin, radius, joint.length, collider_views);
+        if (enable_colliders) {
+          next_tail = SpringBoneCollision::resolve_all_colliders(
+              next_tail, origin, radius, joint.length, collider_views);
+        }
 
         // 2. Environment Colliders (External physics objects)
-        if (environment_collision_enabled && chain.enable_environment_collision) {
+        if (environment_collision_enabled &&
+            chain.enable_environment_collision) {
           Transform3D skel_world = skel->get_global_transform();
           Vector3 origin_world = skel_world.xform(center.xform(origin));
           Vector3 tail_world = skel_world.xform(center.xform(next_tail));
@@ -409,14 +429,15 @@ void VRMSpringBoneSimulation::_simulate_chains(
           if (!env_push.is_zero_approx()) {
             Vector3 push_local = center_inv.basis.xform(
                 skel_world.affine_inverse().basis.xform(env_push));
-            
+
             // Smooth projection: converge smoothly within the iteration loop
             const float smooth_factor = 0.5f;
             next_tail = next_tail.lerp(next_tail + push_local, smooth_factor);
           }
         }
 
-        // 3. Length Constraint (Ensures bones don't stretch due to collision pushes)
+        // 3. Length Constraint (Ensures bones don't stretch due to collision
+        // pushes)
         next_tail = SpringBonePhysics::apply_length_constraint(
             next_tail, origin, joint.length);
 
@@ -440,10 +461,12 @@ void VRMSpringBoneSimulation::_simulate_chains(
         float vn = vel.dot(contact_normal);
         if (vn < 0.0f) {
           vel -= contact_normal * vn;
-          joint.prev_tail = joint.current_tail - vel; // Update verlet previous state
+          joint.prev_tail =
+              joint.current_tail - vel; // Update verlet previous state
         }
-        
-        // Store for next frame's Verlet clamp (prevents stiffness from creating new velocity)
+
+        // Store for next frame's Verlet clamp (prevents stiffness from creating
+        // new velocity)
         joint.env_in_contact = true;
         joint.env_contact_normal = contact_normal;
       } else {
@@ -518,10 +541,10 @@ void VRMSpringBoneSimulation::draw_gizmo(Object *p_mesh_obj,
                                          bool p_draw_colliders) {
   ImmediateMesh *mesh = Object::cast_to<ImmediateMesh>(p_mesh_obj);
   Skeleton3D *skel = get_skeleton();
-  SpringBoneGizmo::draw_gizmo(mesh, skel, p_skel_to_gizmo, chains,
-                              all_colliders, p_color, p_draw_spring_bones,
-                              p_draw_colliders, simulate_in_local_space,
-                              hit_radius_multiplier);
+  SpringBoneGizmo::draw_gizmo(
+      mesh, skel, p_skel_to_gizmo, chains, all_colliders, p_color,
+      p_draw_spring_bones, p_draw_colliders, simulate_in_local_space,
+      hit_radius_multiplier, collider_radius_multiplier);
 }
 
 // ---------------------------------------------------------------------------
