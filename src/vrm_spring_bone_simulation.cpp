@@ -109,11 +109,14 @@ void VRMSpringBoneSimulation::_bind_methods() {
   ClassDB::bind_method(D_METHOD("get_simulate_in_local_space"),
                        &VRMSpringBoneSimulation::get_simulate_in_local_space);
 
-  ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "stiffness_multiplier"),
+  ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "stiffness_multiplier",
+                            PROPERTY_HINT_RANGE, "0.0,10.0,0.01"),
                "set_stiffness_multiplier", "get_stiffness_multiplier");
-  ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "drag_multiplier"),
+  ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "drag_multiplier",
+                            PROPERTY_HINT_RANGE, "0.0,10.0,0.01"),
                "set_drag_multiplier", "get_drag_multiplier");
-  ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "hit_radius_multiplier"),
+  ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "hit_radius_multiplier",
+                            PROPERTY_HINT_RANGE, "0.0,10.0,0.01"),
                "set_hit_radius_multiplier", "get_hit_radius_multiplier");
   ADD_PROPERTY(PropertyInfo(Variant::BOOL, "simulate_in_local_space"),
                "set_simulate_in_local_space", "get_simulate_in_local_space");
@@ -383,20 +386,18 @@ void VRMSpringBoneSimulation::_simulate_chains(
         }
       }
 
-      // VRM Colliders
-      next_tail = SpringBoneCollision::resolve_all_colliders(
-          next_tail, origin, radius, joint.length, collider_views);
+      // --- COLLISION SOLVE (Iterative Relaxation) ---
+      Vector3 before_collision = next_tail;
+      static const int MAX_ITERS = 4;
+      for (int iter = 0; iter < MAX_ITERS; ++iter) {
+        Vector3 iter_start = next_tail;
 
-      // Environment collision (optional)
-      bool has_env_collision = false;
-      Vector3 env_normal_local;
-      if (environment_collision_enabled && chain.enable_environment_collision) {
-        // Iterative solve: collision projection and length constraint
-        // fight each other (projection pushes away from surface, length
-        // constraint pulls back toward origin). Alternate until converged
-        // so the final position satisfies both.
-        static const int MAX_ITERS = 4;
-        for (int iter = 0; iter < MAX_ITERS; ++iter) {
+        // 1. VRM Colliders (Spheres and Capsules attached to the body)
+        next_tail = SpringBoneCollision::resolve_all_colliders(
+            next_tail, origin, radius, joint.length, collider_views);
+
+        // 2. Environment Colliders (External physics objects)
+        if (environment_collision_enabled && chain.enable_environment_collision) {
           Transform3D skel_world = skel->get_global_transform();
           Vector3 origin_world = skel_world.xform(center.xform(origin));
           Vector3 tail_world = skel_world.xform(center.xform(next_tail));
@@ -405,44 +406,47 @@ void VRMSpringBoneSimulation::_simulate_chains(
           _query_game_object_collisions(skel, origin_world, tail_world, radius,
                                         chain.environment_collision_mask,
                                         env_push);
-          if (env_push.is_zero_approx()) {
-            break; // No penetration — converged
+          if (!env_push.is_zero_approx()) {
+            Vector3 push_local = center_inv.basis.xform(
+                skel_world.affine_inverse().basis.xform(env_push));
+            
+            // Smooth projection: converge smoothly within the iteration loop
+            const float smooth_factor = 0.5f;
+            next_tail = next_tail.lerp(next_tail + push_local, smooth_factor);
           }
+        }
 
-          // Smooth projection: lerp toward surface instead of snapping.
-          // Spreading the correction across frames prevents the abrupt
-          // position change that causes visible bounce/jitter.
-          Vector3 push_local = center_inv.basis.xform(
-              skel_world.affine_inverse().basis.xform(env_push));
-          Vector3 target = next_tail + push_local;
-          const float smooth_factor = 0.07f;
-          next_tail = next_tail.lerp(target, smooth_factor);
-          next_tail = SpringBonePhysics::apply_length_constraint(
-              next_tail, origin, joint.length);
-          has_env_collision = true;
-          env_normal_local = push_local.normalized();
+        // 3. Length Constraint (Ensures bones don't stretch due to collision pushes)
+        next_tail = SpringBonePhysics::apply_length_constraint(
+            next_tail, origin, joint.length);
+
+        // Early exit if converged
+        if (next_tail.is_equal_approx(iter_start)) {
+          break;
         }
       }
 
       joint.prev_tail = joint.current_tail;
       joint.current_tail = next_tail;
 
-      // Tangent velocity projection + contact state tracking.
-      // Professional engines (PhysX/Havok) split velocity into normal
-      // (discard) and tangent (keep) to prevent bounce while allowing
-      // natural sliding along the surface.
-      if (has_env_collision) {
+      // --- KINEMATIC CONTACT RESOLUTION (Inelastic Velocity Projection) ---
+      // Determine the combined contact normal from all collision pushes
+      Vector3 total_push = next_tail - before_collision;
+      if (total_push.length_squared() > 1e-8f) {
+        Vector3 contact_normal = total_push.normalized();
+
+        // Tangent velocity projection: removes velocity moving INTO the surface
         Vector3 vel = joint.current_tail - joint.prev_tail;
-        float vn = vel.dot(env_normal_local);
+        float vn = vel.dot(contact_normal);
         if (vn < 0.0f) {
-          vel -= env_normal_local * vn;
-          joint.prev_tail = joint.current_tail - vel;
+          vel -= contact_normal * vn;
+          joint.prev_tail = joint.current_tail - vel; // Update verlet previous state
         }
-        // Store for next frame's Verlet clamp
+        
+        // Store for next frame's Verlet clamp (prevents stiffness from creating new velocity)
         joint.env_in_contact = true;
-        joint.env_contact_normal = env_normal_local;
+        joint.env_contact_normal = contact_normal;
       } else {
-        // No collision this frame — clear contact state
         joint.env_in_contact = false;
       }
 
