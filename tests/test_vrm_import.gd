@@ -327,7 +327,6 @@ func _find_skeleton(root: Node) -> Skeleton3D:
 		return children[0]
 	return null
 
-
 # ── End-bone cleanup (v0 path) ──────────────────────────────────────────────
 	test_completed = true
 

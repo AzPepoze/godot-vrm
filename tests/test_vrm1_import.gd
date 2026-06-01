@@ -90,7 +90,6 @@ func test_vrm1_scene_generated():
 	assert_not_null(_scene_root, "generate_scene must return a non-null root node")
 	test_completed = true
 
-
 # ── Skeleton ─────────────────────────────────────────────────────────────────
 	test_completed = true
 
@@ -107,7 +106,6 @@ func test_vrm1_scene_has_skeleton():
 		assert_ge(_skeleton.find_bone("Head"), 0, "Head bone must exist")
 	test_completed = true
 
-
 # ── Root node ────────────────────────────────────────────────────────────────
 	test_completed = true
 
@@ -118,7 +116,6 @@ func test_vrm1_scene_root_is_vrm_toplevel():
 		var meta = _scene_root.get("vrm_meta")
 		assert_not_null(meta, "Root node must have vrm_meta property set")
 	test_completed = true
-
 
 # ── Meta ─────────────────────────────────────────────────────────────────────
 	test_completed = true
@@ -135,7 +132,6 @@ func test_vrm1_meta_fields():
 	assert_ge(meta.authors.size(), 1, "Must have at least 1 author, got %d" % meta.authors.size())
 	assert_eq(meta.spec_version, "1.0", "spec_version must be '1.0', got '%s'" % meta.spec_version)
 	assert_not_null(meta.humanoid_bone_mapping, "humanoid_bone_mapping (BoneMap) must be set")
-
 
 # ── AnimationPlayer ──────────────────────────────────────────────────────────
 	test_completed = true
@@ -175,7 +171,6 @@ func test_vrm1_animation_preset_names():
 			% [str(expected_presets), str(found_presets)]
 		)
 	)
-
 
 # ── SpringBoneController / spring bones ─────────────────────────────────────────────────
 	test_completed = true
@@ -462,7 +457,6 @@ func test_vrm1_spring_collider_group_refs_resolve_to_spring_bone_controller_grou
 		"AvatarSample_M.vrm should import spring bones that reference collider groups"
 	)
 
-
 # ── Meshes & materials ═══════════════════════════════════════════════════════════
 	test_completed = true
 
@@ -490,7 +484,6 @@ func test_vrm1_meshes_have_materials():
 				assert_not_null(
 					mat, "Mesh '%s' surface %d must have a material" % [mesh_inst.name, surf_idx]
 				)
-
 
 # ── End bone cleanup ─────────────────────────────────────────────────────────
 	test_completed = true

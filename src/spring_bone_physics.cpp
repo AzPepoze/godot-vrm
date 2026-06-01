@@ -18,10 +18,20 @@ Vector3 step_verlet(const VerletState &state, const ForceParams &params,
 Vector3 apply_length_constraint(const Vector3 &tail, const Vector3 &origin,
                                 float length) {
   Vector3 diff = tail - origin;
-  if (diff.is_zero_approx()) {
+  float current_len = diff.length();
+
+  if (current_len <= 0.00001f) {
     return origin + Vector3(0, -length, 0);
   }
-  return origin + diff.normalized() * length;
+
+  // ALLOW COMPRESSION: Only enforce the constraint if the bone is stretching.
+  // If the bone is compressed (e.g., pushed up by the floor), let it be shorter.
+  // This breaks the Tug-of-War between collision push and length constraint.
+  if (current_len > length) {
+    return origin + (diff / current_len) * length;
+  }
+
+  return tail;
 }
 
 Quaternion compute_bone_rotation(const Vector3 &bone_axis,

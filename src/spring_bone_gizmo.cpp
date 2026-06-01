@@ -80,6 +80,7 @@ void draw_gizmo(
     const std::vector<VRMSpringBoneSimulation::CPPSpringBoneChain> &chains,
     const std::vector<VRMSpringBoneSimulation::CPPSpringBoneCollider>
         &colliders,
+    const std::vector<VRMSpringBoneSimulation::CPPCollisionImpact> &impacts,
     Color default_color, bool draw_spring_bones, bool draw_colliders,
     bool p_simulate_in_local_space, float hit_radius_multiplier,
     float body_collider_radius_multiplier) {
@@ -133,6 +134,30 @@ void draw_gizmo(
       } else {
         draw_wireframe_sphere(mesh, pos_gizmo, coll_radius, c.gizmo_color);
       }
+    }
+    mesh->surface_end();
+  }
+
+  // Draw Impact Debug
+  if (!impacts.empty()) {
+    mesh->surface_begin(Mesh::PRIMITIVE_LINES);
+    for (const auto &impact : impacts) {
+      float alpha = 1.0f - (impact.age / 1.0f); // 1-second fade
+      if (alpha <= 0) continue;
+      
+      Color impact_color = Color(1, 0, 0, alpha); // Red for impact
+      Vector3 pos_skel = skel_global_inv.xform(impact.position);
+      Vector3 pos_gizmo = skel_to_gizmo.xform(pos_skel);
+      Vector3 norm_gizmo = skel_to_gizmo.basis.xform(skel_global_inv.basis.xform(impact.normal));
+      
+      // Draw a cross at impact point
+      float size = 0.05f;
+      draw_line(mesh, pos_gizmo + Vector3(size, 0, 0), pos_gizmo - Vector3(size, 0, 0), impact_color);
+      draw_line(mesh, pos_gizmo + Vector3(0, size, 0), pos_gizmo - Vector3(0, size, 0), impact_color);
+      draw_line(mesh, pos_gizmo + Vector3(0, 0, size), pos_gizmo - Vector3(0, 0, size), impact_color);
+      
+      // Draw normal vector
+      draw_line(mesh, pos_gizmo, pos_gizmo + norm_gizmo * 0.2f, Color(1, 1, 0, alpha)); // Yellow normal
     }
     mesh->surface_end();
   }

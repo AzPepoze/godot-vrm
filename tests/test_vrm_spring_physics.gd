@@ -2,7 +2,6 @@ extends "res://tests/test_base.gd"
 
 const VRM_INSTANCE = preload("res://addons/vrm/core/vrm_instance.gd")
 
-
 static var _extensions_registered = false
 
 

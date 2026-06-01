@@ -22,7 +22,6 @@ func test_empty_comment_falls_back_to_bone():
 	assert_eq(result, "Skirt", "Empty comment should fall back to bone name parsing")
 	test_completed = true
 
-
 # --- VRM prefix stripping ---
 	test_completed = true
 
@@ -44,7 +43,6 @@ func test_s_j_prefix():
 	assert_eq(result, "Hair", "S_J_ prefix should be stripped")
 	test_completed = true
 
-
 # --- Side prefix stripping ---
 	test_completed = true
 
@@ -59,7 +57,6 @@ func test_right_side_prefix():
 	var result = VRMSpringBoneParser.detect_group("J_Sec_R_SkirtSide2_01", "")
 	assert_eq(result, "SkirtSide2", "R_ side prefix should be stripped")
 	test_completed = true
-
 
 # --- Trailing chain index stripping ---
 	test_completed = true
@@ -76,7 +73,6 @@ func test_higher_chain_index():
 	assert_eq(result, "Hair3", "Trailing _10 chain index should be stripped")
 	test_completed = true
 
-
 # --- _end marker ---
 	test_completed = true
 
@@ -85,7 +81,6 @@ func test_end_marker():
 	var result = VRMSpringBoneParser.detect_group("J_Sec_Hair3_01_end", "")
 	assert_eq(result, "Hair3", "Trailing _end marker should be stripped")
 	test_completed = true
-
 
 # --- Real-world bone names from AvatarSample_M ---
 	test_completed = true
@@ -125,7 +120,6 @@ func test_avatar_bust_right():
 	var result = VRMSpringBoneParser.detect_group("J_Sec_R_Bust2", "")
 	assert_eq(result, "Bust2", "AvatarSample_M right bust bone (no trailing index)")
 	test_completed = true
-
 
 # --- Edge cases ---
 	test_completed = true

@@ -38,6 +38,12 @@ public:
     Vector3 env_contact_normal;
   };
 
+  struct CPPCollisionImpact {
+    Vector3 position;
+    Vector3 normal;
+    float age = 0.0f;
+  };
+
   struct CPPSpringBoneCollider {
     int bone_idx = -1;
     Node3D *node = nullptr;
@@ -83,6 +89,7 @@ private:
   std::vector<CPPSpringBoneChain> chains;
   std::vector<CPPSpringBoneCollider> all_colliders;
   std::vector<CPPSpringBoneColliderGroup> all_collider_groups;
+  std::vector<CPPCollisionImpact> recent_impacts;
   bool is_setup = false;
   bool need_reset = true;
 
@@ -102,6 +109,8 @@ private:
   float wind_turbulence = 0.0f;
   float wind_frequency = 1.0f;
   float wind_time = 0.0f;
+
+  bool debug_collision = false;
 
   // Environment Collision Global switches/options
   bool environment_collision_enabled = false;
@@ -128,9 +137,8 @@ public:
   int get_chain_count() const;
   int get_joint_count(int p_chain_idx) const;
   Vector3 get_joint_current_tail(int p_chain_idx, int p_joint_idx) const;
-
-  void draw_gizmo(Object *p_mesh_obj, Transform3D p_skel_to_gizmo,
-                  Color p_color, bool p_draw_spring_bones,
+  Vector3 get_joint_prev_tail(int p_chain_idx, int p_joint_idx) const;
+  void draw_gizmo(Object *p_mesh_obj, Transform3D p_skel_to_gizmo, Color p_color, bool p_draw_spring_bones,
                   bool p_draw_colliders);
 
   // Getters/Setters for Multipliers
@@ -186,6 +194,9 @@ public:
   void set_environment_collision_bounce_damping(float p_damping);
   float get_environment_collision_bounce_damping() const;
 
+  void set_debug_collision(bool p_enabled) { debug_collision = p_enabled; }
+  bool is_debug_collision_enabled() const { return debug_collision; }
+
 private:
   void _update_colliders(Skeleton3D *skel);
   void _reset_chains(Skeleton3D *skel, const Transform3D &skel_global_inv);
@@ -194,7 +205,8 @@ private:
   void _query_game_object_collisions(Skeleton3D *skel,
                                      const Vector3 &origin_world,
                                      const Vector3 &tail_world, float radius,
-                                     uint32_t mask, Vector3 &out_push);
+                                     uint32_t mask, Vector3 &out_push,
+                                     float &out_t);
 };
 
 } // namespace godot

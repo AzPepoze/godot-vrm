@@ -8,6 +8,7 @@ var current_error_message = ""
 
 const VRMLogger = preload("res://addons/vrm/core/logger.gd")
 
+
 func _init():
 	print("=========================================")
 	print("Running Godot-VRM Test Suite")
@@ -81,7 +82,9 @@ func run_test_file(path: String):
 			await test_obj.call(name)
 
 			if VRMLogger.error_happened and not current_failed:
-				var allow_errors = test_obj.get("allow_errors") if "allow_errors" in test_obj else false
+				var allow_errors = (
+					test_obj.get("allow_errors") if "allow_errors" in test_obj else false
+				)
 				if not allow_errors:
 					fail_test(name, "VRMLogger recorded an error or warning during test.")
 

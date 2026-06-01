@@ -88,6 +88,11 @@ signal settings_changed
 		environment_collision_enabled = value
 		settings_changed.emit()
 
+@export var environment_collision_debug: bool = false:
+	set(value):
+		environment_collision_debug = value
+		settings_changed.emit()
+
 @export var environment_collision_mask: int = 1:
 	set(value):
 		environment_collision_mask = value

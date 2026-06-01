@@ -7,6 +7,7 @@
 
 #include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/core/class_db.hpp>
+#include <godot_cpp/variant/utility_functions.hpp>
 
 namespace godot {
 
@@ -140,9 +141,10 @@ void VRMSpringBoneSimulation::_bind_methods() {
                        &VRMSpringBoneSimulation::get_chain_count);
   ClassDB::bind_method(D_METHOD("get_joint_count", "chain_idx"),
                        &VRMSpringBoneSimulation::get_joint_count);
-  ClassDB::bind_method(
-      D_METHOD("get_joint_current_tail", "chain_idx", "joint_idx"),
-      &VRMSpringBoneSimulation::get_joint_current_tail);
+  ClassDB::bind_method(D_METHOD("get_joint_current_tail", "chain_idx", "joint_idx"),
+                       &VRMSpringBoneSimulation::get_joint_current_tail);
+  ClassDB::bind_method(D_METHOD("get_joint_prev_tail", "chain_idx", "joint_idx"),
+                       &VRMSpringBoneSimulation::get_joint_prev_tail);
   ClassDB::bind_method(D_METHOD("draw_gizmo", "mesh", "skel_to_gizmo", "color",
                                 "draw_spring_bones", "draw_colliders"),
                        &VRMSpringBoneSimulation::draw_gizmo);
@@ -185,6 +187,11 @@ void VRMSpringBoneSimulation::_bind_methods() {
       D_METHOD("get_environment_collision_bounce_damping"),
       &VRMSpringBoneSimulation::get_environment_collision_bounce_damping);
 
+  ClassDB::bind_method(D_METHOD("set_debug_collision", "enabled"),
+                       &VRMSpringBoneSimulation::set_debug_collision);
+  ClassDB::bind_method(D_METHOD("is_debug_collision_enabled"),
+                       &VRMSpringBoneSimulation::is_debug_collision_enabled);
+
   ADD_GROUP("Wind Settings", "wind_");
   ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "wind_direction"),
                "set_wind_direction", "get_wind_direction");
@@ -207,6 +214,9 @@ void VRMSpringBoneSimulation::_bind_methods() {
                             PROPERTY_HINT_RANGE, "0.0,10.0,0.1"),
                "set_environment_collision_bounce_damping",
                "get_environment_collision_bounce_damping");
+
+  ADD_PROPERTY(PropertyInfo(Variant::BOOL, "debug_collision"),
+               "set_debug_collision", "is_debug_collision_enabled");
 }
 
 VRMSpringBoneSimulation::VRMSpringBoneSimulation() {}
@@ -322,6 +332,16 @@ void VRMSpringBoneSimulation::_reset_chains(
 
 void VRMSpringBoneSimulation::_simulate_chains(
     Skeleton3D *skel, const Transform3D &skel_global_inv, float delta) {
+  // Age recent impacts and remove old ones
+  for (auto it = recent_impacts.begin(); it != recent_impacts.end();) {
+    it->age += delta;
+    if (it->age > 1.0f) {
+      it = recent_impacts.erase(it);
+    } else {
+      ++it;
+    }
+  }
+
   for (auto &chain : chains) {
     Transform3D center = get_center_transform(chain, skel, skel_global_inv,
                                               simulate_in_local_space);
@@ -403,75 +423,154 @@ void VRMSpringBoneSimulation::_simulate_chains(
         }
       }
 
-      // --- COLLISION SOLVE (Iterative Relaxation) ---
+      // --- COLLISION SOLVE ---
       Vector3 before_collision = next_tail;
-      static const int MAX_ITERS = 4;
-      for (int iter = 0; iter < MAX_ITERS; ++iter) {
-        Vector3 iter_start = next_tail;
 
-        // 1. VRM Colliders (Spheres and Capsules attached to the body)
-        if (enable_body_collisions) {
-          next_tail = SpringBoneCollision::resolve_all_colliders(
-              next_tail, origin, radius, joint.length, collider_views);
-        }
+      // 1. VRM Colliders (Spheres and Capsules attached to the body)
+      if (enable_body_collisions) {
+        next_tail = SpringBoneCollision::resolve_all_colliders(
+            next_tail, origin, radius, joint.length, collider_views);
+      }
 
-        // 2. Environment Colliders (External physics objects)
-        if (environment_collision_enabled &&
-            chain.enable_environment_collision) {
-          Transform3D skel_world = skel->get_global_transform();
-          Vector3 origin_world = skel_world.xform(center.xform(origin));
-          Vector3 tail_world = skel_world.xform(center.xform(next_tail));
+      // 2. Environment Colliders (External physics objects)
+      if (environment_collision_enabled && chain.enable_environment_collision) {
+        Transform3D skel_world = skel->get_global_transform();
+        Vector3 origin_world = skel_world.xform(center.xform(origin));
+        Vector3 tail_world = skel_world.xform(center.xform(next_tail));
 
-          Vector3 env_push;
-          _query_game_object_collisions(skel, origin_world, tail_world, radius,
-                                        chain.environment_collision_mask,
-                                        env_push);
-          if (!env_push.is_zero_approx()) {
-            Vector3 push_local = center_inv.basis.xform(
-                skel_world.affine_inverse().basis.xform(env_push));
+        Vector3 env_push;
+        float contact_t = 1.0f;
+        _query_game_object_collisions(skel, origin_world, tail_world, radius,
+                                      chain.environment_collision_mask,
+                                      env_push, contact_t);
 
-            // Smooth projection: converge smoothly within the iteration loop
-            const float smooth_factor = 0.5f;
-            next_tail = next_tail.lerp(next_tail + push_local, smooth_factor);
+        if (!env_push.is_zero_approx()) {
+          // ANGULAR RESOLUTION: Rotate the bone to clear the collision
+          Vector3 impact_point_world = origin_world.lerp(tail_world, contact_t);
+          Vector3 target_point_world = impact_point_world + env_push;
+          
+          Vector3 v_impact = impact_point_world - origin_world;
+          Vector3 v_target = target_point_world - origin_world;
+          
+            if (v_impact.length_squared() > 1e-8f && v_target.length_squared() > 1e-8f) {
+              Quaternion rot = Quaternion(v_impact.normalized(), v_target.normalized());
+              
+              // Record impact for debug
+              if (debug_collision) {
+                  CPPCollisionImpact impact;
+                  impact.position = impact_point_world;
+                  impact.normal = env_push.normalized();
+                  impact.age = 0.0f;
+                  recent_impacts.push_back(impact);
+                  if (recent_impacts.size() > 50) recent_impacts.erase(recent_impacts.begin());
+              }
+
+              // Transform rotation to local simulation space
+            Basis local_rot = center_inv.basis * skel_world.affine_inverse().basis * Basis(rot) * skel_world.basis * center.basis;
+            
+            Vector3 bone_vec = next_tail - origin;
+            next_tail = origin + local_rot.xform(bone_vec);
+            
+            // Apply rotation to prev_tail as well to maintain relative velocity
+            Vector3 prev_bone_vec = joint.prev_tail - origin;
+            joint.prev_tail = origin + local_rot.xform(prev_bone_vec);
+
+            if (debug_collision) {
+              UtilityFunctions::print("[VRM][DEBUG] Angular Resolution - T: ", contact_t, " Rot: ", rot);
+            }
           }
-        }
-
-        // 3. Length Constraint (Ensures bones don't stretch due to collision
-        // pushes)
-        next_tail = SpringBonePhysics::apply_length_constraint(
-            next_tail, origin, joint.length);
-
-        // Early exit if converged
-        if (next_tail.is_equal_approx(iter_start)) {
-          break;
         }
       }
 
+      // 3. Length Constraint (Final pass to keep skeleton intact)
+      next_tail = SpringBonePhysics::apply_length_constraint(next_tail, origin,
+                                                             joint.length);
+
+      // --- STATE UPDATE (Standard Verlet) ---
       joint.prev_tail = joint.current_tail;
       joint.current_tail = next_tail;
 
-      // --- KINEMATIC CONTACT RESOLUTION (Inelastic Velocity Projection) ---
-      // Determine the combined contact normal from all collision pushes
-      Vector3 total_push = next_tail - before_collision;
-      if (total_push.length_squared() > 1e-8f) {
-        Vector3 contact_normal = total_push.normalized();
+      // --- COLLISION RESOLUTION (ANGULAR ITERATIVE) ---
+      for (int iter = 0; iter < 4; ++iter) {
+        bool collision_happened = false;
+        Vector3 contact_normal;
 
-        // Tangent velocity projection: removes velocity moving INTO the surface
-        Vector3 vel = joint.current_tail - joint.prev_tail;
-        float vn = vel.dot(contact_normal);
-        if (vn < 0.0f) {
-          vel -= contact_normal * vn;
-          joint.prev_tail =
-              joint.current_tail - vel; // Update verlet previous state
+        if (environment_collision_enabled && chain.enable_environment_collision) {
+          Transform3D skel_world = skel->get_global_transform();
+          Vector3 origin_world = skel_world.xform(center.xform(origin));
+          Vector3 tail_world = skel_world.xform(center.xform(joint.current_tail));
+
+          Vector3 env_push;
+          float contact_t = 1.0f;
+          _query_game_object_collisions(skel, origin_world, tail_world, radius,
+                                        chain.environment_collision_mask,
+                                        env_push, contact_t);
+
+          if (!env_push.is_zero_approx()) {
+            collision_happened = true;
+            contact_normal = env_push.normalized();
+
+            Vector3 impact_point_world = origin_world.lerp(tail_world, contact_t);
+            Vector3 target_point_world = impact_point_world + env_push;
+            Vector3 v_impact = impact_point_world - origin_world;
+            Vector3 v_target = target_point_world - origin_world;
+
+            if (v_impact.length_squared() > 1e-8f && v_target.length_squared() > 1e-8f) {
+              Quaternion rot = Quaternion(v_impact.normalized(), v_target.normalized());
+              Basis local_rot = center_inv.basis * skel_world.affine_inverse().basis * Basis(rot) * skel_world.basis * center.basis;
+
+              // Rotate both current and prev to cancel artificial velocity
+              joint.current_tail = origin + local_rot.xform(joint.current_tail - origin);
+              joint.prev_tail = origin + local_rot.xform(joint.prev_tail - origin);
+
+              if (debug_collision && iter == 0) {
+                  CPPCollisionImpact impact;
+                  impact.position = impact_point_world;
+                  impact.normal = contact_normal;
+                  impact.age = 0.0f;
+                  recent_impacts.push_back(impact);
+                  if (recent_impacts.size() > 50) recent_impacts.erase(recent_impacts.begin());
+              }
+            }
+          }
         }
 
-        // Store for next frame's Verlet clamp (prevents stiffness from creating
-        // new velocity)
-        joint.env_in_contact = true;
-        joint.env_contact_normal = contact_normal;
-      } else {
-        joint.env_in_contact = false;
+        // --- KINEMATIC CONTACT RESOLUTION ---
+        if (collision_happened) {
+          Vector3 vel = joint.current_tail - joint.prev_tail;
+          float vn = vel.dot(contact_normal);
+          if (vn < 0.0f) {
+              vel -= contact_normal * vn;
+              vel *= 0.95f; 
+              joint.prev_tail = joint.current_tail - vel;
+          }
+          joint.env_in_contact = true;
+          joint.env_contact_normal = contact_normal;
+        } else {
+          if (joint.env_in_contact && iter == 0) {
+              Vector3 vel = joint.current_tail - joint.prev_tail;
+              vel *= 0.2f; 
+              joint.prev_tail = joint.current_tail - vel;
+          }
+          joint.env_in_contact = false;
+          break; // Exit early if no collision in this pass
+        }
       }
+
+      // Final length guard and expansion damping
+      joint.current_tail = SpringBonePhysics::apply_length_constraint(joint.current_tail, origin, joint.length);
+      Vector3 bone_vec = joint.current_tail - origin;
+      float current_len = bone_vec.length();
+      if (current_len < joint.length) {
+        Vector3 cur_vel = joint.current_tail - joint.prev_tail;
+        Vector3 bone_dir = bone_vec / (current_len + 1e-8f);
+        float v_expansion = cur_vel.dot(bone_dir);
+        if (v_expansion > 0.0f) {
+          cur_vel -= bone_dir * v_expansion * 0.5f;
+          joint.prev_tail = joint.current_tail - cur_vel;
+        }
+      }
+      next_tail = joint.current_tail;
 
       // Apply rotation to skeleton
       Transform3D tf = joint.global_pose;
@@ -534,6 +633,16 @@ Vector3 VRMSpringBoneSimulation::get_joint_current_tail(int p_chain_idx,
   return chain.joints[p_joint_idx].current_tail;
 }
 
+Vector3 VRMSpringBoneSimulation::get_joint_prev_tail(int p_chain_idx,
+                                                     int p_joint_idx) const {
+  if (p_chain_idx < 0 || p_chain_idx >= (int)chains.size())
+    return Vector3();
+  const auto &chain = chains[p_chain_idx];
+  if (p_joint_idx < 0 || p_joint_idx >= (int)chain.joints.size())
+    return Vector3();
+  return chain.joints[p_joint_idx].prev_tail;
+}
+
 void VRMSpringBoneSimulation::draw_gizmo(Object *p_mesh_obj,
                                          Transform3D p_skel_to_gizmo,
                                          Color p_color,
@@ -542,7 +651,7 @@ void VRMSpringBoneSimulation::draw_gizmo(Object *p_mesh_obj,
   ImmediateMesh *mesh = Object::cast_to<ImmediateMesh>(p_mesh_obj);
   Skeleton3D *skel = get_skeleton();
   SpringBoneGizmo::draw_gizmo(
-      mesh, skel, p_skel_to_gizmo, chains, all_colliders, p_color,
+      mesh, skel, p_skel_to_gizmo, chains, all_colliders, recent_impacts, p_color,
       p_draw_spring_bones, p_draw_colliders, simulate_in_local_space,
       hit_radius_multiplier, body_collider_radius_multiplier);
 }

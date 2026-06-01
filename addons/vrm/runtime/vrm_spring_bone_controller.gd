@@ -30,6 +30,7 @@ const SpringBoneGizmo = preload("./vrm_spring_bone_controller_gizmo.gd")
 				_settings.environment_collision_enabled,
 				_settings.environment_collision_mask,
 				_settings.environment_collision_bounce_damping,
+				_settings.environment_collision_debug,
 				_settings.springbone_stiffness_multiplier,
 				_settings.springbone_drag_multiplier,
 				(
@@ -64,6 +65,7 @@ const SpringBoneGizmo = preload("./vrm_spring_bone_controller_gizmo.gd")
 				_settings.environment_collision_enabled,
 				_settings.environment_collision_mask,
 				_settings.environment_collision_bounce_damping,
+				_settings.environment_collision_debug,
 				_settings.springbone_stiffness_multiplier,
 				_settings.springbone_drag_multiplier,
 				(
@@ -275,6 +277,7 @@ func update_parameters() -> void:
 			_settings.environment_collision_enabled,
 			_settings.environment_collision_mask,
 			_settings.environment_collision_bounce_damping,
+			_settings.environment_collision_debug,
 			_settings.springbone_stiffness_multiplier,
 			_settings.springbone_drag_multiplier,
 			(

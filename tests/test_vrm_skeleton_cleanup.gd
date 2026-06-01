@@ -20,7 +20,6 @@ func test_cleanup_empty_skeleton():
 	await runner.process_frame
 	test_completed = true
 
-
 # ── remove_end_bone_nodes: basic removal ─────────────────────────────────────
 	test_completed = true
 
@@ -45,7 +44,6 @@ func test_cleanup_removes_bare_node3d_matching_bone():
 	await runner.process_frame
 	test_completed = true
 
-
 # ── remove_end_bone_nodes: keeps non-bone-named Node3D ───────────────────────
 	test_completed = true
 
@@ -66,7 +64,6 @@ func test_cleanup_keeps_non_bone_node3d():
 	await runner.process_frame
 	test_completed = true
 
-
 # ── remove_end_bone_nodes: keeps MeshInstance3D children ─────────────────────
 	test_completed = true
 
@@ -85,7 +82,6 @@ func test_cleanup_keeps_mesh_instance():
 	skel.queue_free()
 	await runner.process_frame
 	test_completed = true
-
 
 # ── remove_end_bone_nodes: keeps nodes with meaningful descendants ───────────
 	test_completed = true
@@ -174,7 +170,6 @@ func test_cleanup_keeps_nested_meaningful_descendant():
 	await runner.process_frame
 	test_completed = true
 
-
 # ── remove_end_bone_nodes: BoneAttachment3D handling ─────────────────────────
 	test_completed = true
 
@@ -193,7 +188,6 @@ func test_cleanup_removes_bare_bone_attachment():
 	skel.queue_free()
 	await runner.process_frame
 	test_completed = true
-
 
 # ── remove_end_bone_nodes: scripted nodes are kept ───────────────────────────
 	test_completed = true
@@ -214,7 +208,6 @@ func test_cleanup_keeps_scripted_node():
 	skel.queue_free()
 	await runner.process_frame
 	test_completed = true
-
 
 # ── remove_end_bone_nodes: mixed cleanup ─────────────────────────────────────
 	test_completed = true
@@ -286,7 +279,6 @@ func test_cleanup_mixed_scenario():
 	skel.queue_free()
 	await runner.process_frame
 	test_completed = true
-
 
 # ── _has_meaningful_descendant: direct tests ─────────────────────────────────
 	test_completed = true
