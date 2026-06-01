@@ -67,3 +67,4 @@ func test_vrm_spring_collision_with_translated_skeleton():
 		0.1,
 		"Bone collider collision should work when the skeleton is not at the world origin"
 	)
+	test_completed = true

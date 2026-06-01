@@ -18,3 +18,4 @@ func test_collision_props():
 	assert_true(props.has("height"), "Capsule should have height")
 	assert_true(props.has("bone_name"), "Capsule should have bone_name")
 	assert_true(props.has("position_offset"), "Capsule should have position_offset")
+	test_completed = true

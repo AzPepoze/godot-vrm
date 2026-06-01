@@ -42,6 +42,7 @@ func test_vrm_spring_force_displacement():
 	var spring_bone_controller = scene_root.get_node_or_null("VRMSpringBoneController")
 	assert_not_null(spring_bone_controller, "SpringBoneController node should exist")
 	if spring_bone_controller == null:
+		test_completed = true
 		return
 
 	var skeleton: Skeleton3D = spring_bone_controller.skel
@@ -54,6 +55,7 @@ func test_vrm_spring_force_displacement():
 
 	assert_not_null(skeleton, "Skeleton should be found")
 	if skeleton == null:
+		test_completed = true
 		return
 	skeleton.modifier_callback_mode_process = Skeleton3D.MODIFIER_CALLBACK_MODE_PROCESS_MANUAL
 
@@ -67,6 +69,7 @@ func test_vrm_spring_force_displacement():
 	var simulation = skeleton.get_node_or_null("VRMSpringBoneSimulation")
 	assert_not_null(simulation, "Spring bone simulation should be attached to the skeleton")
 	if simulation == null:
+		test_completed = true
 		return
 
 	var bone_name = "J_Sec_Hair1_01"
@@ -76,6 +79,7 @@ func test_vrm_spring_force_displacement():
 
 	assert_gt(bone_idx, -1, "Should find a spring bone")
 	if bone_idx == -1:
+		test_completed = true
 		return
 
 	# Get baseline
@@ -101,3 +105,4 @@ func test_vrm_spring_force_displacement():
 		await runner.process_frame
 
 	scene_root.free()
+	test_completed = true

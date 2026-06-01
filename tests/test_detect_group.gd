@@ -132,3 +132,4 @@ func test_trailing_number_after_prefix():
 func test_trailing_number_no_prefix():
 	var result = VRMSpringBoneParser.detect_group("_01", "")
 	assert_eq(result, "Other", "Bone name that becomes purely numeric should return 'Other'")
+	test_completed = true

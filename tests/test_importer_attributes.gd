@@ -46,3 +46,4 @@ func test_attributes_signal_connected():
 		attrs.replacing_by.is_connected(attrs._on_replacing_by),
 		"_on_replacing_by should be connected to replacing_by signal"
 	)
+	test_completed = true

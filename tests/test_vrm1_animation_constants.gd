@@ -82,3 +82,4 @@ func test_look_at_presets_subset_of_all_presets():
 	# Every key in vrm_animation_to_look_at must also be a key in vrm_animation_presets
 	for key in look_at.keys():
 		assert_true(presets.has(key), "look_at key '%s' must exist in vrm_animation_presets" % key)
+	test_completed = true

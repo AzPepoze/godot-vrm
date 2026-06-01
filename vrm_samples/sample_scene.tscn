@@ -154,14 +154,10 @@ collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_bx8sr")])
 
 [sub_resource type="Resource" id="Resource_1hec4"]
 script = ExtResource("7_1hec4")
-disable_spring_bone_collisions = null
-disable_body_collisions = null
-body_collision_radius_multiplier = null
 wind_direction = Vector3(0, 1.15, 1.94)
 wind_strength = 1.37
 wind_frequency = 2.595
 gizmo_spring_bone = true
-gizmo_show_body_collisions = null
 update_in_editor = true
 
 [sub_resource type="Resource" id="Resource_2q1eb"]
@@ -1260,11 +1256,7 @@ center_bone = "Root"
 
 [sub_resource type="Resource" id="Resource_f77ra"]
 script = ExtResource("7_1hec4")
-disable_spring_bone_collisions = null
-disable_body_collisions = null
-body_collision_radius_multiplier = null
 gizmo_spring_bone = true
-gizmo_show_body_collisions = null
 gizmo_show_wind = true
 update_in_editor = true
 
@@ -1998,13 +1990,9 @@ center_bone = "Root"
 
 [sub_resource type="Resource" id="Resource_jv7sj"]
 script = ExtResource("7_1hec4")
-disable_spring_bone_collisions = null
-disable_body_collisions = null
-body_collision_radius_multiplier = null
 environment_collision_enabled = true
 environment_collision_bounce_damping = 10.0
 gizmo_spring_bone = true
-gizmo_show_body_collisions = null
 gizmo_show_wind = true
 update_in_editor = true
 

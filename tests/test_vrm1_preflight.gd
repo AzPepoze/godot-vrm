@@ -97,3 +97,4 @@ func test_vrmc_hdr_emissive_preflight_ok_when_extension_present():
 		OK,
 		"HDR emissive preflight MUST return OK when VRMC_materials_hdr_emissiveMultiplier present"
 	)
+	test_completed = true

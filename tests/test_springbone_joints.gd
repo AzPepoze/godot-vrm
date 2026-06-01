@@ -36,3 +36,4 @@ func test_springbone_joints():
 	assert_eq(sim.get_joint_bone_name(0, 3), "End", "Joint 3 is End")
 
 	skel.queue_free()
+	test_completed = true

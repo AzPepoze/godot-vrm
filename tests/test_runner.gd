@@ -70,12 +70,20 @@ func run_test_file(path: String):
 			current_failed = false
 			current_error_message = ""
 			test_obj.current_test_name = name
+			test_obj.test_completed = false
 
 			# Run optional setup
 			if test_obj.has_method("before_each"):
 				await test_obj.before_each()
 
 			await test_obj.call(name)
+			test_obj.test_completed = true
+
+			if not test_obj.test_completed and not current_failed:
+				fail_test(
+					name,
+					"Godot script error occurred during test (test did not complete). See logs above."
+				)
 
 			# Run optional teardown
 			if test_obj.has_method("after_each"):

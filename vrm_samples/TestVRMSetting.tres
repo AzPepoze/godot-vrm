@@ -4,16 +4,13 @@
 
 [resource]
 script = ExtResource("1_3aimx")
-disable_spring_bone_collisions = null
-disable_body_collisions = null
-body_collision_radius_multiplier = null
 wind_direction = Vector3(0, 0.065, 0.275)
 wind_strength = 0.77
 wind_turbulence = 0.565
 wind_frequency = 3.43
 environment_collision_enabled = true
 gizmo_spring_bone = true
-gizmo_show_body_collisions = null
+gizmo_show_body_collisions = true
 gizmo_show_wind = true
 update_in_editor = true
 override_springbone_center = true

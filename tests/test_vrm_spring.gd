@@ -17,3 +17,4 @@ func test_vrm_spring_exclude_collision():
 		2,
 		"After method call, exclude count should update to 2"
 	)
+	test_completed = true

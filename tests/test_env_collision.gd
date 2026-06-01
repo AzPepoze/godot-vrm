@@ -8,6 +8,7 @@ const ColliderRes = preload("res://addons/vrm/runtime/vrm_collider.gd")
 func test_env_collision_pushes_tail_out_of_box():
 	if not ClassDB.class_exists("VRMSpringBoneSimulation"):
 		print("[SKIP] VRMSpringBoneSimulation not found")
+		test_completed = true
 		return
 
 	# Create a skeleton with a simple 2-bone chain
@@ -95,6 +96,7 @@ func test_env_collision_pushes_tail_out_of_box():
 func test_env_collision_tail_settles_without_bounce():
 	if not ClassDB.class_exists("VRMSpringBoneSimulation"):
 		print("[SKIP] VRMSpringBoneSimulation not found")
+		test_completed = true
 		return
 
 	# Same skeleton setup as above
@@ -179,3 +181,4 @@ func test_env_collision_tail_settles_without_bounce():
 	skeleton.queue_free()
 	runner.root.remove_child(box)
 	box.queue_free()
+	test_completed = true

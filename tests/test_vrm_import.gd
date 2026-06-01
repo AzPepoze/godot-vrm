@@ -14,6 +14,7 @@ func test_load_alicia_v0_skeleton():
 
 	if err != OK:
 		GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+		test_completed = true
 		return
 
 	var scene_root := gltf.generate_scene(state)
@@ -66,6 +67,7 @@ func test_v0_alicia_secondary_to_springbone_clean_rename():
 	assert_eq(err, OK, "append_from_file should succeed")
 	if err != OK:
 		GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+		test_completed = true
 		return
 
 	var scene_root := gltf.generate_scene(state)
@@ -111,6 +113,7 @@ func test_v0_alicia_secondary_to_springbone_clean_rename():
 		scene_root.queue_free()
 		await runner.wait_frame
 		GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+		test_completed = true
 		return
 
 	var spring_bone_controller: Node = controllers[0]
@@ -191,6 +194,7 @@ func test_load_alicia_spring_bones():
 	assert_eq(err, OK, "append_from_file should succeed")
 	if err != OK:
 		GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+		test_completed = true
 		return
 
 	var scene_root := gltf.generate_scene(state)
@@ -233,6 +237,7 @@ func test_load_alicia_collider_groups():
 	assert_eq(err, OK, "append_from_file should succeed")
 	if err != OK:
 		GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+		test_completed = true
 		return
 
 	var scene_root := gltf.generate_scene(state)
@@ -295,6 +300,7 @@ func test_load_godette_small_file():
 	assert_eq(err, OK, "append_from_file for Godette should succeed")
 	if err != OK:
 		GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+		test_completed = true
 		return
 
 	var scene_root := gltf.generate_scene(state)
@@ -307,6 +313,8 @@ func test_load_godette_small_file():
 	scene_root.queue_free()
 	await runner.wait_frame
 	GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+
+	test_completed = true
 
 
 func _find_skeleton(root: Node) -> Skeleton3D:
@@ -329,6 +337,7 @@ func test_v0_alicia_end_bones_removed():
 	assert_eq(err, OK, "append_from_file should succeed")
 	if err != OK:
 		GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+		test_completed = true
 		return
 
 	var scene_root := gltf.generate_scene(state)
@@ -373,6 +382,7 @@ func test_v0_godette_end_bones_removed():
 	assert_eq(err, OK, "append_from_file for Godette should succeed")
 	if err != OK:
 		GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+		test_completed = true
 		return
 
 	var scene_root := gltf.generate_scene(state)
@@ -403,3 +413,4 @@ func test_v0_godette_end_bones_removed():
 	scene_root.queue_free()
 	await runner.wait_frame
 	GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+	test_completed = true

@@ -38,3 +38,4 @@ func test_collision_setup():
 	assert_eq(pose_origin, Vector3(0, -1.0, 0), "Bone pose should be at rest pose initially")
 
 	skel.queue_free()
+	test_completed = true

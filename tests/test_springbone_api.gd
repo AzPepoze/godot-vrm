@@ -10,3 +10,4 @@ func test_springbone_api_methods():
 	assert_true(names.has("get_setting_count"), "API should contain get_setting_count")
 	assert_true(names.has("set_root_bone_name"), "API should contain set_root_bone_name")
 	assert_true(names.has("set_end_bone_name"), "API should contain set_end_bone_name")
+	test_completed = true

@@ -39,3 +39,4 @@ func test_logger_refresh_level():
 	VRMLogger.refresh_level()
 	# Should not crash
 	assert_true(true, "refresh_level should not crash")
+	test_completed = true

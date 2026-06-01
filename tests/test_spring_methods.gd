@@ -47,3 +47,4 @@ func test_spring_methods():
 	# assert_eq(sim.get_joint_bone_name(0, 1), "", "Case 3: Joint 1 should be virtual extension")
 
 	skel.queue_free()
+	test_completed = true

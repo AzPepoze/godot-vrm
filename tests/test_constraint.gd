@@ -7,3 +7,4 @@ func test_constraint_classes():
 		classes.has("VRMConstraintSimulator"),
 		"VRMConstraintSimulator GDExtension class should be compiled and registered"
 	)
+	test_completed = true

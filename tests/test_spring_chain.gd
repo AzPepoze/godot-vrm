@@ -59,3 +59,4 @@ func test_spring_bone_service_chain_building():
 	assert_eq(chains[0][1], "Child", "Second entry should be Child")
 	assert_eq(chains[0][2], "Grandchild", "Third entry should be Grandchild")
 	assert_eq(chains[0][3], "", "Last entry should be empty terminator")
+	test_completed = true

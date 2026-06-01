@@ -158,3 +158,4 @@ func test_vrm1_collider_multiple_groups():
 	# Verify collider 0 is sphere, collider 2 is capsule
 	assert_true(colliders[0]["shape"].has("sphere"), "Collider 0 should be sphere")
 	assert_true(colliders[2]["shape"].has("capsule"), "Collider 2 should be capsule")
+	test_completed = true

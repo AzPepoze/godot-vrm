@@ -26,10 +26,12 @@ func _find_avatar_sample(scene: Node) -> Node:
 func test_avatar_sample_scene_spring_overrides_keep_collider_refs():
 	var scene := await _instantiate_sample_scene()
 	if scene == null:
+		test_completed = true
 		return
 	var avatar := _find_avatar_sample(scene)
 	if avatar == null:
 		scene.queue_free()
+		test_completed = true
 		return
 
 	var collider_groups: Array = avatar.get("collider_groups")
@@ -67,20 +69,24 @@ func test_avatar_sample_scene_spring_overrides_keep_collider_refs():
 func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():
 	if not ClassDB.class_exists("VRMSpringBoneSimulation"):
 		print("[SKIP] VRMSpringBoneSimulation not found")
+		test_completed = true
 		return
 
 	var scene := await _instantiate_sample_scene()
 	if scene == null:
+		test_completed = true
 		return
 	var avatar := _find_avatar_sample(scene)
 	if avatar == null:
 		scene.queue_free()
+		test_completed = true
 		return
 
 	var skeleton: Skeleton3D = avatar.find_child("GeneralSkeleton", true, false)
 	assert_not_null(skeleton, "AvatarSample_M should contain GeneralSkeleton")
 	if skeleton == null:
 		scene.queue_free()
+		test_completed = true
 		return
 
 	var hair_spring: VRMSpringBone = null
@@ -91,6 +97,7 @@ func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():
 	assert_not_null(hair_spring, "AvatarSample_M should have a hair spring")
 	if hair_spring == null:
 		scene.queue_free()
+		test_completed = true
 		return
 
 	var root_bone := str(hair_spring.joint_nodes[0])
@@ -98,6 +105,7 @@ func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():
 	assert_gt(root_bone_idx, -1, "Hair spring root bone should exist in skeleton")
 	if root_bone_idx == -1:
 		scene.queue_free()
+		test_completed = true
 		return
 
 	# Verify the simulation can be set up and run without errors
@@ -122,3 +130,4 @@ func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():
 	)
 	assert_gt(simulation.get_joint_count(0), 0, "First chain should have joints")
 	scene.queue_free()
+	test_completed = true

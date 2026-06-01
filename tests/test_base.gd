@@ -2,6 +2,7 @@ extends RefCounted
 
 var runner = null
 var current_test_name: String = ""
+var test_completed: bool = false
 
 
 func assert_eq(got, expected, msg: String = ""):

@@ -335,3 +335,4 @@ func test_has_meaningful_descendant_deeply_nested_mesh():
 	l1.add_child(l2)
 	assert_true(Cleanup._has_meaningful_descendant(l1), "Deeply nested MeshInstance3D → true")
 	l1.queue_free()
+	test_completed = true

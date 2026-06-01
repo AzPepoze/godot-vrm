@@ -121,6 +121,7 @@ func test_vrm1_meta_fields():
 	var meta = _scene_root.get("vrm_meta")
 	assert_not_null(meta, "vrm_meta must be set on root")
 	if not meta:
+		test_completed = true
 		return
 	assert_true(meta.title is String, "title must be a String")
 	assert_false(meta.title.is_empty(), "title must be non-empty")
@@ -141,12 +142,14 @@ func test_vrm1_animation_player_exists():
 
 func test_vrm1_animation_has_reset():
 	if not _anim_player:
+		test_completed = true
 		return
 	assert_true(_anim_player.has_animation(&"RESET"), "AnimationPlayer must have RESET animation")
 
 
 func test_vrm1_animation_preset_names():
 	if not _anim_player:
+		test_completed = true
 		return
 	var anim_list: PackedStringArray = _anim_player.get_animation_list()
 	# At least one expression preset must be present
@@ -173,6 +176,7 @@ func test_vrm1_spring_bone_controller_exists():
 
 func test_vrm1_spring_bone_controller_has_owner():
 	if not _spring_bone_controller:
+		test_completed = true
 		return
 	# Bug 3: spring_bone_controller.owner must not be null
 	assert_not_null(
@@ -183,10 +187,12 @@ func test_vrm1_spring_bone_controller_has_owner():
 
 func test_vrm1_spring_bone_controller_has_spring_bones():
 	if not _spring_bone_controller:
+		test_completed = true
 		return
 	var spring_bones_raw = _spring_bone_controller.get("spring_bones")
 	assert_not_null(spring_bones_raw, "spring_bones property must exist on spring_bone_controller")
 	if spring_bones_raw == null:
+		test_completed = true
 		return
 	# spring_bones should be an Array
 	var spring_bones: Array = spring_bones_raw
@@ -202,9 +208,11 @@ func test_vrm1_spring_bone_controller_has_spring_bones():
 
 func test_vrm1_spring_bone_group_assigned():
 	if not _spring_bone_controller:
+		test_completed = true
 		return
 	var spring_bones: Array = _spring_bone_controller.get("spring_bones")
 	if spring_bones.is_empty():
+		test_completed = true
 		return
 	for i in spring_bones.size():
 		var sb = spring_bones[i]
@@ -219,9 +227,11 @@ func test_vrm1_spring_bone_group_assigned():
 
 func test_vrm1_spring_bone_resource_name_readable():
 	if not _spring_bone_controller:
+		test_completed = true
 		return
 	var spring_bones: Array = _spring_bone_controller.get("spring_bones")
 	if spring_bones.is_empty():
+		test_completed = true
 		return
 	# If comment is set, resource_name should contain both group and bone name
 	for i in spring_bones.size():
@@ -247,9 +257,11 @@ func test_vrm1_spring_bone_resource_name_readable():
 
 func test_vrm1_spring_bones_sorted_by_group():
 	if not _spring_bone_controller:
+		test_completed = true
 		return
 	var spring_bones: Array = _spring_bone_controller.get("spring_bones")
 	if spring_bones.size() < 2:
+		test_completed = true
 		return
 	for i in spring_bones.size() - 1:
 		var a = spring_bones[i]
@@ -269,9 +281,11 @@ func test_vrm1_spring_bones_sorted_by_group():
 func test_vrm1_spring_bone_report():
 	"""Print spring bone count and group breakdown for inspection."""
 	if not _spring_bone_controller:
+		test_completed = true
 		return
 	var spring_bones: Array = _spring_bone_controller.get("spring_bones")
 	if spring_bones.is_empty():
+		test_completed = true
 		return
 	var groups := {}
 	for sb in spring_bones:
@@ -291,10 +305,12 @@ func test_vrm1_spring_bone_report():
 
 func test_vrm1_spring_bone_controller_has_skeleton_path():
 	if not _spring_bone_controller:
+		test_completed = true
 		return
 	var skeleton_path = _spring_bone_controller.get("skeleton")
 	assert_not_null(skeleton_path, "spring_bone_controller.skeleton must be set")
 	if skeleton_path == null:
+		test_completed = true
 		return
 	# Bug 1: skeleton path must resolve to a valid node
 	var resolved = _spring_bone_controller.get_node_or_null(skeleton_path)
@@ -306,18 +322,21 @@ func test_vrm1_spring_bone_controller_has_skeleton_path():
 
 func test_vrm1_collider_groups_are_groups_not_flat_colliders():
 	if not _spring_bone_controller:
+		test_completed = true
 		return
 	var collider_groups_raw = _spring_bone_controller.get("collider_groups")
 	assert_not_null(
 		collider_groups_raw, "collider_groups property must exist on spring_bone_controller"
 	)
 	if collider_groups_raw == null:
+		test_completed = true
 		return
 	var collider_groups: Array = collider_groups_raw
 	print("  [V1 collider_groups]: size=%d" % collider_groups.size())
 	if collider_groups.size() == 0:
 		# No collider groups present — not an error, just skip detailed checks
 		print("  [INFO] VRM 1.0 file has no collider groups (springs without colliders)")
+		test_completed = true
 		return
 
 	# Bug 2: Each collider group should contain VRMCollider objects (not empty)
@@ -342,9 +361,11 @@ func test_vrm1_collider_groups_are_groups_not_flat_colliders():
 func test_vrm1_collider_groups_consistent_with_spring_bones():
 	"""If any spring bone references a collider group, collider_groups must not be empty."""
 	if not _spring_bone_controller:
+		test_completed = true
 		return
 	var spring_bones: Array = _spring_bone_controller.get("spring_bones")
 	if spring_bones.is_empty():
+		test_completed = true
 		return
 
 	var spring_references_colliders := false
@@ -366,6 +387,7 @@ func test_vrm1_collider_groups_consistent_with_spring_bones():
 
 	if not spring_references_colliders:
 		print("  [INFO] No spring bones reference collider groups — collider_groups may be 0")
+		test_completed = true
 		return
 
 	var collider_groups: Array = collider_groups_raw
@@ -384,10 +406,12 @@ func test_vrm1_collider_groups_consistent_with_spring_bones():
 
 func test_vrm1_spring_collider_group_refs_resolve_to_spring_bone_controller_groups():
 	if not _spring_bone_controller:
+		test_completed = true
 		return
 
 	var collider_groups: Array = _spring_bone_controller.get("collider_groups")
 	if collider_groups.is_empty():
+		test_completed = true
 		return
 
 	var collider_group_ids := {}
@@ -423,6 +447,7 @@ func test_vrm1_spring_collider_group_refs_resolve_to_spring_bone_controller_grou
 
 func test_vrm1_meshes_have_materials():
 	if not _scene_root:
+		test_completed = true
 		return
 	var mesh_instances := _scene_root.find_children("*", "MeshInstance3D")
 	assert_gt(mesh_instances.size(), 0, "Must have at least one MeshInstance3D")
@@ -451,6 +476,7 @@ func test_vrm1_meshes_have_materials():
 func test_vrm1_end_bone_nodes_removed():
 	"""Verify that end-bone Node3D markers are cleaned from the skeleton."""
 	if not _skeleton:
+		test_completed = true
 		return
 
 	# These are known end-bone patterns in AvatarSample_M.vrm that should be removed.
@@ -473,9 +499,11 @@ func test_vrm1_end_bone_nodes_removed():
 func test_vrm1_end_bone_removal_keeps_skeleton_bones():
 	"""Skeleton bone count should still be 50+ after end-bone cleanup."""
 	if not _skeleton:
+		test_completed = true
 		return
 	assert_ge(
 		_skeleton.get_bone_count(),
 		50,
 		"Skeleton must retain 50+ bones after cleanup, got %d" % _skeleton.get_bone_count()
 	)
+	test_completed = true

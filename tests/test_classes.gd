@@ -11,3 +11,4 @@ func test_classes_exist():
 		ClassDB.class_exists("SpringBoneCollisionCapsule3D"),
 		"SpringBoneCollisionCapsule3D should exist"
 	)
+	test_completed = true

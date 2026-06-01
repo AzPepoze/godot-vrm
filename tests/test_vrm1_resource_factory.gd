@@ -130,3 +130,4 @@ func test_create_meta_v1_humanoid_bone_mapping():
 	var bm := _make_bone_map()
 	var meta = vrm_resource_factory.create_meta_v1(vrm_ext, _fresh_state(), bm)
 	assert_not_null(meta.humanoid_bone_mapping, "humanoid_bone_mapping (BoneMap) should be set")
+	test_completed = true
