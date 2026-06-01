@@ -114,10 +114,10 @@ void VRMSpringBoneSimulation::_bind_methods() {
   ClassDB::bind_method(
       D_METHOD("get_body_collider_radius_multiplier"),
       &VRMSpringBoneSimulation::get_body_collider_radius_multiplier);
-  ClassDB::bind_method(D_METHOD("set_enable_body_colliders", "enabled"),
-                       &VRMSpringBoneSimulation::set_enable_body_colliders);
-  ClassDB::bind_method(D_METHOD("get_enable_body_colliders"),
-                       &VRMSpringBoneSimulation::get_enable_body_colliders);
+  ClassDB::bind_method(D_METHOD("set_enable_body_collisions", "enabled"),
+                       &VRMSpringBoneSimulation::set_enable_body_collisions);
+  ClassDB::bind_method(D_METHOD("get_enable_body_collisions"),
+                       &VRMSpringBoneSimulation::get_enable_body_collisions);
 
   ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "stiffness_multiplier",
                             PROPERTY_HINT_RANGE, "0.0,10.0,0.01"),
@@ -132,8 +132,8 @@ void VRMSpringBoneSimulation::_bind_methods() {
                             PROPERTY_HINT_RANGE, "0.0,10.0,0.01"),
                "set_body_collider_radius_multiplier",
                "get_body_collider_radius_multiplier");
-  ADD_PROPERTY(PropertyInfo(Variant::BOOL, "enable_body_colliders"),
-               "set_enable_body_colliders", "get_enable_body_colliders");
+  ADD_PROPERTY(PropertyInfo(Variant::BOOL, "enable_body_collisions"),
+               "set_enable_body_collisions", "get_enable_body_collisions");
   ADD_PROPERTY(PropertyInfo(Variant::BOOL, "simulate_in_local_space"),
                "set_simulate_in_local_space", "get_simulate_in_local_space");
   ClassDB::bind_method(D_METHOD("get_chain_count"),
@@ -410,7 +410,7 @@ void VRMSpringBoneSimulation::_simulate_chains(
         Vector3 iter_start = next_tail;
 
         // 1. VRM Colliders (Spheres and Capsules attached to the body)
-        if (enable_body_colliders) {
+        if (enable_body_collisions) {
           next_tail = SpringBoneCollision::resolve_all_colliders(
               next_tail, origin, radius, joint.length, collider_views);
         }

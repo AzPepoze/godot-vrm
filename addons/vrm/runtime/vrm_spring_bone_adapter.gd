@@ -28,7 +28,7 @@ func _init(p_skeleton: Skeleton3D) -> void:
 func setup_simulation(
 	spring_bones: Array,
 	collider_groups: Array,
-	disable_body_colliders: bool,
+	disable_body_collisions: bool,
 	update_in_editor: bool
 ) -> void:
 	if skeleton == null:
@@ -36,13 +36,13 @@ func setup_simulation(
 
 	cleanup()
 
-	_setup_cpp(spring_bones, collider_groups, disable_body_colliders, update_in_editor)
+	_setup_cpp(spring_bones, collider_groups, disable_body_collisions, update_in_editor)
 
 
 func _setup_cpp(
 	spring_bones: Array,
 	collider_groups: Array,
-	disable_body_colliders: bool,
+	disable_body_collisions: bool,
 	update_in_editor: bool
 ) -> void:
 	if not has_simulation:
@@ -63,7 +63,7 @@ func _setup_cpp(
 	)
 
 	simulation.setup(spring_bones, collider_groups)
-	simulation.active = !disable_body_colliders
+	simulation.active = true
 	if Engine.is_editor_hint():
 		simulation.active = update_in_editor
 
@@ -85,7 +85,7 @@ func update_parameters(
 	p_hit_radius_multiplier: float = 1.0,
 	p_body_collider_radius_multiplier: float = 1.0,
 	p_simulate_in_local_space: bool = false,
-	p_disable_body_colliders: bool = false
+	p_disable_body_collisions: bool = false
 ) -> void:
 	gravity_multiplier = p_gravity_multiplier
 	stiffness_multiplier = p_stiffness_multiplier
@@ -104,7 +104,7 @@ func update_parameters(
 			hit_radius_multiplier,
 			p_body_collider_radius_multiplier
 		)
-		simulation.set_enable_body_colliders(!p_disable_body_colliders)
+		simulation.set_enable_body_collisions(!p_disable_body_collisions)
 		simulation.set_wind_direction(p_wind_direction)
 		simulation.set_simulate_in_local_space(p_simulate_in_local_space)
 		simulation.set_wind_strength(p_wind_strength)
@@ -125,10 +125,10 @@ func draw_gizmo(
 	skel_to_gizmo: Transform3D,
 	color: Color,
 	draw_spring_bones: bool,
-	draw_body_colliders: bool
+	draw_body_collisions: bool
 ) -> void:
 	if simulation:
-		simulation.draw_gizmo(mesh, skel_to_gizmo, color, draw_spring_bones, draw_body_colliders)
+		simulation.draw_gizmo(mesh, skel_to_gizmo, color, draw_spring_bones, draw_body_collisions)
 
 
 func cleanup() -> void:

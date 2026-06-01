@@ -91,7 +91,7 @@ private:
   float drag_multiplier = 1.0f;
   float hit_radius_multiplier = 1.0f;
   float body_collider_radius_multiplier = 1.0f;
-  bool enable_body_colliders = true;
+  bool enable_body_collisions = true;
   bool simulate_in_local_space = false;
   Quaternion gravity_rotation;
   Vector3 add_force;
@@ -153,10 +153,10 @@ public:
     return body_collider_radius_multiplier;
   }
 
-  void set_enable_body_colliders(bool p_enabled) {
-    enable_body_colliders = p_enabled;
+  void set_enable_body_collisions(bool p_enabled) {
+    enable_body_collisions = p_enabled;
   }
-  bool get_enable_body_colliders() const { return enable_body_colliders; }
+  bool get_enable_body_collisions() const { return enable_body_collisions; }
 
   void set_simulate_in_local_space(bool p_enabled) {
     simulate_in_local_space = p_enabled;

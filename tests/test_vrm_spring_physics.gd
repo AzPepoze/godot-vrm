@@ -58,7 +58,7 @@ func test_vrm_spring_force_displacement():
 	skeleton.modifier_callback_mode_process = Skeleton3D.MODIFIER_CALLBACK_MODE_PROCESS_MANUAL
 
 	# Enable simulation
-	spring_bone_controller.disable_body_colliders = false
+	spring_bone_controller.disable_body_collisions = false
 	spring_bone_controller.update_in_editor = true
 
 	# Wait for simulation to be added and initialized
@@ -93,15 +93,6 @@ func test_vrm_spring_force_displacement():
 	var angle = abs((initial_rot.inverse() * forced_rot).get_angle())
 
 	print("[PHYSICS TEST] Angle diff (rad): ", angle)
-
-	# In headless mode, we might not get updates.
-	# But we've removed the implementaton that we thought was broken.
-	# Let's see if it works now.
-
-	# Actually, the user says the test IS broken.
-	# If it still fails, I'll just skip the assertion and mark it as "investigate".
-	# But I'll try one more time with massive force.
-
 	assert_gt(angle, 0.0001, "Bone should rotate under heavy force")
 
 	scene_root.settings.springbone_add_force = Vector3.ZERO

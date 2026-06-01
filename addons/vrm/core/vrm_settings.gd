@@ -20,26 +20,31 @@ signal settings_changed
 		springbone_gravity_multiplier = value
 		settings_changed.emit()
 
+@export var constraint_weight_multiplier: float = 1.0:
+	set(value):
+		constraint_weight_multiplier = value
+		settings_changed.emit()
+
 @export_group("Spring Bone Collisions")
+@export var disable_spring_bone_collisions: bool = false:
+	set(value):
+		disable_spring_bone_collisions = value
+		settings_changed.emit()
+
 @export var springbone_hit_radius_multiplier: float = 1.0:
 	set(value):
 		springbone_hit_radius_multiplier = value
 		settings_changed.emit()
 
-@export var disable_spring_bones: bool = false:
+@export_group("Body Collisions")
+@export var disable_body_collisions: bool = false:
 	set(value):
-		disable_spring_bones = value
+		disable_body_collisions = value
 		settings_changed.emit()
 
-@export_group("Body Colliders")
-@export var body_collider_radius_multiplier: float = 1.0:
+@export var body_collision_radius_multiplier: float = 1.0:
 	set(value):
-		body_collider_radius_multiplier = value
-		settings_changed.emit()
-
-@export var constraint_weight_multiplier: float = 1.0:
-	set(value):
-		constraint_weight_multiplier = value
+		body_collision_radius_multiplier = value
 		settings_changed.emit()
 
 @export_group("Force & Gravity")
@@ -94,7 +99,33 @@ signal settings_changed
 		environment_collision_bounce_damping = value
 		settings_changed.emit()
 
-@export_group("Springbone Runtime Settings")
+@export_group("Springbone Gizmos")
+@export var gizmo_spring_bone: bool = false:
+	set(value):
+		gizmo_spring_bone = value
+		settings_changed.emit()
+
+@export var gizmo_spring_bone_color: Color = Color.LIGHT_YELLOW:
+	set(value):
+		gizmo_spring_bone_color = value
+		settings_changed.emit()
+
+@export var gizmo_show_body_collisions: bool = false:
+	set(value):
+		gizmo_show_body_collisions = value
+		settings_changed.emit()
+
+@export var gizmo_show_wind: bool = false:
+	set(value):
+		gizmo_show_wind = value
+		settings_changed.emit()
+
+@export var gizmo_wind_color: Color = Color.CYAN:
+	set(value):
+		gizmo_wind_color = value
+		settings_changed.emit()
+
+@export_group("Advanced & Runtime")
 @export var update_in_editor: bool = false:
 	set(value):
 		update_in_editor = value
@@ -110,38 +141,7 @@ signal settings_changed
 		springbone_simulate_in_local_space = value
 		settings_changed.emit()
 
-@export var disable_body_colliders: bool = false:
-	set(value):
-		disable_body_colliders = value
-		settings_changed.emit()
-
 @export var override_springbone_center: bool = false:
 	set(value):
 		override_springbone_center = value
-		settings_changed.emit()
-
-@export_group("Springbone Gizmos")
-@export var gizmo_spring_bone: bool = false:
-	set(value):
-		gizmo_spring_bone = value
-		settings_changed.emit()
-
-@export var gizmo_spring_bone_color: Color = Color.LIGHT_YELLOW:
-	set(value):
-		gizmo_spring_bone_color = value
-		settings_changed.emit()
-
-@export var gizmo_show_body_colliders: bool = false:
-	set(value):
-		gizmo_show_body_colliders = value
-		settings_changed.emit()
-
-@export var gizmo_show_wind: bool = false:
-	set(value):
-		gizmo_show_wind = value
-		settings_changed.emit()
-
-@export var gizmo_wind_color: Color = Color.CYAN:
-	set(value):
-		gizmo_wind_color = value
 		settings_changed.emit()
