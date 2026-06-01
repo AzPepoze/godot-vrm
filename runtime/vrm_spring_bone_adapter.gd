@@ -26,18 +26,24 @@ func _init(p_skeleton: Skeleton3D) -> void:
 
 
 func setup_simulation(
-	spring_bones: Array, collider_groups: Array, disable_colliders: bool, update_in_editor: bool
+	spring_bones: Array,
+	collider_groups: Array,
+	disable_body_colliders: bool,
+	update_in_editor: bool
 ) -> void:
 	if skeleton == null:
 		return
 
 	cleanup()
 
-	_setup_cpp(spring_bones, collider_groups, disable_colliders, update_in_editor)
+	_setup_cpp(spring_bones, collider_groups, disable_body_colliders, update_in_editor)
 
 
 func _setup_cpp(
-	spring_bones: Array, collider_groups: Array, disable_colliders: bool, update_in_editor: bool
+	spring_bones: Array,
+	collider_groups: Array,
+	disable_body_colliders: bool,
+	update_in_editor: bool
 ) -> void:
 	if not has_simulation:
 		return
@@ -57,7 +63,7 @@ func _setup_cpp(
 	)
 
 	simulation.setup(spring_bones, collider_groups)
-	simulation.active = !disable_colliders
+	simulation.active = !disable_body_colliders
 	if Engine.is_editor_hint():
 		simulation.active = update_in_editor
 
@@ -77,9 +83,9 @@ func update_parameters(
 	p_stiffness_multiplier: float = 1.0,
 	p_drag_multiplier: float = 1.0,
 	p_hit_radius_multiplier: float = 1.0,
-	p_collider_radius_multiplier: float = 1.0,
+	p_body_collider_radius_multiplier: float = 1.0,
 	p_simulate_in_local_space: bool = false,
-	p_disable_colliders: bool = false
+	p_disable_body_colliders: bool = false
 ) -> void:
 	gravity_multiplier = p_gravity_multiplier
 	stiffness_multiplier = p_stiffness_multiplier
@@ -96,9 +102,9 @@ func update_parameters(
 			stiffness_multiplier,
 			drag_multiplier,
 			hit_radius_multiplier,
-			p_collider_radius_multiplier
+			p_body_collider_radius_multiplier
 		)
-		simulation.set_enable_colliders(!p_disable_colliders)
+		simulation.set_enable_body_colliders(!p_disable_body_colliders)
 		simulation.set_wind_direction(p_wind_direction)
 		simulation.set_simulate_in_local_space(p_simulate_in_local_space)
 		simulation.set_wind_strength(p_wind_strength)
@@ -119,10 +125,10 @@ func draw_gizmo(
 	skel_to_gizmo: Transform3D,
 	color: Color,
 	draw_spring_bones: bool,
-	draw_colliders: bool
+	draw_body_colliders: bool
 ) -> void:
 	if simulation:
-		simulation.draw_gizmo(mesh, skel_to_gizmo, color, draw_spring_bones, draw_colliders)
+		simulation.draw_gizmo(mesh, skel_to_gizmo, color, draw_spring_bones, draw_body_colliders)
 
 
 func cleanup() -> void:
