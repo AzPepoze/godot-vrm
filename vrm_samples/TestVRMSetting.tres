@@ -10,7 +10,6 @@ wind_turbulence = 0.565
 wind_frequency = 3.43
 environment_collision_enabled = true
 update_in_editor = true
-update_spring_bone_controller_in_physics = true
 disable_colliders = true
 override_springbone_center = true
 gizmo_spring_bone = true
