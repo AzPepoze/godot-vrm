@@ -19,29 +19,7 @@ const SpringBoneGizmo = preload("./vrm_spring_bone_controller_gizmo.gd")
 			_settings = VRMSettings.new()
 		_settings.disable_spring_bone_collisions = value
 		if spring_bone_adapter:
-			spring_bone_adapter.update_parameters(
-				_settings.springbone_gravity_multiplier,
-				_settings.springbone_gravity_rotation,
-				_settings.springbone_add_force,
-				_settings.wind_direction,
-				_settings.wind_strength,
-				_settings.wind_turbulence,
-				_settings.wind_frequency,
-				_settings.environment_collision_enabled,
-				_settings.environment_collision_mask,
-				_settings.environment_collision_bounce_damping,
-				_settings.environment_collision_debug,
-				_settings.springbone_stiffness_multiplier,
-				_settings.springbone_drag_multiplier,
-				(
-					_settings.springbone_hit_radius_multiplier
-					if not _settings.disable_spring_bone_collisions
-					else 0.0
-				),
-				_settings.body_collision_radius_multiplier,
-				_settings.springbone_simulate_in_local_space,
-				_settings.disable_body_collisions
-			)
+			spring_bone_adapter.update_parameters(_settings)
 
 @export_group("Body Collisions")
 @export var disable_body_collisions: bool:
@@ -54,29 +32,7 @@ const SpringBoneGizmo = preload("./vrm_spring_bone_controller_gizmo.gd")
 			_settings = VRMSettings.new()
 		_settings.disable_body_collisions = value
 		if spring_bone_adapter:
-			spring_bone_adapter.update_parameters(
-				_settings.springbone_gravity_multiplier,
-				_settings.springbone_gravity_rotation,
-				_settings.springbone_add_force,
-				_settings.wind_direction,
-				_settings.wind_strength,
-				_settings.wind_turbulence,
-				_settings.wind_frequency,
-				_settings.environment_collision_enabled,
-				_settings.environment_collision_mask,
-				_settings.environment_collision_bounce_damping,
-				_settings.environment_collision_debug,
-				_settings.springbone_stiffness_multiplier,
-				_settings.springbone_drag_multiplier,
-				(
-					_settings.springbone_hit_radius_multiplier
-					if not _settings.disable_spring_bone_collisions
-					else 0.0
-				),
-				_settings.body_collision_radius_multiplier,
-				_settings.springbone_simulate_in_local_space,
-				_settings.disable_body_collisions
-			)
+			spring_bone_adapter.update_parameters(_settings)
 
 @export_group("Advanced & Runtime")
 @export var update_spring_bone_controller_in_physics: bool:
@@ -112,7 +68,7 @@ const SpringBoneGizmo = preload("./vrm_spring_bone_controller_gizmo.gd")
 			_settings = VRMSettings.new()
 		_settings.update_in_editor = value
 		if spring_bone_adapter:
-			spring_bone_adapter.set_active(value or not Engine.is_editor_hint())
+			spring_bone_adapter.update_parameters(_settings)
 
 @export_group("Gizmos")
 @export var gizmo_spring_bone: bool:
@@ -144,6 +100,8 @@ const SpringBoneGizmo = preload("./vrm_spring_bone_controller_gizmo.gd")
 		if _settings == null:
 			_settings = VRMSettings.new()
 		_settings.gizmo_display_mode = value
+		if spring_bone_adapter:
+			spring_bone_adapter.set_gizmo_display_mode(value)
 
 @export var gizmo_show_body_collisions: bool:
 	get:
@@ -244,15 +202,15 @@ func _ready() -> void:
 
 
 func update_from_settings(settings: VRMSettings) -> void:
-	if _settings != null and _settings.settings_changed.is_connected(update_parameters):
-		_settings.settings_changed.disconnect(update_parameters)
+	if _settings != null and _settings.settings_changed.is_connected(_update_adapter):
+		_settings.settings_changed.disconnect(_update_adapter)
 
 	_settings = settings
 
 	if _settings != null:
-		if not _settings.settings_changed.is_connected(update_parameters):
-			_settings.settings_changed.connect(update_parameters)
-		update_parameters()
+		if not _settings.settings_changed.is_connected(_update_adapter):
+			_settings.settings_changed.connect(_update_adapter)
+		_update_adapter()
 		_notify_constraint_appliers()
 
 
@@ -265,7 +223,7 @@ func _setup_spring_bone_adapter() -> void:
 	spring_bone_adapter.setup_simulation(
 		spring_bones, collider_groups, disable_body_collisions, update_in_editor
 	)
-	update_parameters()
+	_update_adapter()
 
 
 func _setup_gizmo() -> void:
@@ -274,34 +232,9 @@ func _setup_gizmo() -> void:
 		add_child(_gizmo, false, Node.INTERNAL_MODE_BACK)
 
 
-func update_parameters() -> void:
+func _update_adapter() -> void:
 	if spring_bone_adapter != null and _settings != null:
-		spring_bone_adapter.update_parameters(
-			_settings.springbone_gravity_multiplier,
-			_settings.springbone_gravity_rotation,
-			_settings.springbone_add_force,
-			_settings.wind_direction,
-			_settings.wind_strength,
-			_settings.wind_turbulence,
-			_settings.wind_frequency,
-			_settings.environment_collision_enabled,
-			_settings.environment_collision_mask,
-			_settings.environment_collision_bounce_damping,
-			_settings.environment_collision_debug,
-			_settings.springbone_stiffness_multiplier,
-			_settings.springbone_drag_multiplier,
-			(
-				_settings.springbone_hit_radius_multiplier
-				if not _settings.disable_spring_bone_collisions
-				else 0.0
-			),
-			_settings.body_collision_radius_multiplier,
-			_settings.springbone_simulate_in_local_space,
-			_settings.disable_body_collisions
-		)
-		spring_bone_adapter.set_active(true)
-		if Engine.is_editor_hint():
-			spring_bone_adapter.set_active(_settings.update_in_editor)
+		spring_bone_adapter.update_parameters(_settings)
 
 
 func _process(_delta: float):
@@ -315,7 +248,7 @@ func _process(_delta: float):
 			gizmo_spring_bone_color,
 			gizmo_spring_bone,
 			gizmo_show_body_collisions,
-			_settings.gizmo_display_mode
+			gizmo_display_mode
 		)
 
 		if gizmo_show_wind and _settings != null:
