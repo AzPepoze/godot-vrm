@@ -218,7 +218,8 @@ func update_parameters() -> void:
 			_settings.environment_collision_bounce_damping,
 			_settings.springbone_stiffness_multiplier,
 			_settings.springbone_drag_multiplier,
-			_settings.springbone_hit_radius_multiplier
+			_settings.springbone_hit_radius_multiplier,
+			_settings.springbone_simulate_in_local_space
 		)
 		spring_bone_adapter.set_active(!_settings.disable_colliders)
 		if Engine.is_editor_hint():
@@ -263,14 +264,11 @@ func _draw_wind_arrow(
 	if head_idx != -1:
 		start_pos_skel = skel.get_bone_global_pose(head_idx).origin
 
-	# The direction is already transformed to skeleton-local space by VRMWind
-	# But the gizmo line should show where it points in skeleton space
-	var end_pos_skel = start_pos_skel + direction.normalized() * 0.5
-
-	# Transform points from skeleton local space to gizmo local space
-	# This ensures the arrow correctly represents the world direction
-	var start_pos = skel_to_gizmo * start_pos_skel
-	var end_pos = skel_to_gizmo * end_pos_skel
+	# direction is global, so we add it in global space, then transform to gizmo space
+	var start_pos_global = skel.global_transform * start_pos_skel
+	var end_pos_global = start_pos_global + direction.normalized() * 0.5
+	var start_pos = _gizmo.global_transform.affine_inverse() * start_pos_global
+	var end_pos = _gizmo.global_transform.affine_inverse() * end_pos_global
 
 	# Draw Main Line
 	mesh.surface_add_vertex(start_pos)

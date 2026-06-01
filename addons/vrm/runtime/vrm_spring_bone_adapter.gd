@@ -75,7 +75,8 @@ func update_parameters(
 	p_env_coll_bounce_damping: float = 0.8,
 	p_stiffness_multiplier: float = 1.0,
 	p_drag_multiplier: float = 1.0,
-	p_hit_radius_multiplier: float = 1.0
+	p_hit_radius_multiplier: float = 1.0,
+	p_simulate_in_local_space: bool = false
 ) -> void:
 	gravity_multiplier = p_gravity_multiplier
 	stiffness_multiplier = p_stiffness_multiplier
@@ -94,6 +95,7 @@ func update_parameters(
 			hit_radius_multiplier
 		)
 		simulation.set_wind_direction(p_wind_direction)
+		simulation.set_simulate_in_local_space(p_simulate_in_local_space)
 		simulation.set_wind_strength(p_wind_strength)
 		simulation.set_wind_turbulence(p_wind_turbulence)
 		simulation.set_wind_frequency(p_wind_frequency)

@@ -35,13 +35,14 @@ static Vector3 joint_param_vec(const std::vector<Vector3> &arr, size_t idx,
 // ---------------------------------------------------------------------------
 static Transform3D
 get_center_transform(const VRMSpringBoneSimulation::CPPSpringBoneChain &chain,
-                     Skeleton3D *skel, const Transform3D &skel_global_inv) {
+                     Skeleton3D *skel, const Transform3D &skel_global_inv,
+                     bool simulate_in_local_space) {
   if (chain.center_bone != -1) {
     return skel->get_bone_global_pose(chain.center_bone);
   } else if (chain.center_node) {
     return skel_global_inv * chain.center_node->get_global_transform();
   }
-  return Transform3D();
+  return simulate_in_local_space ? Transform3D() : skel_global_inv;
 }
 
 // ---------------------------------------------------------------------------
@@ -103,12 +104,19 @@ void VRMSpringBoneSimulation::_bind_methods() {
   ClassDB::bind_method(D_METHOD("get_hit_radius_multiplier"),
                        &VRMSpringBoneSimulation::get_hit_radius_multiplier);
 
+  ClassDB::bind_method(D_METHOD("set_simulate_in_local_space", "enabled"),
+                       &VRMSpringBoneSimulation::set_simulate_in_local_space);
+  ClassDB::bind_method(D_METHOD("get_simulate_in_local_space"),
+                       &VRMSpringBoneSimulation::get_simulate_in_local_space);
+
   ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "stiffness_multiplier"),
                "set_stiffness_multiplier", "get_stiffness_multiplier");
   ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "drag_multiplier"),
                "set_drag_multiplier", "get_drag_multiplier");
   ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "hit_radius_multiplier"),
                "set_hit_radius_multiplier", "get_hit_radius_multiplier");
+  ADD_PROPERTY(PropertyInfo(Variant::BOOL, "simulate_in_local_space"),
+               "set_simulate_in_local_space", "get_simulate_in_local_space");
   ClassDB::bind_method(D_METHOD("get_chain_count"),
                        &VRMSpringBoneSimulation::get_chain_count);
   ClassDB::bind_method(D_METHOD("get_joint_count", "chain_idx"),
@@ -257,7 +265,8 @@ void VRMSpringBoneSimulation::_reset_chains(
   static const int PUSH_OUT_PASSES = 4;
 
   for (auto &chain : chains) {
-    Transform3D center = get_center_transform(chain, skel, skel_global_inv);
+    Transform3D center = get_center_transform(chain, skel, skel_global_inv,
+                                              simulate_in_local_space);
     Transform3D center_inv = center.affine_inverse();
 
     // Reset tail positions to rest pose
@@ -295,7 +304,8 @@ void VRMSpringBoneSimulation::_reset_chains(
 void VRMSpringBoneSimulation::_simulate_chains(
     Skeleton3D *skel, const Transform3D &skel_global_inv, float delta) {
   for (auto &chain : chains) {
-    Transform3D center = get_center_transform(chain, skel, skel_global_inv);
+    Transform3D center = get_center_transform(chain, skel, skel_global_inv,
+                                              simulate_in_local_space);
     Transform3D center_inv = center.affine_inverse();
     Quaternion center_rot = center.basis.get_rotation_quaternion();
     Quaternion center_rot_inv = center_rot.inverse();
@@ -327,14 +337,15 @@ void VRMSpringBoneSimulation::_simulate_chains(
       // Wind
       if (wind_strength > 0.0001f) {
         SpringBoneWind::WindParams wp;
-        wp.direction = wind_direction;
+        wp.direction =
+            center_rot_inv.xform(skel_global_inv.basis.xform(wind_direction));
         wp.strength = wind_strength;
         wp.turbulence = wind_turbulence;
         wp.frequency = wind_frequency;
         Vector3 wind_val = SpringBoneWind::compute_wind_force(
             wp, joint.current_tail, wind_time,
             (int)joint.bone_idx + (int)i * 100);
-        external += center_rot_inv.xform(wind_val * delta);
+        external += wind_val * delta;
       }
 
       // Update global pose from skeleton
@@ -505,7 +516,7 @@ void VRMSpringBoneSimulation::draw_gizmo(Object *p_mesh_obj,
   Skeleton3D *skel = get_skeleton();
   SpringBoneGizmo::draw_gizmo(mesh, skel, p_skel_to_gizmo, chains,
                               all_colliders, p_color, p_draw_spring_bones,
-                              p_draw_colliders);
+                              p_draw_colliders, simulate_in_local_space);
 }
 
 // ---------------------------------------------------------------------------

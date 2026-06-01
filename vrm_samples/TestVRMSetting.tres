@@ -5,7 +5,9 @@
 [resource]
 script = ExtResource("1_3aimx")
 wind_direction = Vector3(0, 0.065, 0.275)
-wind_strength = -4.23
+wind_strength = 0.77
+wind_turbulence = 0.565
+wind_frequency = 3.43
 environment_collision_enabled = true
 update_in_editor = true
 update_spring_bone_controller_in_physics = true

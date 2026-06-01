@@ -116,10 +116,10 @@ func recreate_simulation() -> void:
 		if settings != null and settings.settings_changed.is_connected(_on_settings_changed):
 			settings.settings_changed.disconnect(_on_settings_changed)
 
-		# Ensure settings are unique per instance to prevent cross-contamination
-		settings = value.duplicate() if value != null else VRMSettings.new()
+		settings = value
 
-		settings.settings_changed.connect(_on_settings_changed)
+		if settings != null:
+			settings.settings_changed.connect(_on_settings_changed)
 		_on_settings_changed()
 
 @export_category("Springbone Runtime")
@@ -224,9 +224,6 @@ func recreate_simulation() -> void:
 func _init() -> void:
 	if settings == null:
 		settings = VRMSettings.new()
-	else:
-		# Ensure settings are unique per instance to prevent cross-contamination
-		settings = settings.duplicate()
 
 
 func _on_settings_changed() -> void:

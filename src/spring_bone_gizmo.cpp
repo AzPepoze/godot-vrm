@@ -45,7 +45,8 @@ void draw_gizmo(
     const std::vector<VRMSpringBoneSimulation::CPPSpringBoneChain> &chains,
     const std::vector<VRMSpringBoneSimulation::CPPSpringBoneCollider>
         &colliders,
-    Color default_color, bool draw_spring_bones, bool draw_colliders) {
+    Color default_color, bool draw_spring_bones, bool draw_colliders,
+    bool p_simulate_in_local_space) {
   if (!mesh || !skel) {
     return;
   }
@@ -63,6 +64,9 @@ void draw_gizmo(
       } else if (chain.center_node) {
         center_transform =
             skel_global_inv * chain.center_node->get_global_transform();
+      } else {
+        center_transform =
+            p_simulate_in_local_space ? Transform3D() : skel_global_inv;
       }
 
       for (const auto &joint : chain.joints) {

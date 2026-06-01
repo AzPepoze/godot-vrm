@@ -90,6 +90,7 @@ private:
   float stiffness_multiplier = 1.0f;
   float drag_multiplier = 1.0f;
   float hit_radius_multiplier = 1.0f;
+  bool simulate_in_local_space = false;
   Quaternion gravity_rotation;
   Vector3 add_force;
 
@@ -142,6 +143,11 @@ public:
     hit_radius_multiplier = p_multiplier;
   }
   float get_hit_radius_multiplier() const { return hit_radius_multiplier; }
+
+  void set_simulate_in_local_space(bool p_enabled) {
+    simulate_in_local_space = p_enabled;
+  }
+  bool get_simulate_in_local_space() const { return simulate_in_local_space; }
 
   // Getters/Setters for Wind parameters
   void set_wind_direction(Vector3 p_dir);
