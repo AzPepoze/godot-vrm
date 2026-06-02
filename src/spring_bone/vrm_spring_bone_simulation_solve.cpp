@@ -278,71 +278,7 @@ void VRMSpringBoneSimulation::_simulate_chains(
       joint.current_tail = next_tail;
 
       // --- COLLISION RESOLUTION (ANGULAR ITERATIVE) ---
-      for (int iter = 0; iter < 4; ++iter) {
-        bool collision_happened = false;
-        Vector3 contact_normal;
-
-        if (environment_collision_enabled && chain.enable_environment_collision) {
-          Transform3D skel_world = skel->get_global_transform();
-          Vector3 origin_world = skel_world.xform(center.xform(origin));
-          Vector3 tail_world = skel_world.xform(center.xform(joint.current_tail));
-
-          Vector3 env_push;
-          float contact_t = 1.0f;
-          _query_game_object_collisions(skel, origin_world, tail_world, radius,
-                                        chain.environment_collision_mask,
-                                        env_push, contact_t);
-
-          if (!env_push.is_zero_approx()) {
-            collision_happened = true;
-            contact_normal = env_push.normalized();
-
-            Vector3 impact_point_world = origin_world.lerp(tail_world, contact_t);
-            Vector3 target_point_world = impact_point_world + env_push;
-            Vector3 v_impact = impact_point_world - origin_world;
-            Vector3 v_target = target_point_world - origin_world;
-
-            if (v_impact.length_squared() > 1e-8f && v_target.length_squared() > 1e-8f) {
-              Quaternion rot = Quaternion(v_impact.normalized(), v_target.normalized());
-              Basis local_rot = center_inv.basis * skel_world.affine_inverse().basis * Basis(rot) * skel_world.basis * center.basis;
-
-              // Rotate both current and prev to cancel artificial velocity
-              joint.current_tail = origin + local_rot.xform(joint.current_tail - origin);
-              joint.prev_tail = origin + local_rot.xform(joint.prev_tail - origin);
-
-              if (debug_collision && iter == 0) {
-                  CPPCollisionImpact impact;
-                  impact.position = impact_point_world;
-                  impact.normal = contact_normal;
-                  impact.age = 0.0f;
-                  recent_impacts.push_back(impact);
-                  if (recent_impacts.size() > 50) recent_impacts.erase(recent_impacts.begin());
-              }
-            }
-          }
-        }
-
-        // --- KINEMATIC CONTACT RESOLUTION ---
-        if (collision_happened) {
-          Vector3 vel = joint.current_tail - joint.prev_tail;
-          float vn = vel.dot(contact_normal);
-          if (vn < 0.0f) {
-              vel -= contact_normal * vn;
-              vel *= 0.95f; 
-              joint.prev_tail = joint.current_tail - vel;
-          }
-          joint.env_in_contact = true;
-          joint.env_contact_normal = contact_normal;
-        } else {
-          if (joint.env_in_contact && iter == 0) {
-              Vector3 vel = joint.current_tail - joint.prev_tail;
-              vel *= 0.2f; 
-              joint.prev_tail = joint.current_tail - vel;
-          }
-          joint.env_in_contact = false;
-          break; // Exit early if no collision in this pass
-        }
-      }
+      _resolve_angular_collisions(skel, center, center_inv, chain, joint, origin, radius);
 
       // Final length guard and expansion damping
       joint.current_tail = SpringBonePhysics::apply_length_constraint(joint.current_tail, origin, joint.length);
@@ -390,6 +326,82 @@ void VRMSpringBoneSimulation::_update_colliders(Skeleton3D *skel) {
     c.position = tf.xform(c.offset);
     if (c.is_capsule) {
       c.tail_position = tf.xform(c.tail);
+    }
+  }
+}
+
+void VRMSpringBoneSimulation::_resolve_angular_collisions(
+    Skeleton3D *skel, const Transform3D &center, const Transform3D &center_inv,
+    CPPSpringBoneChain &chain, CPPSpringBoneJoint &joint, const Vector3 &origin,
+    float radius) {
+  for (int iter = 0; iter < 4; ++iter) {
+    bool collision_happened = false;
+    Vector3 contact_normal;
+
+    if (environment_collision_enabled && chain.enable_environment_collision) {
+      Transform3D skel_world = skel->get_global_transform();
+      Vector3 origin_world = skel_world.xform(center.xform(origin));
+      Vector3 tail_world = skel_world.xform(center.xform(joint.current_tail));
+
+      Vector3 env_push;
+      float contact_t = 1.0f;
+      _query_game_object_collisions(skel, origin_world, tail_world, radius,
+                                    chain.environment_collision_mask, env_push,
+                                    contact_t);
+
+      if (!env_push.is_zero_approx()) {
+        collision_happened = true;
+        contact_normal = env_push.normalized();
+
+        Vector3 impact_point_world = origin_world.lerp(tail_world, contact_t);
+        Vector3 target_point_world = impact_point_world + env_push;
+        Vector3 v_impact = impact_point_world - origin_world;
+        Vector3 v_target = target_point_world - origin_world;
+
+        if (v_impact.length_squared() > 1e-8f &&
+            v_target.length_squared() > 1e-8f) {
+          Quaternion rot =
+              Quaternion(v_impact.normalized(), v_target.normalized());
+          Basis local_rot = center_inv.basis * skel_world.affine_inverse().basis *
+                            Basis(rot) * skel_world.basis * center.basis;
+
+          // Rotate both current and prev to cancel artificial velocity
+          joint.current_tail =
+              origin + local_rot.xform(joint.current_tail - origin);
+          joint.prev_tail = origin + local_rot.xform(joint.prev_tail - origin);
+
+          if (debug_collision && iter == 0) {
+            CPPCollisionImpact impact;
+            impact.position = impact_point_world;
+            impact.normal = contact_normal;
+            impact.age = 0.0f;
+            recent_impacts.push_back(impact);
+            if (recent_impacts.size() > 50)
+              recent_impacts.erase(recent_impacts.begin());
+          }
+        }
+      }
+    }
+
+    // --- KINEMATIC CONTACT RESOLUTION ---
+    if (collision_happened) {
+      Vector3 vel = joint.current_tail - joint.prev_tail;
+      float vn = vel.dot(contact_normal);
+      if (vn < 0.0f) {
+        vel -= contact_normal * vn;
+        vel *= 0.95f;
+        joint.prev_tail = joint.current_tail - vel;
+      }
+      joint.env_in_contact = true;
+      joint.env_contact_normal = contact_normal;
+    } else {
+      if (joint.env_in_contact && iter == 0) {
+        Vector3 vel = joint.current_tail - joint.prev_tail;
+        vel *= (1.0f - environment_collision_bounce_damping);
+        joint.prev_tail = joint.current_tail - vel;
+      }
+      joint.env_in_contact = false;
+      break; // Exit early if no collision in this pass
     }
   }
 }

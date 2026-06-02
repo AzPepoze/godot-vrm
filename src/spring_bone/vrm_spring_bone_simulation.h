@@ -219,6 +219,11 @@ private:
                                      const Vector3 &tail_world, float radius,
                                      uint32_t mask, Vector3 &out_push,
                                      float &out_t);
+  void _resolve_angular_collisions(Skeleton3D *skel, const Transform3D &center,
+                                   const Transform3D &center_inv,
+                                   CPPSpringBoneChain &chain,
+                                   CPPSpringBoneJoint &joint,
+                                   const Vector3 &origin, float radius);
 };
 
 } // namespace godot

@@ -31,7 +31,7 @@ const vrm_collider_group = preload("./vrm_collider_group.gd")
 @export var enable_environment_collision: bool = true
 @export var environment_collision_mask: int = 1
 ## 0 = no damping (bouncy), higher values stick to surface
-@export_range(0.0, 10.0, 0.1) var environment_collision_bounce_damping: float = 0.8
+@export_range(0.0, 1.0, 0.01) var environment_collision_bounce_damping: float = 0.8
 
 # Reference to the vrm_collidergroup for collisions with swaying objects.
 @export var collider_groups: Array[VRMColliderGroup]

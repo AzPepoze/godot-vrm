@@ -127,6 +127,7 @@ void VRMSpringBoneSimulation::_bind_methods() {
   ClassDB::bind_method(
       D_METHOD("set_environment_collision_bounce_damping", "damping"),
       &VRMSpringBoneSimulation::set_environment_collision_bounce_damping);
+
   ClassDB::bind_method(
       D_METHOD("get_environment_collision_bounce_damping"),
       &VRMSpringBoneSimulation::get_environment_collision_bounce_damping);
@@ -155,7 +156,7 @@ void VRMSpringBoneSimulation::_bind_methods() {
                "get_environment_collision_mask");
   ADD_PROPERTY(PropertyInfo(Variant::FLOAT,
                             "environment_collision_bounce_damping",
-                            PROPERTY_HINT_RANGE, "0.0,10.0,0.1"),
+                            PROPERTY_HINT_RANGE, "0.0,1.0,0.01"),
                "set_environment_collision_bounce_damping",
                "get_environment_collision_bounce_damping");
 
