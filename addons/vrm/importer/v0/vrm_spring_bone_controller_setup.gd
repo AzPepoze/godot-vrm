@@ -4,6 +4,7 @@ extends RefCounted
 const VRMLogger = preload("../../core/logger.gd")
 const vrm_spring_bone_controller = preload("../../runtime/vrm_spring_bone_controller.gd")
 const vrm_spring_bone_parser = preload("../common/vrm_spring_bone_parser.gd")
+const vrm_spring_bone_group_setting = preload("../../core/vrm_spring_bone_group_setting.gd")
 
 
 static func parse_spring_bone_controller(
@@ -48,3 +49,19 @@ static func parse_spring_bone_controller(
 	spring_bone_controller.set("spring_bones", Array(spring_bones))
 	spring_bone_controller.set("collider_groups", Array(collider_groups))
 	spring_bone_controller.set("collider_library", Array(collider_library))
+
+	var unique_groups := {}
+	for sb in spring_bones:
+		if not sb.group.is_empty() and sb.group != "Other":
+			unique_groups[sb.group] = true
+	
+	if not unique_groups.is_empty():
+		var group_settings: Array[VRMSpringBoneGroupSetting] = []
+		var sorted_groups = unique_groups.keys()
+		sorted_groups.sort()
+		for group_name in sorted_groups:
+			var gs = vrm_spring_bone_group_setting.new()
+			gs.resource_name = group_name
+			gs.group_name = group_name
+			group_settings.append(gs)
+		spring_bone_controller.get_parent().set("springbone_group_multipliers", group_settings)

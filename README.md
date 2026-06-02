@@ -38,6 +38,7 @@ VRM importer, exporter, and runtime spring bone physics for **Godot Engine 4.3+*
 | `VRMC_springBone` | ✅ C++ GDExtension physics |
 | Spring Bone Wind | ✅ Direction, strength, turbulence, frequency |
 | Spring Bone Environment Collision | ✅ Capsule queries against physics bodies |
+| Spring Bone Group Multipliers | ✅ Per-instance hit radius scaling for specific groups (e.g. Hair, Skirt) |
 | `VRMC_materials_mtoon` | ✅ |
 | `VRMC_materials_hdr_emissive` | ✅ |
 | `VRMC_vrm` | ✅ |

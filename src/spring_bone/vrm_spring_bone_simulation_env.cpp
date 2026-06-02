@@ -30,8 +30,7 @@ void VRMSpringBoneSimulation::set_environment_collision_bounce_damping(
     float p_damping) {
   environment_collision_bounce_damping = p_damping;
 }
-float VRMSpringBoneSimulation::get_environment_collision_bounce_damping()
-    const {
+float VRMSpringBoneSimulation::get_environment_collision_bounce_damping() const {
   return environment_collision_bounce_damping;
 }
 
