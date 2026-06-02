@@ -9,26 +9,34 @@ const vrm_collider = preload("../../runtime/vrm_collider.gd")
 
 # Detect a human-readable group label from a bone name or VRM comment.
 static func detect_group(bone_name: String, comment: String) -> String:
-	if not comment.is_empty():
-		return comment.split("\n")[0].strip_edges()
+	var name = comment.split("\n")[0].strip_edges() if not comment.is_empty() else bone_name
 
-	var name = bone_name
 	for prefix in ["J_Sec_", "J_", "S_J_"]:
 		if name.begins_with(prefix):
 			name = name.trim_prefix(prefix)
 			break
 
-	if name.begins_with("L_") or name.begins_with("R_"):
+	if name.begins_with("L_") or name.begins_with("R_") or name.begins_with("l_") or name.begins_with("r_"):
 		name = name.substr(2)
 
 	if name.ends_with("_end"):
 		name = name.trim_suffix("_end")
+
+	if name.ends_with("_L") or name.ends_with("_R") or name.ends_with("_l") or name.ends_with("_r"):
+		name = name.substr(0, name.length() - 2)
 
 	var underscore_idx = name.rfind("_")
 	if underscore_idx != -1:
 		var suffix = name.substr(underscore_idx + 1)
 		if suffix.is_valid_int():
 			name = name.substr(0, underscore_idx)
+
+	while name.length() > 0:
+		var c = name.unicode_at(name.length() - 1)
+		if (c >= 48 and c <= 57) or c == 95: # '0'-'9' or '_'
+			name = name.substr(0, name.length() - 1)
+		else:
+			break
 
 	if name.is_empty() or name.is_valid_int():
 		return "Other"
