@@ -63,6 +63,14 @@ Available in the Import dock when selecting a `.vrm` file:
 
 ---
 
+## Icons
+
+- <img src="addons/vrm/icons/vrm_instance.svg" width="32" height="32" align="center"> **VRM Instance**
+- <img src="addons/vrm/icons/vrm_constraint.svg" width="32" height="32" align="center"> **VRM Constraint**
+- <img src="addons/vrm/icons/vrm_constraint_applier.svg" width="32" height="32" align="center"> **VRM Constraint Applier**
+
+---
+
 ## Credits
 
 Originally created by [V-Sekai](https://v-sekai.org/about). Fork maintained by [AzPepoze](https://github.com/AzPepoze).

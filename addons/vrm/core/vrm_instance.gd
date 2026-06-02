@@ -1,4 +1,5 @@
 @tool
+@icon("res://addons/vrm/icons/vrm_instance.svg")
 class_name VRMInstance
 extends Node
 
