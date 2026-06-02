@@ -48,6 +48,12 @@ _subresources={
 "save_to_file/fallback_path": "res://adad.tres",
 "save_to_file/path": "uid://ckbuqdea57joy"
 }
+},
+"nodes": {
+"PATH:GeneralSkeleton": {
+"retarget/bone_map": Object(BoneMap,"resource_local_to_scene":false,"resource_name":"","profile":null,"bonemap":null,"script":null)
+
+}
 }
 }
 vrm/head_hiding_method=0
