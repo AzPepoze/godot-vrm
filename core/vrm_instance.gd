@@ -109,6 +109,18 @@ func recreate_simulation() -> void:
 
 
 @export_category("VRM Settings")
+
+@export var springbone_group_multipliers: Array[VRMSpringBoneGroupSetting] = []:
+	set(value):
+		for old_setting in springbone_group_multipliers:
+			if old_setting and old_setting.changed.is_connected(_on_group_settings_changed):
+				old_setting.changed.disconnect(_on_group_settings_changed)
+		springbone_group_multipliers = value
+		for new_setting in springbone_group_multipliers:
+			if new_setting and not new_setting.changed.is_connected(_on_group_settings_changed):
+				new_setting.changed.connect(_on_group_settings_changed)
+		_on_group_settings_changed()
+
 @export var settings: VRMSettings:
 	set(value):
 		if settings == value:
@@ -138,6 +150,11 @@ func _init() -> void:
 func _on_settings_changed() -> void:
 	if spring_bone_controller and spring_bone_controller.has_method("update_from_settings"):
 		spring_bone_controller.update_from_settings(settings)
+
+
+func _on_group_settings_changed() -> void:
+	if spring_bone_controller and spring_bone_controller.has_method("_setup_spring_bone_adapter"):
+		spring_bone_controller._setup_spring_bone_adapter()
 
 
 func is_vrm_root() -> bool:

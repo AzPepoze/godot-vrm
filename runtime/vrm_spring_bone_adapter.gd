@@ -24,21 +24,23 @@ func setup_simulation(
 	spring_bones: Array,
 	collider_groups: Array,
 	disable_body_collisions: bool,
-	update_in_editor: bool
+	update_in_editor: bool,
+	group_multipliers: Array = []
 ) -> void:
 	if skeleton == null:
 		return
 
 	cleanup()
 
-	_setup_cpp(spring_bones, collider_groups, disable_body_collisions, update_in_editor)
+	_setup_cpp(spring_bones, collider_groups, disable_body_collisions, update_in_editor, group_multipliers)
 
 
 func _setup_cpp(
 	spring_bones: Array,
 	collider_groups: Array,
 	_disable_body_collisions: bool,
-	update_in_editor: bool
+	update_in_editor: bool,
+	group_multipliers: Array = []
 ) -> void:
 	if not has_simulation:
 		return
@@ -54,7 +56,30 @@ func _setup_cpp(
 		if simulation.get_parent() == null:
 			skeleton.add_child(simulation)
 
-		simulation.setup(spring_bones, collider_groups)
+		var modified_spring_bones: Array = []
+		for sb in spring_bones:
+			if sb == null:
+				continue
+			var multiplier = 1.0
+			for gm in group_multipliers:
+				if gm != null and gm.group_name == sb.group:
+					multiplier = gm.hit_radius_multiplier
+					break
+			if multiplier != 1.0:
+				var sb_copy: VRMSpringBone = sb.duplicate()
+				# PackedFloat64Array is passed by value, but modifying the property directly works
+				# However, since it is a copy, we can just replace the array
+				var new_hit_radius = PackedFloat64Array()
+				for r in sb_copy.hit_radius:
+					new_hit_radius.append(r * multiplier)
+				sb_copy.hit_radius = new_hit_radius
+				# also scale hit_radius_scale
+				sb_copy.hit_radius_scale *= multiplier
+				modified_spring_bones.append(sb_copy)
+			else:
+				modified_spring_bones.append(sb)
+
+		simulation.setup(modified_spring_bones, collider_groups)
 		if _settings:
 			update_parameters(_settings)
 		else:

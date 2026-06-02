@@ -220,8 +220,12 @@ func _setup_spring_bone_adapter() -> void:
 	else:
 		spring_bone_adapter.skeleton = skel
 
+	var group_multipliers: Array = []
+	if is_child_of_vrm and _parent_ref != null:
+		group_multipliers = _parent_ref.get("springbone_group_multipliers")
+
 	spring_bone_adapter.setup_simulation(
-		spring_bones, collider_groups, disable_body_collisions, update_in_editor
+		spring_bones, collider_groups, disable_body_collisions, update_in_editor, group_multipliers
 	)
 	_update_adapter()
 
