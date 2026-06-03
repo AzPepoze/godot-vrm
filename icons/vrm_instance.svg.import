@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://x4qxpswxup7p"
-path="res://.godot/imported/vrm_constraint_applier.svg-61c153a7c56b22648cdcea8102eb920a.ctex"
+uid="uid://cqm4fs08qhlv1"
+path="res://.godot/imported/vrm_instance.svg-62dcfe34591c504a4ed6b9eb6eb8c865.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/vrm/node_constraint/icons/vrm_constraint_applier.svg"
-dest_files=["res://.godot/imported/vrm_constraint_applier.svg-61c153a7c56b22648cdcea8102eb920a.ctex"]
+source_file="res://addons/vrm/icons/vrm_instance.svg"
+dest_files=["res://.godot/imported/vrm_instance.svg-62dcfe34591c504a4ed6b9eb6eb8c865.ctex"]
 
 [params]
 

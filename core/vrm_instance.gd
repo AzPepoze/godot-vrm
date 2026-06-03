@@ -1,4 +1,5 @@
 @tool
+@icon("res://addons/vrm/icons/vrm_instance.svg")
 class_name VRMInstance
 extends Node
 
@@ -7,103 +8,56 @@ const vrm_meta_class = preload("./vrm_meta.gd")
 var spring_bone_controller: Node3D:
 	set(value):
 		spring_bone_controller = value
-		if spring_bone_controller:
-			var parent_springs = spring_bones
-			var child_springs = spring_bone_controller.get("spring_bones")
-			if child_springs is Array:
-				if parent_springs.is_empty() and not child_springs.is_empty():
-					spring_bones = child_springs
-				elif not parent_springs.is_empty() and child_springs.is_empty():
-					spring_bone_controller.set("spring_bones", parent_springs)
-				elif parent_springs != child_springs:
-					spring_bone_controller.set("spring_bones", parent_springs)
+		_sync_all_arrays()
 
-			var parent_cgroups = collider_groups
-			var child_cgroups = spring_bone_controller.get("collider_groups")
-			if child_cgroups is Array:
-				if parent_cgroups.is_empty() and not child_cgroups.is_empty():
-					collider_groups = child_cgroups
-				elif not parent_cgroups.is_empty() and child_cgroups.is_empty():
-					spring_bone_controller.set("collider_groups", parent_cgroups)
-				elif parent_cgroups != child_cgroups:
-					spring_bone_controller.set("collider_groups", parent_cgroups)
+func _sync_all_arrays() -> void:
+	if not spring_bone_controller: return
+	spring_bones = _sync_from_controller(&"spring_bones", spring_bones)
+	collider_groups = _sync_from_controller(&"collider_groups", collider_groups)
+	collider_library = _sync_from_controller(&"collider_library", collider_library)
 
-			var parent_clib = collider_library
-			var child_clib = spring_bone_controller.get("collider_library")
-			if child_clib is Array:
-				if parent_clib.is_empty() and not child_clib.is_empty():
-					collider_library = child_clib
-				elif not parent_clib.is_empty() and child_clib.is_empty():
-					spring_bone_controller.set("collider_library", parent_clib)
-				elif parent_clib != child_clib:
-					spring_bone_controller.set("collider_library", parent_clib)
+func _sync_from_controller(prop: StringName, parent_val: Array) -> Array:
+	var child_val = spring_bone_controller.get(prop)
+	if not (child_val is Array): return parent_val
+	if parent_val.is_empty() and not child_val.is_empty():
+		return child_val
+	if not parent_val.is_empty() and child_val.is_empty():
+		spring_bone_controller.set(prop, parent_val)
+	elif parent_val != child_val:
+		spring_bone_controller.set(prop, parent_val)
+	return parent_val
+
+func _sync_to_controller(prop: StringName, value: Array) -> Array:
+	if not spring_bone_controller: return value
+	var child_val = spring_bone_controller.get(prop)
+	if child_val is Array and not child_val.is_empty() and value.is_empty():
+		return child_val
+	if spring_bone_controller.get(prop) != value:
+		spring_bone_controller.set(prop, value)
+	return value
 
 @export var vrm_meta: Resource
 
 @export_category("Spring bones")
 @export var spring_bones: Array[VRMSpringBone] = []:
 	set(value):
-		spring_bones = value
-		if spring_bone_controller:
-			var child_springs = spring_bone_controller.get("spring_bones")
-			if child_springs is Array and not child_springs.is_empty() and value.is_empty():
-				spring_bones = child_springs
-			elif spring_bone_controller.get("spring_bones") != value:
-				spring_bone_controller.set("spring_bones", value)
+		spring_bones = _sync_to_controller(&"spring_bones", value)
 
 @export var collider_groups: Array[VRMColliderGroup] = []:
 	set(value):
-		collider_groups = value
-		if spring_bone_controller:
-			var child_cgroups = spring_bone_controller.get("collider_groups")
-			if child_cgroups is Array and not child_cgroups.is_empty() and value.is_empty():
-				collider_groups = child_cgroups
-			elif spring_bone_controller.get("collider_groups") != value:
-				spring_bone_controller.set("collider_groups", value)
+		collider_groups = _sync_to_controller(&"collider_groups", value)
 
 @export var collider_library: Array[VRMCollider] = []:
 	set(value):
-		collider_library = value
-		if spring_bone_controller:
-			var child_clib = spring_bone_controller.get("collider_library")
-			if child_clib is Array and not child_clib.is_empty() and value.is_empty():
-				collider_library = child_clib
-			elif spring_bone_controller.get("collider_library") != value:
-				spring_bone_controller.set("collider_library", value)
+		collider_library = _sync_to_controller(&"collider_library", value)
 
 @export_tool_button("Recreate Spring Bone Simulation", "Reload")
 var recreate_spring_bone_simulation: Callable = recreate_simulation
 
 
 func recreate_simulation() -> void:
+	_sync_all_arrays()
 	if spring_bone_controller:
-		if spring_bone_controller.get("spring_bones").is_empty() and not spring_bones.is_empty():
-			spring_bone_controller.set("spring_bones", spring_bones)
-		if (
-			spring_bone_controller.get("collider_groups").is_empty()
-			and not collider_groups.is_empty()
-		):
-			spring_bone_controller.set("collider_groups", collider_groups)
-		if (
-			spring_bone_controller.get("collider_library").is_empty()
-			and not collider_library.is_empty()
-		):
-			spring_bone_controller.set("collider_library", collider_library)
-
-		# Sync child arrays to parent if parent is empty
-		if spring_bones.is_empty() and not spring_bone_controller.get("spring_bones").is_empty():
-			spring_bones = spring_bone_controller.get("spring_bones")
-		if (
-			collider_groups.is_empty()
-			and not spring_bone_controller.get("collider_groups").is_empty()
-		):
-			collider_groups = spring_bone_controller.get("collider_groups")
-		if (
-			collider_library.is_empty()
-			and not spring_bone_controller.get("collider_library").is_empty()
-		):
-			collider_library = spring_bone_controller.get("collider_library")
-
 		spring_bone_controller.call("_ready")
 		notify_property_list_changed()
 
