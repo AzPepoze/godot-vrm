@@ -1,34 +1,50 @@
+<h1 align="center">
+  <img src="docs/vrm_instance.png" alt="Logo" width="128" height="128" style="border-radius: 20px;"/><br>
+  ✦ GODOT VRM ✦
+</h1>
+
 <p align="center">
-  <img src="docs/vrm_instance.png" width="128" height="128">
+  <strong>◈ VRM importer, exporter, and runtime spring bone physics for Godot Engine 4.3+ ◈</strong>
+  <br>
+  <strong>◈ Includes a standalone MToon shader ◈</strong>
 </p>
 
-# godot-vrm
+<p align="center">
+  <a href="https://github.com/AzPepoze/godot-vrm/releases/latest">
+    <img src="https://img.shields.io/github/v/release/AzPepoze/godot-vrm?style=for-the-badge&label=%E2%97%88%20RELEASE%20%E2%97%88&labelColor=%23181818&color=%23458dc0" alt="Latest Release">
+  </a>
+  <a href="https://github.com/AzPepoze/godot-vrm/stargazers">
+    <img src="https://img.shields.io/github/stars/AzPepoze/godot-vrm?style=for-the-badge&label=%E2%97%88%20STARS%20%E2%97%88&labelColor=%23181818&color=%23458dc0" alt="Stars">
+  </a>
+  <a href="https://godotengine.org/asset-library/asset/5222">
+    <img src="https://img.shields.io/badge/%E2%97%88%20ASSET%20LIBRARY%20%E2%97%88-DOWNLOAD-458dc0?style=for-the-badge&labelColor=%23181818" alt="Godot Asset Library">
+  </a>
+</p>
 
 > [!IMPORTANT]
 > An active fork and continuation of the excellent [V-Sekai/godot-vrm](https://github.com/V-Sekai/godot-vrm), providing ongoing maintenance and major performance upgrades. Maintained by **[AzPepoze](https://github.com/AzPepoze)**.
-
-VRM importer, exporter, and runtime spring bone physics for **Godot Engine 4.3+**. Includes a standalone MToon shader.
 
 ---
 
 ## Contents
 
-- [godot-vrm](#godot-vrm)
-     - [Contents](#contents)
-     - [What is VRM?](#what-is-vrm)
-     - [What this fork mainly improves](#what-this-fork-mainly-improves)
-     - [Installation](#installation)
-     - [Showcase](#showcase)
-          - [Spring Bone \& Environment Collision](#spring-bone--environment-collision)
-          - [VRM Import \& Spring Bone Gizmos](#vrm-import--spring-bone-gizmos)
-     - [Features Status](#features-status)
-          - [Core VRM Support](#core-vrm-support)
-          - [Spring Bones (`VRMC_springBone`)](#spring-bones-vrmc_springbone)
-          - [Materials \& Shading](#materials--shading)
-          - [Animation \& Retargeting](#animation--retargeting)
-     - [Import Options](#import-options)
-     - [Icons](#icons)
-     - [Credits](#credits)
+- [Contents](#contents)
+- [What is VRM?](#what-is-vrm)
+- [What this fork mainly improves](#what-this-fork-mainly-improves)
+- [Installation](#installation)
+	- [Method 1: Godot Asset Library](#method-1-godot-asset-library)
+	- [Method 2: Manual Install](#method-2-manual-install)
+- [Showcase](#showcase)
+	- [Spring Bone \& Environment Collision](#spring-bone--environment-collision)
+	- [VRM Import \& Spring Bone Gizmos](#vrm-import--spring-bone-gizmos)
+- [Features Status](#features-status)
+	- [Core VRM Support](#core-vrm-support)
+	- [Spring Bones (`VRMC_springBone`)](#spring-bones-vrmc_springbone)
+	- [Materials \& Shading](#materials--shading)
+	- [Animation \& Retargeting](#animation--retargeting)
+- [Import Options](#import-options)
+- [Icons](#icons)
+- [Credits](#credits)
 
 ---
 
@@ -52,9 +68,14 @@ VRM importer, exporter, and runtime spring bone physics for **Godot Engine 4.3+*
 
 ## Installation
 
-1. Copy `addons/vrm` into your project's `addons/` — **do not rename**
-2. Copy `addons/mtoon` into `addons/mtoon` — **do not rename**
-3. Enable both in **Project Settings → Plugins → VRM** and **mtoon**
+### Method 1: Godot Asset Library
+Download and install directly via the [Godot Asset Library](https://godotengine.org/asset-library/asset/5222).
+
+### Method 2: Manual Install
+1. Download the latest `.zip` from the [Releases page](https://github.com/AzPepoze/godot-vrm/releases/latest).
+2. Copy `addons/vrm` into your project's `addons/` — **do not rename**
+3. Copy `addons/mtoon` into `addons/mtoon` — **do not rename**
+4. Enable both in **Project Settings → Plugins → VRM** and **mtoon**
 
 ---
 
