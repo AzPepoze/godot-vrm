@@ -4,6 +4,7 @@ const SpringBoneRes = preload("res://addons/vrm/runtime/vrm_spring_bone.gd")
 const ColliderGroupRes = preload("res://addons/vrm/runtime/vrm_collider_group.gd")
 const ColliderRes = preload("res://addons/vrm/runtime/vrm_collider.gd")
 
+
 # --- TEST 1: Basic Push Detection ---
 func test_env_collision_pushes_tail_out_of_box():
 	if not ClassDB.class_exists("VRMSpringBoneSimulation"):
@@ -59,6 +60,7 @@ func test_env_collision_pushes_tail_out_of_box():
 	runner.root.remove_child(box)
 	box.queue_free()
 	test_completed = true
+
 
 # --- TEST 2: Static Settling (High Gravity) ---
 func test_env_collision_tail_settles_without_bounce():
@@ -132,6 +134,7 @@ func test_env_collision_tail_settles_without_bounce():
 	box.queue_free()
 	test_completed = true
 
+
 # --- TEST 3: Chaos Stress Test (Long Chain & Angle) ---
 func test_env_collision_chaos_stress_test():
 	if not ClassDB.class_exists("VRMSpringBoneSimulation"):
@@ -144,7 +147,7 @@ func test_env_collision_chaos_stress_test():
 	for i in range(bone_names.size()):
 		skeleton.add_bone(bone_names[i])
 		if i > 0:
-			skeleton.set_bone_parent(i, i-1)
+			skeleton.set_bone_parent(i, i - 1)
 			skeleton.set_bone_rest(i, Transform3D(Basis(), Vector3(0, -0.2, 0)))
 	skeleton.rotation_degrees.x = 45
 
@@ -185,7 +188,7 @@ func test_env_collision_chaos_stress_test():
 
 	var movement: float = 0.0
 	for i in range(1, positions.size()):
-		movement += (positions[i] - positions[i-1]).length()
+		movement += (positions[i] - positions[i - 1]).length()
 	assert_lt(movement, 0.005, "Chaos Test Failed: High movement detected")
 
 	runner.root.remove_child(skeleton)
@@ -193,6 +196,7 @@ func test_env_collision_chaos_stress_test():
 	runner.root.remove_child(floor_obj)
 	floor_obj.queue_free()
 	test_completed = true
+
 
 # --- TEST 4: Moving Platform Response ---
 func test_env_collision_moving_platform_jitter():
@@ -257,6 +261,7 @@ func test_env_collision_moving_platform_jitter():
 	floor_obj.queue_free()
 	test_completed = true
 
+
 # --- TEST 5: Energy Divergence (Explosion Check) ---
 func test_env_collision_energy_divergence():
 	if not ClassDB.class_exists("VRMSpringBoneSimulation"):
@@ -269,7 +274,7 @@ func test_env_collision_energy_divergence():
 	for i in range(bone_names.size()):
 		skeleton.add_bone(bone_names[i])
 		if i > 0:
-			skeleton.set_bone_parent(i, i-1)
+			skeleton.set_bone_parent(i, i - 1)
 			skeleton.set_bone_rest(i, Transform3D(Basis(), Vector3(0, -0.2, 0)))
 	skeleton.rotation_degrees.x = 45
 
@@ -309,11 +314,13 @@ func test_env_collision_energy_divergence():
 		energy_log.append(energy)
 
 	var e_start = 0.0
-	for i in range(50, 70): e_start += energy_log[i]
+	for i in range(50, 70):
+		e_start += energy_log[i]
 	e_start /= 20.0
 
 	var e_end = 0.0
-	for i in range(180, 200): e_end += energy_log[i]
+	for i in range(180, 200):
+		e_end += energy_log[i]
 	e_end /= 20.0
 
 	assert_lt(e_end, e_start * 1.5, "Energy Divergence detected!")

@@ -32,7 +32,9 @@ func setup_simulation(
 
 	cleanup()
 
-	_setup_cpp(spring_bones, collider_groups, disable_body_collisions, update_in_editor, group_multipliers)
+	_setup_cpp(
+		spring_bones, collider_groups, disable_body_collisions, update_in_editor, group_multipliers
+	)
 
 
 func _setup_cpp(
@@ -127,7 +129,9 @@ func update_parameters(p_settings: VRMSettings) -> void:
 		simulation.set_wind_turbulence(_settings.wind_turbulence)
 		simulation.set_wind_frequency(_settings.wind_frequency)
 		simulation.set_environment_collision_enabled(_settings.environment_collision_enabled)
-		simulation.set_environment_collision_bounce_damping(_settings.environment_collision_bounce_damping)
+		simulation.set_environment_collision_bounce_damping(
+			_settings.environment_collision_bounce_damping
+		)
 		simulation.set_environment_collision_mask(_settings.environment_collision_mask)
 		simulation.set_debug_collision(_settings.environment_collision_debug)
 

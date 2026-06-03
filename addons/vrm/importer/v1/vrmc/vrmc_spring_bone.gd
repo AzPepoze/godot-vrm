@@ -60,7 +60,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 	for sb in spring_bones:
 		if not sb.group.is_empty() and sb.group != "Other":
 			unique_groups[sb.group] = true
-	
+
 	if not unique_groups.is_empty():
 		var group_settings: Array[VRMSpringBoneGroupSetting] = []
 		var sorted_groups = unique_groups.keys()

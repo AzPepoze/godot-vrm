@@ -1,5 +1,6 @@
 extends SceneTree
 
+
 func _init():
 	var gltf_extension_classes = [
 		load("res://addons/vrm/importer/v1/vrmc/vrmc_node_constraint.gd"),
@@ -14,25 +15,25 @@ func _init():
 		var instance = ext_cls.new()
 		instances.append(instance)
 		GLTFDocument.register_gltf_document_extension(instance, true)
-		
+
 	var doc = GLTFDocument.new()
 	var state = GLTFState.new()
-	
+
 	print("Loading AvatarSample_M.vrm...")
 	var err = doc.append_from_file("res://vrm_samples/AvatarSample_M.vrm", state)
 	if err != OK:
 		print("Failed to append from file: ", err)
 		quit()
 		return
-		
+
 	var root = doc.generate_scene(state)
 	if root == null:
 		print("Failed to generate scene from GLTFDocument")
 		quit()
 		return
-		
+
 	print("Generated scene successfully. Now exporting to /tmp/exported.vrm...")
-	
+
 	var doc2 = GLTFDocument.new()
 	var state2 = GLTFState.new()
 	err = doc2.append_from_scene(root, state2)
@@ -40,7 +41,7 @@ func _init():
 		err = doc2.write_to_filesystem(state2, "/tmp/exported.vrm")
 		if err == OK:
 			print("Export succeeded to /tmp/exported.vrm")
-			
+
 			print("Testing import of the exported file...")
 			var doc3 = GLTFDocument.new()
 			var state3 = GLTFState.new()
@@ -57,5 +58,5 @@ func _init():
 			print("Failed to write to filesystem: ", err)
 	else:
 		print("Failed to append from scene: ", err)
-		
+
 	quit()

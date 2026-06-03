@@ -16,7 +16,12 @@ static func detect_group(bone_name: String, comment: String) -> String:
 			name = name.trim_prefix(prefix)
 			break
 
-	if name.begins_with("L_") or name.begins_with("R_") or name.begins_with("l_") or name.begins_with("r_"):
+	if (
+		name.begins_with("L_")
+		or name.begins_with("R_")
+		or name.begins_with("l_")
+		or name.begins_with("r_")
+	):
 		name = name.substr(2)
 
 	if name.ends_with("_end"):
@@ -33,7 +38,7 @@ static func detect_group(bone_name: String, comment: String) -> String:
 
 	while name.length() > 0:
 		var c = name.unicode_at(name.length() - 1)
-		if (c >= 48 and c <= 57) or c == 95: # '0'-'9' or '_'
+		if (c >= 48 and c <= 57) or c == 95:  # '0'-'9' or '_'
 			name = name.substr(0, name.length() - 1)
 		else:
 			break
