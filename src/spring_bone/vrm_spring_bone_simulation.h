@@ -174,7 +174,10 @@ public:
   bool get_enable_body_collisions() const { return enable_body_collisions; }
 
   void set_simulate_in_local_space(bool p_enabled) {
-    simulate_in_local_space = p_enabled;
+    if (simulate_in_local_space != p_enabled) {
+      simulate_in_local_space = p_enabled;
+      need_reset = true;
+    }
   }
   bool get_simulate_in_local_space() const { return simulate_in_local_space; }
 

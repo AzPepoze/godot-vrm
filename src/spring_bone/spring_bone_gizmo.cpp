@@ -97,14 +97,15 @@ void draw_gizmo(
     mesh->surface_begin(Mesh::PRIMITIVE_LINES);
     for (const auto &chain : chains) {
       Transform3D center_transform;
-      if (chain.center_bone != -1) {
+      if (!p_simulate_in_local_space) {
+        center_transform = skel_global_inv;
+      } else if (chain.center_bone != -1) {
         center_transform = skel->get_bone_global_pose(chain.center_bone);
       } else if (chain.center_node) {
         center_transform =
             skel_global_inv * chain.center_node->get_global_transform();
       } else {
-        center_transform =
-            p_simulate_in_local_space ? Transform3D() : skel_global_inv;
+        center_transform = Transform3D();
       }
 
       for (size_t i = 0; i < chain.joints.size(); ++i) {

@@ -36,12 +36,15 @@ static Transform3D
 get_center_transform(const VRMSpringBoneSimulation::CPPSpringBoneChain &chain,
                      Skeleton3D *skel, const Transform3D &skel_global_inv,
                      bool simulate_in_local_space) {
+  if (!simulate_in_local_space) {
+    return skel_global_inv;
+  }
   if (chain.center_bone != -1) {
     return skel->get_bone_global_pose(chain.center_bone);
   } else if (chain.center_node) {
     return skel_global_inv * chain.center_node->get_global_transform();
   }
-  return simulate_in_local_space ? Transform3D() : skel_global_inv;
+  return Transform3D();
 }
 
 // ---------------------------------------------------------------------------
