@@ -1270,6 +1270,9 @@ hit_radius_multiplier = 2.0
 
 [sub_resource type="Resource" id="Resource_f77ra"]
 script = ExtResource("7_1hec4")
+gizmo_spring_bone = true
+gizmo_show_body_collisions = true
+gizmo_show_wind = true
 update_in_editor = true
 
 [sub_resource type="Resource" id="Resource_5kuih"]
@@ -2246,81 +2249,11 @@ radius = 0.06
 script = ExtResource("6_0g8rx")
 colliders = Array[ExtResource("6_1hec4")]([SubResource("Resource_lgp22"), SubResource("Resource_froxa"), SubResource("Resource_0fesl")])
 
-[sub_resource type="Resource" id="Resource_biyun"]
-resource_name = "skirt_10_01"
+[sub_resource type="Resource" id="Resource_uw47o"]
+resource_name = "skirt_01_01"
 script = ExtResource("5_w5qep")
 group = "skirt"
-joint_nodes = PackedStringArray("skirt_10_01", "skirt_10_02", "")
-drag_force_scale = 0.8
-hit_radius_scale = 0.05
-gravity_scale = 0.05
-collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_2tdl1")])
-
-[sub_resource type="Resource" id="Resource_8qwgd"]
-resource_name = "skirt_09_01"
-script = ExtResource("5_w5qep")
-group = "skirt"
-joint_nodes = PackedStringArray("skirt_09_01", "skirt_09_02", "")
-drag_force_scale = 0.8
-hit_radius_scale = 0.05
-gravity_scale = 0.05
-collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_2tdl1")])
-
-[sub_resource type="Resource" id="Resource_52agq"]
-resource_name = "skirt_08_01"
-script = ExtResource("5_w5qep")
-group = "skirt"
-joint_nodes = PackedStringArray("skirt_08_01", "skirt_08_02", "")
-drag_force_scale = 0.8
-hit_radius_scale = 0.05
-gravity_scale = 0.05
-collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_2tdl1")])
-
-[sub_resource type="Resource" id="Resource_0atml"]
-resource_name = "skirt_07_01"
-script = ExtResource("5_w5qep")
-group = "skirt"
-joint_nodes = PackedStringArray("skirt_07_01", "skirt_07_02", "")
-drag_force_scale = 0.8
-hit_radius_scale = 0.05
-gravity_scale = 0.05
-collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_2tdl1")])
-
-[sub_resource type="Resource" id="Resource_g5knp"]
-resource_name = "skirt_06_01"
-script = ExtResource("5_w5qep")
-group = "skirt"
-joint_nodes = PackedStringArray("skirt_06_01", "skirt_06_02", "")
-drag_force_scale = 0.8
-hit_radius_scale = 0.05
-gravity_scale = 0.05
-collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_2tdl1")])
-
-[sub_resource type="Resource" id="Resource_g7kw1"]
-resource_name = "skirt_05_01"
-script = ExtResource("5_w5qep")
-group = "skirt"
-joint_nodes = PackedStringArray("skirt_05_01", "skirt_05_02", "")
-drag_force_scale = 0.8
-hit_radius_scale = 0.05
-gravity_scale = 0.05
-collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_2tdl1")])
-
-[sub_resource type="Resource" id="Resource_gi1y5"]
-resource_name = "skirt_04_01"
-script = ExtResource("5_w5qep")
-group = "skirt"
-joint_nodes = PackedStringArray("skirt_04_01", "skirt_04_02", "")
-drag_force_scale = 0.8
-hit_radius_scale = 0.05
-gravity_scale = 0.05
-collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_2tdl1")])
-
-[sub_resource type="Resource" id="Resource_v3sw5"]
-resource_name = "skirt_03_01"
-script = ExtResource("5_w5qep")
-group = "skirt"
-joint_nodes = PackedStringArray("skirt_03_01", "skirt_03_02", "")
+joint_nodes = PackedStringArray("skirt_01_01", "skirt_01_02", "")
 drag_force_scale = 0.8
 hit_radius_scale = 0.05
 gravity_scale = 0.05
@@ -2336,15 +2269,93 @@ hit_radius_scale = 0.05
 gravity_scale = 0.05
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_2tdl1")])
 
-[sub_resource type="Resource" id="Resource_uw47o"]
-resource_name = "skirt_01_01"
+[sub_resource type="Resource" id="Resource_v3sw5"]
+resource_name = "skirt_03_01"
 script = ExtResource("5_w5qep")
 group = "skirt"
-joint_nodes = PackedStringArray("skirt_01_01", "skirt_01_02", "")
+joint_nodes = PackedStringArray("skirt_03_01", "skirt_03_02", "")
 drag_force_scale = 0.8
 hit_radius_scale = 0.05
 gravity_scale = 0.05
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_2tdl1")])
+
+[sub_resource type="Resource" id="Resource_gi1y5"]
+resource_name = "skirt_04_01"
+script = ExtResource("5_w5qep")
+group = "skirt"
+joint_nodes = PackedStringArray("skirt_04_01", "skirt_04_02", "")
+drag_force_scale = 0.8
+hit_radius_scale = 0.05
+gravity_scale = 0.05
+collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_2tdl1")])
+
+[sub_resource type="Resource" id="Resource_g7kw1"]
+resource_name = "skirt_05_01"
+script = ExtResource("5_w5qep")
+group = "skirt"
+joint_nodes = PackedStringArray("skirt_05_01", "skirt_05_02", "")
+drag_force_scale = 0.8
+hit_radius_scale = 0.05
+gravity_scale = 0.05
+collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_2tdl1")])
+
+[sub_resource type="Resource" id="Resource_g5knp"]
+resource_name = "skirt_06_01"
+script = ExtResource("5_w5qep")
+group = "skirt"
+joint_nodes = PackedStringArray("skirt_06_01", "skirt_06_02", "")
+drag_force_scale = 0.8
+hit_radius_scale = 0.05
+gravity_scale = 0.05
+collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_2tdl1")])
+
+[sub_resource type="Resource" id="Resource_0atml"]
+resource_name = "skirt_07_01"
+script = ExtResource("5_w5qep")
+group = "skirt"
+joint_nodes = PackedStringArray("skirt_07_01", "skirt_07_02", "")
+drag_force_scale = 0.8
+hit_radius_scale = 0.05
+gravity_scale = 0.05
+collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_2tdl1")])
+
+[sub_resource type="Resource" id="Resource_52agq"]
+resource_name = "skirt_08_01"
+script = ExtResource("5_w5qep")
+group = "skirt"
+joint_nodes = PackedStringArray("skirt_08_01", "skirt_08_02", "")
+drag_force_scale = 0.8
+hit_radius_scale = 0.05
+gravity_scale = 0.05
+collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_2tdl1")])
+
+[sub_resource type="Resource" id="Resource_8qwgd"]
+resource_name = "skirt_09_01"
+script = ExtResource("5_w5qep")
+group = "skirt"
+joint_nodes = PackedStringArray("skirt_09_01", "skirt_09_02", "")
+drag_force_scale = 0.8
+hit_radius_scale = 0.05
+gravity_scale = 0.05
+collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_2tdl1")])
+
+[sub_resource type="Resource" id="Resource_biyun"]
+resource_name = "skirt_10_01"
+script = ExtResource("5_w5qep")
+group = "skirt"
+joint_nodes = PackedStringArray("skirt_10_01", "skirt_10_02", "")
+drag_force_scale = 0.8
+hit_radius_scale = 0.05
+gravity_scale = 0.05
+collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_2tdl1")])
+
+[sub_resource type="Resource" id="Resource_xmba4"]
+script = ExtResource("7_1hec4")
+wind_direction = Vector3(0, 0.545, 0)
+gizmo_display_mode = 1
+gizmo_spring_bone = true
+gizmo_show_body_collisions = true
+update_in_editor = true
 
 [node name="Spatial" type="Node3D" unique_id=2048687081]
 script = ExtResource("3")
@@ -2363,13 +2374,6 @@ spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_2383u"), Sub
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_bx8sr"), SubResource("Resource_522qr")])
 collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_4wf7p"), SubResource("Resource_jw5ma"), SubResource("Resource_kvc02"), SubResource("Resource_kj872")])
 settings = SubResource("Resource_1hec4")
-
-[node name="VRMSpringBoneController" parent="Godette_vrm_v4" index="3" unique_id=843691399]
-update_in_editor = true
-gizmo_spring_bone = true
-spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_2383u"), SubResource("Resource_aj1uy"), SubResource("Resource_1xoni"), SubResource("Resource_b6c6s"), SubResource("Resource_ep3bh"), SubResource("Resource_i6o5b"), SubResource("Resource_7camr"), SubResource("Resource_0w46o")])
-collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_bx8sr"), SubResource("Resource_522qr")])
-collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_4wf7p"), SubResource("Resource_jw5ma"), SubResource("Resource_kvc02"), SubResource("Resource_kj872")])
 
 [node name="AliciaSolid_vrm-059" parent="." unique_id=1988248279 instance=ExtResource("1")]
 transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, 4.913352, 0, -2.3783264)
@@ -2489,8 +2493,7 @@ springbone_group_multipliers = Array[ExtResource("10_jstv3")]([SubResource("Reso
 settings = SubResource("Resource_jv7sj")
 
 [node name="AliciaSolid_vrm-0_51" parent="." unique_id=1926456560 instance=ExtResource("1")]
-spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_kws1l"), SubResource("Resource_22daj"), SubResource("Resource_gye3p"), SubResource("Resource_bj2ke"), SubResource("Resource_83rs6"), SubResource("Resource_d1qxi"), SubResource("Resource_diav4"), SubResource("Resource_s53rv"), SubResource("Resource_biyun"), SubResource("Resource_8qwgd"), SubResource("Resource_52agq"), SubResource("Resource_0atml"), SubResource("Resource_g5knp"), SubResource("Resource_g7kw1"), SubResource("Resource_gi1y5"), SubResource("Resource_v3sw5"), SubResource("Resource_wkhtb"), SubResource("Resource_uw47o")])
+spring_bones = Array[ExtResource("5_w5qep")]([SubResource("Resource_kws1l"), SubResource("Resource_22daj"), SubResource("Resource_gye3p"), SubResource("Resource_bj2ke"), SubResource("Resource_83rs6"), SubResource("Resource_d1qxi"), SubResource("Resource_diav4"), SubResource("Resource_s53rv"), SubResource("Resource_uw47o"), SubResource("Resource_wkhtb"), SubResource("Resource_v3sw5"), SubResource("Resource_gi1y5"), SubResource("Resource_g7kw1"), SubResource("Resource_g5knp"), SubResource("Resource_0atml"), SubResource("Resource_52agq"), SubResource("Resource_8qwgd"), SubResource("Resource_biyun")])
 collider_groups = Array[ExtResource("6_0g8rx")]([SubResource("Resource_rn3ps"), SubResource("Resource_l5g6t"), SubResource("Resource_fxgvk"), SubResource("Resource_6nogv"), SubResource("Resource_itdgx"), SubResource("Resource_2tdl1")])
 collider_library = Array[ExtResource("6_1hec4")]([SubResource("Resource_xol2m"), SubResource("Resource_tcpeh"), SubResource("Resource_4tx60"), SubResource("Resource_u3be1"), SubResource("Resource_jw4kh"), SubResource("Resource_s6en0"), SubResource("Resource_lgp22"), SubResource("Resource_froxa"), SubResource("Resource_0fesl"), SubResource("Resource_jstv3"), SubResource("Resource_wlhup"), SubResource("Resource_c68qo"), SubResource("Resource_1mx4j"), SubResource("Resource_lx0lc")])
-
-[editable path="Godette_vrm_v4"]
+settings = SubResource("Resource_xmba4")
