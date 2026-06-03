@@ -97,14 +97,15 @@ void VRMSpringBoneSimulation::_resolve_angular_collisions(
 
     if (collision_happened) {
       Vector3 velocity = joint.current_tail - joint.prev_tail;
-      const float normal_velocity = velocity.dot(contact_normal);
+      Vector3 contact_normal_local = center_inv.basis.xform(skel->get_global_transform().affine_inverse().basis.xform(contact_normal)).normalized();
+      const float normal_velocity = velocity.dot(contact_normal_local);
       if (normal_velocity < 0.0f) {
-        velocity -= contact_normal * normal_velocity;
+        velocity -= contact_normal_local * normal_velocity;
         velocity *= SpringBoneConstants::CONTACT_VELOCITY_DAMPING;
         joint.prev_tail = joint.current_tail - velocity;
       }
       joint.env_in_contact = true;
-      joint.env_contact_normal = contact_normal;
+      joint.env_contact_normal = contact_normal_local;
     } else {
       if (joint.env_in_contact && iter == 0) {
         Vector3 velocity = joint.current_tail - joint.prev_tail;

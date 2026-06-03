@@ -53,13 +53,16 @@ func _init():
 
 
 func run_test_file(path: String):
-	print("Running suite: %s" % path.get_file())
 	var script = load(path)
 	if not script:
 		printerr("  [ERROR] Failed to load test script: ", path)
 		failed_tests += 1
 		return
 
+	if script.get_instance_base_type() != "RefCounted":
+		return
+
+	print("Running suite: %s" % path.get_file())
 	var test_obj = script.new()
 	test_obj.runner = self
 

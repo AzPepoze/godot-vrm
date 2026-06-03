@@ -364,7 +364,15 @@ static func setup_animation_player_v0(
 			)
 
 	animation_library.add_animation("RESET", reset_anim)
-	animplayer.add_animation_library("", animation_library)
+	if not animplayer.has_animation_library(&""):
+		animplayer.add_animation_library("", animation_library)
+	else:
+		var existing_library: AnimationLibrary = animplayer.get_animation_library("")
+		for anim_name in animation_library.get_animation_list():
+			if existing_library.has_animation(anim_name):
+				existing_library.remove_animation(anim_name)
+			var anim: Animation = animation_library.get_animation(anim_name)
+			existing_library.add_animation(anim_name, anim)
 	VRMLogger.info(
 		"vrm_animation.gd", "setup_animation_player_v0: animation library set up complete"
 	)
