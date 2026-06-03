@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="addons/vrm/icons/vrm_instance.svg" width="128" height="128">
+  <img src="addons/vrm/icons/vrm_instance.png" width="128" height="128">
 </p>
 
 # godot-vrm
