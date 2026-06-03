@@ -13,19 +13,28 @@ VRM importer, exporter, and runtime spring bone physics for **Godot Engine 4.3+*
 
 ## Contents
 
-- [What is VRM?](#what-is-vrm)
-- [What this fork improves](#what-this-fork-improves)
-- [Installation](#installation)
-- [Showcase](#showcase)
-- [Features Status](#features-status)
-- [Import Options](#import-options)
-- [Credits](#credits)
+- [godot-vrm](#godot-vrm)
+     - [Contents](#contents)
+     - [What is VRM?](#what-is-vrm)
+     - [What this fork mainly improves](#what-this-fork-mainly-improves)
+     - [Installation](#installation)
+     - [Showcase](#showcase)
+          - [Spring Bone \& Environment Collision](#spring-bone--environment-collision)
+          - [VRM Import \& Spring Bone Gizmos](#vrm-import--spring-bone-gizmos)
+     - [Features Status](#features-status)
+          - [Core VRM Support](#core-vrm-support)
+          - [Spring Bones (`VRMC_springBone`)](#spring-bones-vrmc_springbone)
+          - [Materials \& Shading](#materials--shading)
+          - [Animation \& Retargeting](#animation--retargeting)
+     - [Import Options](#import-options)
+     - [Icons](#icons)
+     - [Credits](#credits)
 
 ---
 
 ## What is VRM?
 
-- **[VRM](https://vrm.dev/en/)**: A 3D avatar format based on glTF 2.0 that standardizes bones, expressions, and physics.
+- **[VRM](https://vrm.dev/en/)**: 3D avatar ecosystem created by Pixiv.
 - **[VRoid Studio](https://vroid.com/en/studio)**: A free tool to easily create your own custom VRM avatars.
 
 ---
@@ -60,6 +69,7 @@ VRM importer, exporter, and runtime spring bone physics for **Godot Engine 4.3+*
 | ![VRM 0.0 Collision](docs/collision_with_environment_v0.png) | ![VRM 1.0 Collision](docs/collision_with_environment_v1.png) |
 
 Spring bones can collide with two types of objects:
+
 - **Body Colliders**: The character's own internal VRM colliders.
 - **Environment Collision**: Godot's external physics bodies (can be toggled in settings).
 
@@ -89,12 +99,12 @@ In the debug images above:
 
 ### Core VRM Support
 
-| Feature                 | Status | Details                                                     |
-| ----------------------- | :----: | ----------------------------------------------------------- |
-| VRM 0.0 Import          |   ✅   |                                                             |
-| VRM 1.0 Import          |   ✅   |                                                             |
+| Feature                          | Status | Details                                                                               |
+| -------------------------------- | :----: | ------------------------------------------------------------------------------------- |
+| VRM 0.0 Import                   |   ✅   |                                                                                       |
+| VRM 1.0 Import                   |   ✅   |                                                                                       |
 | VRM 1.0 Export (`.vrm` / `.glb`) |   ⚠️   | Exports metadata, MToon, and node constraints, but humanoid bones/expressions are WIP |
-| Metadata                |   ✅   | License, screenshot parsing                                 |
+| Metadata                         |   ✅   | License, screenshot parsing                                                           |
 
 ### Spring Bones (`VRMC_springBone`)
 
@@ -105,7 +115,7 @@ In the debug images above:
 | Environment Collision     |   ✅   | Capsule queries against Godot's physics environment. Can be toggled.   |
 | Group Multipliers         |   ✅   | Per-instance hit radius scaling for specific groups (e.g. Hair, Skirt) |
 | Editor Gizmos             |   ✅   | Visualizes spring bone colliders and radius in the 3D viewport         |
-| `.gltf` Standalone Export |   ⚠️   | Spring bones are not currently exported to glTF        |
+| `.gltf` Standalone Export |   ⚠️   | Spring bones are not currently exported to glTF                        |
 
 ### Materials & Shading
 
