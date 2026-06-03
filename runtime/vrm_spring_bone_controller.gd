@@ -11,127 +11,97 @@ const SpringBoneGizmo = preload("./vrm_spring_bone_controller_gizmo.gd")
 @export_group("Spring Bone Collisions")
 @export var disable_spring_bone_collisions: bool:
 	get:
-		if _settings == null:
-			_settings = VRMSettings.new()
-		return _settings.disable_spring_bone_collisions
+		return _get_settings().disable_spring_bone_collisions
 	set(value):
-		if _settings == null:
-			_settings = VRMSettings.new()
-		_settings.disable_spring_bone_collisions = value
+		_get_settings().disable_spring_bone_collisions = value
 		if spring_bone_adapter:
 			spring_bone_adapter.update_parameters(_settings)
 
 @export_group("Body Collisions")
 @export var disable_body_collisions: bool:
 	get:
-		if _settings == null:
-			_settings = VRMSettings.new()
-		return _settings.disable_body_collisions
+		return _get_settings().disable_body_collisions
 	set(value):
-		if _settings == null:
-			_settings = VRMSettings.new()
-		_settings.disable_body_collisions = value
+		_get_settings().disable_body_collisions = value
 		if spring_bone_adapter:
 			spring_bone_adapter.update_parameters(_settings)
 
 @export_group("Advanced & Runtime")
 @export var update_spring_bone_controller_in_physics: bool:
 	get:
-		if _settings == null:
-			_settings = VRMSettings.new()
-		return _settings.update_spring_bone_controller_in_physics
+		return _get_settings().update_spring_bone_controller_in_physics
 	set(value):
-		if _settings == null:
-			_settings = VRMSettings.new()
-		_settings.update_spring_bone_controller_in_physics = value
+		_get_settings().update_spring_bone_controller_in_physics = value
 
 @export var override_springbone_center: bool:
 	get:
-		if _settings == null:
-			_settings = VRMSettings.new()
-		return _settings.override_springbone_center
+		return _get_settings().override_springbone_center
 	set(value):
-		if _settings == null:
-			_settings = VRMSettings.new()
-		_settings.override_springbone_center = value
+		_get_settings().override_springbone_center = value
 
 @export var default_springbone_center: Node3D
 
 @export_group("Run in Editor")
 @export var update_in_editor: bool:
 	get:
-		if _settings == null:
-			_settings = VRMSettings.new()
-		return _settings.update_in_editor
+		return _get_settings().update_in_editor
 	set(value):
-		if _settings == null:
-			_settings = VRMSettings.new()
-		_settings.update_in_editor = value
+		_get_settings().update_in_editor = value
 		if spring_bone_adapter:
 			spring_bone_adapter.update_parameters(_settings)
+		if Engine.is_editor_hint():
+			update_configuration_warnings()
 
 @export_group("Gizmos")
 @export var gizmo_spring_bone: bool:
 	get:
-		if _settings == null:
-			_settings = VRMSettings.new()
-		return _settings.gizmo_spring_bone
+		return _get_settings().gizmo_spring_bone
 	set(value):
-		if _settings == null:
-			_settings = VRMSettings.new()
-		_settings.gizmo_spring_bone = value
+		_get_settings().gizmo_spring_bone = value
+		if Engine.is_editor_hint():
+			update_configuration_warnings()
 
 @export var gizmo_spring_bone_color: Color:
 	get:
-		if _settings == null:
-			_settings = VRMSettings.new()
-		return _settings.gizmo_spring_bone_color
+		return _get_settings().gizmo_spring_bone_color
 	set(value):
-		if _settings == null:
-			_settings = VRMSettings.new()
-		_settings.gizmo_spring_bone_color = value
+		_get_settings().gizmo_spring_bone_color = value
 
 @export_enum("Line Circle", "Capsule") var gizmo_display_mode: int:
 	get:
-		if _settings == null:
-			_settings = VRMSettings.new()
-		return _settings.gizmo_display_mode
+		return _get_settings().gizmo_display_mode
 	set(value):
-		if _settings == null:
-			_settings = VRMSettings.new()
-		_settings.gizmo_display_mode = value
+		_get_settings().gizmo_display_mode = value
 		if spring_bone_adapter:
 			spring_bone_adapter.set_gizmo_display_mode(value)
 
 @export var gizmo_show_body_collisions: bool:
 	get:
-		if _settings == null:
-			_settings = VRMSettings.new()
-		return _settings.gizmo_show_body_collisions
+		return _get_settings().gizmo_show_body_collisions
 	set(value):
-		if _settings == null:
-			_settings = VRMSettings.new()
-		_settings.gizmo_show_body_collisions = value
+		_get_settings().gizmo_show_body_collisions = value
+		if Engine.is_editor_hint():
+			update_configuration_warnings()
 
 @export var gizmo_show_wind: bool:
 	get:
-		if _settings == null:
-			_settings = VRMSettings.new()
-		return _settings.gizmo_show_wind
+		return _get_settings().gizmo_show_wind
 	set(value):
-		if _settings == null:
-			_settings = VRMSettings.new()
-		_settings.gizmo_show_wind = value
+		_get_settings().gizmo_show_wind = value
+		if Engine.is_editor_hint():
+			update_configuration_warnings()
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings = PackedStringArray()
+	if not update_in_editor and (gizmo_spring_bone or gizmo_show_body_collisions or gizmo_show_wind):
+		warnings.append("Please enable 'Update In Editor' to correctly display the spring bone gizmos.")
+	return warnings
 
 @export var gizmo_wind_color: Color:
 	get:
-		if _settings == null:
-			_settings = VRMSettings.new()
-		return _settings.gizmo_wind_color
+		return _get_settings().gizmo_wind_color
 	set(value):
-		if _settings == null:
-			_settings = VRMSettings.new()
-		_settings.gizmo_wind_color = value
+		_get_settings().gizmo_wind_color = value
 
 @export_category("Spring bones")
 @export_node_path("Skeleton3D") var skeleton: NodePath:
@@ -161,12 +131,17 @@ var spring_bone_adapter: RefCounted = null
 var _gizmo: MeshInstance3D = null
 var _settings: VRMSettings = null
 
+func _get_settings() -> VRMSettings:
+	if _settings == null:
+		_settings = VRMSettings.new()
+	return _settings
+
 
 func _enter_tree() -> void:
 	_parent_ref = get_parent()
 	if _parent_ref != null and _parent_ref.has_method("is_vrm_root"):
 		is_child_of_vrm = true
-		_parent_ref.set("spring_bone_controller", self)
+		_parent_ref.set("spring_bone_controller", self )
 		# Pull settings resource
 		var parent_settings = _parent_ref.get("settings")
 		if parent_settings is VRMSettings:
@@ -199,6 +174,8 @@ func _ready() -> void:
 		"vrm_spring_bone_controller.gd",
 		"_ready: setup complete for %d spring bones" % spring_bones.size()
 	)
+	if Engine.is_editor_hint():
+		update_configuration_warnings()
 
 
 func update_from_settings(settings: VRMSettings) -> void:
@@ -212,6 +189,8 @@ func update_from_settings(settings: VRMSettings) -> void:
 			_settings.settings_changed.connect(_update_adapter)
 		_update_adapter()
 		_notify_constraint_appliers()
+		if Engine.is_editor_hint():
+			update_configuration_warnings()
 
 
 func _setup_spring_bone_adapter() -> void:
@@ -232,7 +211,7 @@ func _setup_spring_bone_adapter() -> void:
 
 func _setup_gizmo() -> void:
 	if _gizmo == null:
-		_gizmo = SpringBoneGizmo.new(self)
+		_gizmo = SpringBoneGizmo.new(self )
 		add_child(_gizmo, false, Node.INTERNAL_MODE_BACK)
 
 
@@ -276,7 +255,7 @@ func _draw_wind_arrow(
 	# Gizmo is in skeleton space because of the skel_to_gizmo transform
 	# Find Head bone for positioning
 	var head_idx = skel.find_bone("Head")
-	var start_pos_skel = Vector3(0, 1.5, 0)  # Fallback
+	var start_pos_skel = Vector3(0, 1.5, 0) # Fallback
 	if head_idx != -1:
 		start_pos_skel = skel.get_bone_global_pose(head_idx).origin
 
