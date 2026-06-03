@@ -339,7 +339,15 @@ static func setup_animation_player_v1(
 		reset_anim.rotation_track_insert_key(animtrack, 0.0, eye_bone_horizontal)
 
 	animation_library.add_animation(&"RESET", reset_anim)
-	animplayer.add_animation_library("", animation_library)
+	if not animplayer.has_animation_library(&""):
+		animplayer.add_animation_library("", animation_library)
+	else:
+		var existing_library: AnimationLibrary = animplayer.get_animation_library("")
+		for anim_name in animation_library.get_animation_list():
+			if existing_library.has_animation(anim_name):
+				existing_library.remove_animation(anim_name)
+			var anim: Animation = animation_library.get_animation(anim_name)
+			existing_library.add_animation(anim_name, anim)
 	return animplayer
 
 
