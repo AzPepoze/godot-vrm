@@ -1,27 +1,35 @@
-name: "Push to Asset Lib"
+name: "Release Build"
 
 on:
-  release:
-    types: [published, prereleased]
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
   build:
-    name: Build (${{ matrix.platform }})
-    runs-on: ubuntu-latest
+    name: Build (${{ matrix.platform }}, ${{ matrix.target }}, ${{ matrix.precision }})
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        platform: [linux, windows, macos]
+        target: [template_debug, template_release]
+        precision: [float, double]
         include:
           - platform: linux
-            scons-args: platform=linux target=template_release
-            artifact-path: addons/vrm/bin/libvrm_physics.linux.template_release.x86_64.so
-
+            os: ubuntu-latest
           - platform: windows
-            scons-args: platform=windows target=template_release use_mingw=yes
-            artifact-path: addons/vrm/bin/libvrm_physics.windows.template_release.x86_64.dll
+            os: ubuntu-latest
+            scons-args: use_mingw=yes
+          - platform: macos
+            os: macos-latest
+        exclude:
+          - platform: macos
+            precision: double
 
     steps:
       - name: Checkout
@@ -35,32 +43,39 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
+      - name: Install Dependencies
+        run: |
+          if [ "${{ matrix.platform }}" = "linux" ]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y build-essential
+          elif [ "${{ matrix.platform }}" = "windows" ]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y mingw-w64
+          fi
+          pip install scons
+
       - name: Cache SCons
         uses: actions/cache@v4
         with:
           path: |
             ${{ github.workspace }}/.scons_cache/
             ${{ github.workspace }}/godot-cpp/.scons_cache/
-          key: ${{ matrix.platform }}-scons-${{ github.ref_name }}-${{ github.sha }}
+          key: scons-${{ matrix.platform }}-${{ matrix.target }}-${{ matrix.precision }}-${{ hashFiles('**/SConstruct', 'godot-cpp/SConstruct') }}
           restore-keys: |
-            ${{ matrix.platform }}-scons-${{ github.ref_name }}-
-            ${{ matrix.platform }}-scons-
-
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update -qq
-          [[ "${{ matrix.platform }}" == "windows" ]] && sudo apt-get install -y mingw-w64
-          pip install scons
+            scons-${{ matrix.platform }}-${{ matrix.target }}-${{ matrix.precision }}-
 
       - name: Build (${{ matrix.platform }})
         run: |
-          scons ${{ matrix.scons-args }} -j$(nproc) scons_cache=${{ github.workspace }}/.scons_cache/
+          scons platform=${{ matrix.platform }} target=${{ matrix.target }} precision=${{ matrix.precision }} ${{ matrix.scons-args }} -j$(nproc 2>/dev/null || sysctl -n hw.ncpu) scons_cache=${{ github.workspace }}/.scons_cache/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.platform }}-binary
-          path: ${{ matrix.artifact-path }}
+          name: binary-${{ matrix.platform }}-${{ matrix.target }}-${{ matrix.precision }}
+          path: |
+            addons/vrm/bin/*.so
+            addons/vrm/bin/*.dll
+            addons/vrm/bin/*.framework
           if-no-files-found: error
 
   publish:
@@ -76,24 +91,41 @@ jobs:
         with:
           path: artifacts
 
+      - name: Re-structure binaries
+        run: |
+          mkdir -p addons/vrm/bin
+          # Clean existing binaries to avoid confusion
+          rm -f addons/vrm/bin/*.so addons/vrm/bin/*.dll
+          rm -rf addons/vrm/bin/*.framework
+          
+          # Find and move all binaries from artifact folders
+          find artifacts -name "*.so" -exec cp {} addons/vrm/bin/ \;
+          find artifacts -name "*.dll" -exec cp {} addons/vrm/bin/ \;
+          find artifacts -name "*.framework" -exec cp -r {} addons/vrm/bin/ \;
+          
+          ls -R addons/vrm/bin/
+
       - name: Update plugin.cfg version
         run: |
           VERSION=${GITHUB_REF_NAME#v}
-          sed -i "s/version=\".*\"/version=\"$VERSION\"/" addons/vrm/plugin.cfg
+          if [[ "$VERSION" != "workflow_dispatch" ]]; then
+            sed -i "s/version=\".*\"/version=\"$VERSION\"/" addons/vrm/plugin.cfg
+          fi
 
       - name: Package addon
         run: |
-          mkdir -p addons/vrm/bin
-          find artifacts -name "*.so" -exec cp {} addons/vrm/bin/ \;
-          find artifacts -name "*.dll" -exec cp {} addons/vrm/bin/ \;
+          # Create the zip with addons/vrm and addons/mtoon
           zip -r godot-vrm-${{ github.ref_name }}.zip addons/ -x "*.import" -x "*.unwrap_cache"
 
       - name: Update Release
         uses: softprops/action-gh-release@v2
         with:
           files: godot-vrm-${{ github.ref_name }}.zip
+          generate_release_notes: true
+          tag_name: ${{ github.ref_name }}
 
       - name: Godot Asset Lib
+        if: github.event_name != 'workflow_dispatch'
         uses: deep-entertainment/godot-asset-lib-action@v0.4.0
         with:
           username: ${{ secrets.GODOT_ASSET_LIB_USER }}
