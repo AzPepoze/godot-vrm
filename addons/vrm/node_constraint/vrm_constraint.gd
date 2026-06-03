@@ -1,6 +1,6 @@
 ## Constrains a target bone or node, by reading a source a bone or node.
 @tool
-@icon("icons/vrm_constraint.svg")
+@icon("res://addons/vrm/icons/vrm_constraint.svg")
 class_name VRMConstraint
 extends Resource
 

@@ -108,7 +108,9 @@ func _add_vrm_nodes_to_skin(obj: Dictionary) -> bool:
 
 func remove_null_owner(node: Node):
 	if node.owner == null:
-		node.get_parent().remove_child(node)
+		var parent = node.get_parent()
+		if parent:
+			parent.remove_child(node)
 		node.queue_free()
 		return
 	for child in node.get_children():
@@ -133,12 +135,26 @@ func _export_preflight(state: GLTFState, root: Node) -> Error:
 	# TODO: humanoid, lookAt, expressions, secondaryAnimation, etc.
 	# This is a very barebones export.
 
-	if state.json.get("extensions") == null:
-		state.json["extensions"] = {}
-	state.json["extensions"]["VRMC_vrm"] = vrm_extension
+	# Store the extension data to be injected in _export_post
+	state.set_additional_data(&"vrmc_vrm_dict", vrm_extension)
 	state.add_used_extension("VRMC_vrm", false)
 
 	VRMLogger.info("vrmc_vrm.gd", "_export_preflight: VRM 1.0 export prepared OK")
+	return OK
+
+
+func _export_post(state: GLTFState) -> Error:
+	print("--- _export_post called in vrmc_vrm.gd ---")
+	var vrm_extension = state.get_additional_data(&"vrmc_vrm_dict")
+	print("vrm_extension is: ", vrm_extension)
+	if vrm_extension == null:
+		return ERR_SKIP
+
+	if state.json.get("extensions") == null:
+		state.json["extensions"] = {}
+	state.json["extensions"]["VRMC_vrm"] = vrm_extension
+
+	VRMLogger.info("vrmc_vrm.gd", "_export_post: injected VRMC_vrm extension into JSON")
 	return OK
 
 

@@ -1,7 +1,7 @@
 ## Attach this node in the scene and it will process the array of constraint
 ## resources on either bones or nodes, whatever the constraints reference.
 @tool
-@icon("icons/vrm_constraint_applier.svg")
+@icon("res://addons/vrm/icons/vrm_constraint_applier.svg")
 class_name VRMConstraintApplier
 extends Node
 
