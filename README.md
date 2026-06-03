@@ -32,16 +32,16 @@
 - [What is VRM?](#what-is-vrm)
 - [What this fork mainly improves](#what-this-fork-mainly-improves)
 - [Installation](#installation)
-	- [Method 1: Godot Asset Library](#method-1-godot-asset-library)
-	- [Method 2: Manual Install](#method-2-manual-install)
+     - [Method 1: Godot Asset Library](#method-1-godot-asset-library)
+     - [Method 2: Manual Install](#method-2-manual-install)
 - [Showcase](#showcase)
-	- [Spring Bone \& Environment Collision](#spring-bone--environment-collision)
-	- [VRM Import \& Spring Bone Gizmos](#vrm-import--spring-bone-gizmos)
+     - [Spring Bone \& Environment Collision](#spring-bone--environment-collision)
+     - [VRM Import \& Spring Bone Gizmos](#vrm-import--spring-bone-gizmos)
 - [Features Status](#features-status)
-	- [Core VRM Support](#core-vrm-support)
-	- [Spring Bones (`VRMC_springBone`)](#spring-bones-vrmc_springbone)
-	- [Materials \& Shading](#materials--shading)
-	- [Animation \& Retargeting](#animation--retargeting)
+     - [Core VRM Support](#core-vrm-support)
+     - [Spring Bones (`VRMC_springBone`)](#spring-bones-vrmc_springbone)
+     - [Materials \& Shading](#materials--shading)
+     - [Animation \& Retargeting](#animation--retargeting)
 - [Import Options](#import-options)
 - [Icons](#icons)
 - [Credits](#credits)
@@ -69,9 +69,11 @@
 ## Installation
 
 ### Method 1: Godot Asset Library
+
 Download and install directly via the [Godot Asset Library](https://godotengine.org/asset-library/asset/5222).
 
 ### Method 2: Manual Install
+
 1. Download the latest `.zip` from the [Releases page](https://github.com/AzPepoze/godot-vrm/releases/latest).
 2. Copy `addons/vrm` into your project's `addons/` — **do not rename**
 3. Copy `addons/mtoon` into `addons/mtoon` — **do not rename**
