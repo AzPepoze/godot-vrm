@@ -214,7 +214,7 @@ static func parse_springs_v0(
 		var center_node: NodePath = NodePath()
 		var center_bone: String = ""
 		var center_node_idx = sbone.get("center", -1)
-		if center_node_idx != -1:
+		if center_node_idx != null and center_node_idx != -1:
 			var center_gltfnode: GLTFNode = nodes[int(center_node_idx)]
 			var bone_name: String = center_gltfnode.resource_name
 			if (
@@ -297,7 +297,7 @@ static func parse_springs_v1(
 		_process_v1_joint_parameters(spring_bone)
 
 		var center_node_idx = sbone.get("center", -1)
-		if center_node_idx != -1:
+		if center_node_idx != null and center_node_idx != -1:
 			var center_gltfnode: GLTFNode = nodes[int(center_node_idx)]
 			var bone_name: String = center_gltfnode.resource_name
 			var skeleton: Skeleton3D = _get_skel_godot_node(
