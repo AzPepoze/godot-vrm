@@ -18,7 +18,7 @@ jobs:
       matrix:
         platform: [linux, windows, macos]
         target: [template_debug, template_release]
-        precision: [single, double]
+        precision: [single]
         include:
           - platform: linux
             os: ubuntu-latest
@@ -27,9 +27,6 @@ jobs:
             scons-args: use_mingw=yes
           - platform: macos
             os: macos-latest
-        exclude:
-          - platform: macos
-            precision: double
 
     steps:
       - name: Checkout
@@ -66,7 +63,8 @@ jobs:
 
       - name: Build (${{ matrix.platform }})
         run: |
-          scons platform=${{ matrix.platform }} target=${{ matrix.target }} precision=${{ matrix.precision }} ${{ matrix.scons-args }} -j$(nproc 2>/dev/null || sysctl -n hw.ncpu) scons_cache=${{ github.workspace }}/.scons_cache/
+          export SCONS_CACHE=${{ github.workspace }}/.scons_cache/
+          scons platform=${{ matrix.platform }} target=${{ matrix.target }} precision=${{ matrix.precision }} ${{ matrix.scons-args }} -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
