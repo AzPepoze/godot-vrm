@@ -17,6 +17,9 @@
 
 #include <vector>
 
+#include <godot_cpp/classes/capsule_shape3d.hpp>
+#include <godot_cpp/classes/physics_shape_query_parameters3d.hpp>
+
 namespace godot {
 
 class VRMSpringBoneSimulation : public SkeletonModifier3D {
@@ -227,6 +230,15 @@ private:
                                    CPPSpringBoneChain &chain,
                                    CPPSpringBoneJoint &joint,
                                    const Vector3 &origin, float radius);
+  bool _resolve_angular_env_push(Skeleton3D *skel, const Transform3D &center,
+                                 const Transform3D &center_inv,
+                                 const Vector3 &origin, float radius,
+                                 uint32_t mask, Vector3 &current_tail,
+                                 Vector3 &prev_tail, Vector3 &out_contact_normal,
+                                 float &out_contact_t, Vector3 &out_impact_point_world);
+
+  Ref<CapsuleShape3D> env_query_shape;
+  Ref<PhysicsShapeQueryParameters3D> env_query_params;
 };
 
 } // namespace godot

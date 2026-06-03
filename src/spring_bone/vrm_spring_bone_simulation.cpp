@@ -276,10 +276,18 @@ void VRMSpringBoneSimulation::draw_gizmo(Object *p_mesh_obj,
                                          bool p_draw_colliders) {
   ImmediateMesh *mesh = Object::cast_to<ImmediateMesh>(p_mesh_obj);
   Skeleton3D *skel = get_skeleton();
+
+  SpringBoneGizmo::GizmoDrawParams params;
+  params.default_color = p_color;
+  params.draw_spring_bones = p_draw_spring_bones;
+  params.draw_colliders = p_draw_colliders;
+  params.display_mode = gizmo_display_mode;
+  params.simulate_in_local_space = simulate_in_local_space;
+  params.hit_radius_multiplier = hit_radius_multiplier;
+  params.body_collider_radius_multiplier = body_collider_radius_multiplier;
+
   SpringBoneGizmo::draw_gizmo(
-      mesh, skel, p_skel_to_gizmo, chains, all_colliders, recent_impacts, p_color,
-      p_draw_spring_bones, p_draw_colliders, gizmo_display_mode,
-      simulate_in_local_space, hit_radius_multiplier, body_collider_radius_multiplier);
+      mesh, skel, p_skel_to_gizmo, chains, all_colliders, recent_impacts, params);
 }
 
 // ---------------------------------------------------------------------------

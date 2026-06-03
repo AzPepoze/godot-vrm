@@ -13,6 +13,16 @@ namespace godot {
 
 namespace SpringBoneGizmo {
 
+struct GizmoDrawParams {
+  Color default_color;
+  bool draw_spring_bones = true;
+  bool draw_colliders = true;
+  VRMSpringBoneSimulation::GizmoDisplayMode display_mode;
+  bool simulate_in_local_space = false;
+  float hit_radius_multiplier = 1.0f;
+  float body_collider_radius_multiplier = 1.0f;
+};
+
 // Draw joint chain lines and collider wireframe spheres.
 void draw_gizmo(
     ImmediateMesh *mesh, Skeleton3D *skel, const Transform3D &skel_to_gizmo,
@@ -20,10 +30,7 @@ void draw_gizmo(
     const std::vector<VRMSpringBoneSimulation::CPPSpringBoneCollider>
         &colliders,
     const std::vector<VRMSpringBoneSimulation::CPPCollisionImpact> &impacts,
-    Color default_color, bool draw_spring_bones, bool draw_colliders,
-    VRMSpringBoneSimulation::GizmoDisplayMode gizmo_display_mode,
-    bool p_simulate_in_local_space = false, float hit_radius_multiplier = 1.0f,
-    float body_collider_radius_multiplier = 1.0f);
+    const GizmoDrawParams &params);
 
 } // namespace SpringBoneGizmo
 

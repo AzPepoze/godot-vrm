@@ -1,4 +1,6 @@
 #include "spring_bone_setup.h"
+#include "spring_bone_constants.h"
+#include "spring_bone_util.h"
 
 #include <godot_cpp/classes/node3d.hpp>
 #include <godot_cpp/classes/resource.hpp>
@@ -121,14 +123,9 @@ void parse_spring_bones(
           Object::cast_to<Node3D>(resolver_root->get_node_or_null(center_np));
     }
 
-    // Center transform for initial tail positions
-    Transform3D center_transform;
-    if (chain.center_bone != -1) {
-      center_transform = skel->get_bone_global_pose(chain.center_bone);
-    } else if (chain.center_node) {
-      center_transform =
-          skel_global_inv * chain.center_node->get_global_transform();
-    }
+    // Center transform for initial tail positions (Option A: pass true)
+    Transform3D center_transform = SpringBoneUtil::get_center_transform(
+        chain, skel, skel_global_inv, true);
     Transform3D center_transform_inv = center_transform.affine_inverse();
 
     // Build joints
@@ -144,7 +141,7 @@ void parse_spring_bones(
       Vector3 pos;
       if (joint_nodes[j + 1].is_empty()) {
         Vector3 delta = skel->get_bone_rest(joint.bone_idx).origin;
-        pos = delta.normalized() * 0.07f;
+        pos = delta.normalized() * SpringBoneConstants::DEFAULT_BONE_LENGTH;
       } else {
         int first_child = skel->find_bone(joint_nodes[j + 1]);
         if (first_child != -1) {
@@ -153,7 +150,7 @@ void parse_spring_bones(
           pos = Vector3(local_position.x * sca.x, local_position.y * sca.y,
                         local_position.z * sca.z);
         } else {
-          pos = Vector3(0, -0.07f, 0);
+          pos = Vector3(0, -SpringBoneConstants::DEFAULT_BONE_LENGTH, 0);
         }
       }
 

@@ -1,4 +1,6 @@
 #include "spring_bone_gizmo.h"
+#include "spring_bone_constants.h"
+#include "spring_bone_util.h"
 
 #include <godot_cpp/classes/mesh.hpp>
 #include <godot_cpp/core/math.hpp>
@@ -67,24 +69,13 @@ static void draw_wireframe_capsule(ImmediateMesh *mesh, const Vector3 &a,
   }
 }
 
-static float joint_param(const std::vector<float> &arr, size_t idx,
-                         float default_val = 1.0f) {
-  if (arr.empty()) {
-    return default_val;
-  }
-  return (idx < arr.size()) ? arr[idx] : arr.back();
-}
-
 void draw_gizmo(
     ImmediateMesh *mesh, Skeleton3D *skel, const Transform3D &skel_to_gizmo,
     const std::vector<VRMSpringBoneSimulation::CPPSpringBoneChain> &chains,
     const std::vector<VRMSpringBoneSimulation::CPPSpringBoneCollider>
         &colliders,
     const std::vector<VRMSpringBoneSimulation::CPPCollisionImpact> &impacts,
-    Color default_color, bool draw_spring_bones, bool draw_colliders,
-    VRMSpringBoneSimulation::GizmoDisplayMode gizmo_display_mode,
-    bool p_simulate_in_local_space, float hit_radius_multiplier,
-    float body_collider_radius_multiplier) {
+    const GizmoDrawParams &params) {
   if (!mesh || !skel) {
     return;
   }
@@ -93,20 +84,11 @@ void draw_gizmo(
 
   Transform3D skel_global_inv = skel->get_global_transform().affine_inverse();
 
-  if (draw_spring_bones && !chains.empty()) {
+  if (params.draw_spring_bones && !chains.empty()) {
     mesh->surface_begin(Mesh::PRIMITIVE_LINES);
     for (const auto &chain : chains) {
-      Transform3D center_transform;
-      if (!p_simulate_in_local_space) {
-        center_transform = skel_global_inv;
-      } else if (chain.center_bone != -1) {
-        center_transform = skel->get_bone_global_pose(chain.center_bone);
-      } else if (chain.center_node) {
-        center_transform =
-            skel_global_inv * chain.center_node->get_global_transform();
-      } else {
-        center_transform = Transform3D();
-      }
+      Transform3D center_transform = SpringBoneUtil::get_center_transform(
+          chain, skel, skel_global_inv, params.simulate_in_local_space);
 
       for (size_t i = 0; i < chain.joints.size(); ++i) {
         const auto &joint = chain.joints[i];
@@ -114,27 +96,27 @@ void draw_gizmo(
         Vector3 end_gizmo =
             skel_to_gizmo.xform(center_transform.xform(joint.current_tail));
 
-        float radius = hit_radius_multiplier * chain.hit_radius_scale *
-                       joint_param(chain.hit_radius, i);
+        float radius = params.hit_radius_multiplier * chain.hit_radius_scale *
+                       SpringBoneUtil::joint_param(chain.hit_radius, i);
 
-        if (gizmo_display_mode == VRMSpringBoneSimulation::GIZMO_CAPSULE) {
+        if (params.display_mode == VRMSpringBoneSimulation::GIZMO_CAPSULE) {
             draw_wireframe_capsule(mesh, start_gizmo, end_gizmo, radius,
-                                   default_color);
+                                   params.default_color);
         } else {
-            draw_wireframe_sphere(mesh, start_gizmo, radius, default_color);
-            draw_wireframe_sphere(mesh, end_gizmo, radius, default_color);
-            draw_line(mesh, start_gizmo, end_gizmo, default_color);
+            draw_wireframe_sphere(mesh, start_gizmo, radius, params.default_color);
+            draw_wireframe_sphere(mesh, end_gizmo, radius, params.default_color);
+            draw_line(mesh, start_gizmo, end_gizmo, params.default_color);
         }
       }
     }
     mesh->surface_end();
   }
 
-  if (draw_colliders && !colliders.empty()) {
+  if (params.draw_colliders && !colliders.empty()) {
     mesh->surface_begin(Mesh::PRIMITIVE_LINES);
     for (const auto &c : colliders) {
       Vector3 pos_gizmo = skel_to_gizmo.xform(c.position);
-      float coll_radius = c.radius * body_collider_radius_multiplier;
+      float coll_radius = c.radius * params.body_collider_radius_multiplier;
       if (c.is_capsule) {
         Vector3 tail_gizmo = skel_to_gizmo.xform(c.tail_position);
         draw_wireframe_capsule(mesh, pos_gizmo, tail_gizmo, coll_radius,
@@ -150,7 +132,7 @@ void draw_gizmo(
   if (!impacts.empty()) {
     mesh->surface_begin(Mesh::PRIMITIVE_LINES);
     for (const auto &impact : impacts) {
-      float alpha = 1.0f - (impact.age / 1.0f); // 1-second fade
+      float alpha = 1.0f - (impact.age / SpringBoneConstants::IMPACT_FADE_DURATION);
       if (alpha <= 0) continue;
       
       Color impact_color = Color(1, 0, 0, alpha); // Red for impact

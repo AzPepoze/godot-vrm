@@ -1,4 +1,5 @@
 #include "vrm_spring_bone_simulation.h"
+#include "spring_bone_constants.h"
 
 #include <godot_cpp/classes/capsule_shape3d.hpp>
 #include <godot_cpp/classes/collision_object3d.hpp>
@@ -78,18 +79,22 @@ void VRMSpringBoneSimulation::_query_game_object_collisions(
     rot_basis = Basis(rot_axis, rot_angle);
   }
 
-  Ref<CapsuleShape3D> shape;
-  shape.instantiate();
-  shape->set_radius(scaled_radius);
+  // Lazy-initialize the cached shape and parameters
+  if (env_query_shape.is_null()) {
+    env_query_shape.instantiate();
+  }
+  if (env_query_params.is_null()) {
+    env_query_params.instantiate();
+    env_query_params->set_shape(env_query_shape);
+  }
+
+  env_query_shape->set_radius(scaled_radius);
   // GODOT 4 FIX: height is total height including radius. 
   // For a swept sphere of length L, height must be L + 2R.
-  shape->set_height(bone_length + scaled_radius * 2.0f);
+  env_query_shape->set_height(bone_length + scaled_radius * 2.0f);
 
-  Ref<PhysicsShapeQueryParameters3D> params;
-  params.instantiate();
-  params->set_shape(shape);
-  params->set_transform(Transform3D(rot_basis, mid_point));
-  params->set_collision_mask(mask);
+  env_query_params->set_transform(Transform3D(rot_basis, mid_point));
+  env_query_params->set_collision_mask(mask);
 
   // Exclude the model's own collision objects
   TypedArray<RID> exclude;
@@ -100,9 +105,9 @@ void VRMSpringBoneSimulation::_query_game_object_collisions(
       exclude.push_back(co->get_rid());
     }
   }
-  params->set_exclude(exclude);
+  env_query_params->set_exclude(exclude);
 
-  TypedArray<Vector3> contacts = space_state->collide_shape(params, 32);
+  TypedArray<Vector3> contacts = space_state->collide_shape(env_query_params, 32);
   if (contacts.size() < 2)
     return;
 
@@ -132,7 +137,7 @@ void VRMSpringBoneSimulation::_query_game_object_collisions(
 
   if (max_depth > 0.001f) {
     Vector3 normal = deepest_push.normalized();
-    float margin = scaled_radius * 0.1f; 
+    float margin = scaled_radius * SpringBoneConstants::ENV_SHAPE_MARGIN_FACTOR; 
     out_push = normal * (max_depth + margin); 
   }
 }
