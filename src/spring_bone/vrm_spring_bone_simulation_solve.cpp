@@ -11,9 +11,7 @@
 
 namespace godot {
 
-// ---------------------------------------------------------------------------
 // Struct to hold computed forces and params for a joint
-// ---------------------------------------------------------------------------
 struct JointForces {
   float stiffness;
   float drag;
@@ -21,9 +19,7 @@ struct JointForces {
   float radius;
 };
 
-// ---------------------------------------------------------------------------
 // Compute joint-specific forces and physics params
-// ---------------------------------------------------------------------------
 static inline JointForces compute_joint_forces(
     const VRMSpringBoneSimulation::CPPSpringBoneChain &chain, size_t i, float delta,
     float stiffness_multiplier, float drag_multiplier, float hit_radius_multiplier,
@@ -66,9 +62,7 @@ static inline JointForces compute_joint_forces(
   return jf;
 }
 
-// ---------------------------------------------------------------------------
 // Build a flat list of ColliderViews in center space for the given chain.
-// ---------------------------------------------------------------------------
 static std::vector<SpringBoneCollision::ColliderView> gather_collider_views(
     const VRMSpringBoneSimulation::CPPSpringBoneChain &chain,
     const std::vector<VRMSpringBoneSimulation::CPPSpringBoneCollider>
@@ -209,7 +203,7 @@ void VRMSpringBoneSimulation::_simulate_chains(
         }
       }
 
-      // --- COLLISION SOLVE ---
+      // Collision Solve
 
       // 1. VRM Colliders (Spheres and Capsules attached to the body)
       if (enable_body_collisions) {
@@ -243,11 +237,11 @@ void VRMSpringBoneSimulation::_simulate_chains(
       next_tail = SpringBonePhysics::apply_length_constraint(next_tail, origin,
                                                              joint.length);
 
-      // --- STATE UPDATE (Standard Verlet) ---
+      // State Update (Standard Verlet)
       joint.prev_tail = joint.current_tail;
       joint.current_tail = next_tail;
 
-      // --- COLLISION RESOLUTION (ANGULAR ITERATIVE) ---
+      // Collision Resolution (Angular Iterative)
       _resolve_angular_collisions(skel, center, center_inv, chain, joint, origin, jf.radius);
 
       // Final length guard and expansion damping
@@ -374,7 +368,7 @@ void VRMSpringBoneSimulation::_resolve_angular_collisions(
       }
     }
 
-    // --- KINEMATIC CONTACT RESOLUTION ---
+    // Kinematic Contact Resolution
     if (collision_happened) {
       Vector3 vel = joint.current_tail - joint.prev_tail;
       float vn = vel.dot(contact_normal);

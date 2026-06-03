@@ -10,9 +10,7 @@
 
 namespace godot {
 
-// ---------------------------------------------------------------------------
 // Environment collision property accessors
-// ---------------------------------------------------------------------------
 
 void VRMSpringBoneSimulation::set_environment_collision_enabled(
     bool p_enabled) {
@@ -35,10 +33,8 @@ float VRMSpringBoneSimulation::get_environment_collision_bounce_damping() const 
   return environment_collision_bounce_damping;
 }
 
-// ---------------------------------------------------------------------------
 // PhysicsServer3D query — capsule shape covering the full bone segment.
 // Returns a world-space push vector that moves the tail out of the collider.
-// ---------------------------------------------------------------------------
 
 void VRMSpringBoneSimulation::_query_game_object_collisions(
     Skeleton3D *skel, const Vector3 &origin_world, const Vector3 &tail_world,

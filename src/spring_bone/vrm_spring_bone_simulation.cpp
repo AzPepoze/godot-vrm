@@ -11,9 +11,7 @@
 
 namespace godot {
 
-// ---------------------------------------------------------------------------
 // Binding
-// ---------------------------------------------------------------------------
 void VRMSpringBoneSimulation::_bind_methods() {
   ClassDB::bind_method(D_METHOD("setup", "spring_bones", "collider_groups"),
                        &VRMSpringBoneSimulation::setup);
@@ -170,9 +168,7 @@ void VRMSpringBoneSimulation::_bind_methods() {
 VRMSpringBoneSimulation::VRMSpringBoneSimulation() {}
 VRMSpringBoneSimulation::~VRMSpringBoneSimulation() {}
 
-// ---------------------------------------------------------------------------
 // Public API
-// ---------------------------------------------------------------------------
 void VRMSpringBoneSimulation::update_parameters(
     float p_gravity_multiplier, Quaternion p_gravity_rotation,
     Vector3 p_add_force, float p_stiffness_multiplier, float p_drag_multiplier,
@@ -209,9 +205,7 @@ void VRMSpringBoneSimulation::setup(Array p_spring_bones,
   need_reset = true;
 }
 
-// ---------------------------------------------------------------------------
 // Simulation Entry Point
-// ---------------------------------------------------------------------------
 void VRMSpringBoneSimulation::_process_modification() {
   Skeleton3D *skel = get_skeleton();
   if (!skel || !is_setup) {
@@ -236,9 +230,7 @@ void VRMSpringBoneSimulation::_process_modification() {
   _simulate_chains(skel, skel_global_inv, delta);
 }
 
-// ---------------------------------------------------------------------------
 // Accessors
-// ---------------------------------------------------------------------------
 int VRMSpringBoneSimulation::get_chain_count() const {
   return (int)chains.size();
 }
@@ -290,9 +282,7 @@ void VRMSpringBoneSimulation::draw_gizmo(Object *p_mesh_obj,
       mesh, skel, p_skel_to_gizmo, chains, all_colliders, recent_impacts, params);
 }
 
-// ---------------------------------------------------------------------------
 // Wind property accessors
-// ---------------------------------------------------------------------------
 void VRMSpringBoneSimulation::set_wind_direction(Vector3 p_dir) {
   wind_direction = p_dir;
 }
