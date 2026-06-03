@@ -1,7 +1,7 @@
 # godot-vrm
 
 > [!IMPORTANT]
-> This project aims to serve as a continuation and active successor to the excellent [V-Sekai/godot-vrm](https://github.com/V-Sekai/godot-vrm). My goal is to provide ongoing maintenance, updates, and new features for the community. I am deeply grateful to the V-Sekai team and original authors for their incredible foundational work. Maintained by **[AzPepoze](https://github.com/AzPepoze)**.
+> An active fork and continuation of the excellent [V-Sekai/godot-vrm](https://github.com/V-Sekai/godot-vrm), providing ongoing maintenance and major performance upgrades. Maintained by **[AzPepoze](https://github.com/AzPepoze)**.
 
 VRM importer, exporter, and runtime spring bone physics for **Godot Engine 4.3+**. Includes a standalone MToon shader.
 
@@ -9,12 +9,20 @@ VRM importer, exporter, and runtime spring bone physics for **Godot Engine 4.3+*
 
 ## Contents
 
+- [What is VRM?](#what-is-vrm)
 - [What this fork improves](#what-this-fork-improves)
 - [Installation](#installation)
 - [Showcase](#showcase)
 - [Features Status](#features-status)
 - [Import Options](#import-options)
 - [Credits](#credits)
+
+---
+
+## What is VRM?
+
+- **[VRM](https://vrm.dev/en/)**: A 3D avatar format based on glTF 2.0 that standardizes bones, expressions, and physics.
+- **[VRoid Studio](https://vroid.com/en/studio)**: A free tool to easily create your own custom VRM avatars.
 
 ---
 
@@ -25,6 +33,7 @@ VRM importer, exporter, and runtime spring bone physics for **Godot Engine 4.3+*
 - **Environment Collision**: Spring bones can now collide with Godot's physics bodies.
 - **Editor Gizmos**: Visualize spring bone colliders and radius directly in the editor.
 - **Group Multipliers**: Scale hit radius for specific spring bone groups (like Hair or Skirts) per-instance.
+- **Shared Settings**: Optionally share a single `VRMSettings` resource across multiple avatars to synchronize global wind, gravity, and collisions, or keep them completely unique per character.
 
 ---
 
@@ -38,10 +47,19 @@ VRM importer, exporter, and runtime spring bone physics for **Godot Engine 4.3+*
 
 ## Showcase
 
+![Overall](docs/overall.png)
+
 ### Spring Bone & Environment Collision
 
-Spring bones can collide with the VRM character's own body colliders, as well as Godot's external physics bodies ("environment collision", which can be toggled).
-In the collision images below:
+|                      VRM 0.0 Collision                       |                      VRM 1.0 Collision                       |
+| :----------------------------------------------------------: | :----------------------------------------------------------: |
+| ![VRM 0.0 Collision](docs/collision_with_environment_v0.png) | ![VRM 1.0 Collision](docs/collision_with_environment_v1.png) |
+
+Spring bones can collide with two types of objects:
+- **Body Colliders**: The character's own internal VRM colliders.
+- **Environment Collision**: Godot's external physics bodies (can be toggled in settings).
+
+In the debug images above:
 
 - **White wireframe**: Spring bone collision radius
 - **Purple wireframe**: VRM character body colliders
@@ -49,11 +67,7 @@ In the collision images below:
 - **Red X**: The exact point of collision with the environment
 
 > [!WARNING]
-> **Known Issue:** Spring bones may occasionally pass through colliders (clipping). Contributions and PRs to help improve collision stability are very welcome!
-
-|                      VRM 0.0 Collision                       |                      VRM 1.0 Collision                       |
-| :----------------------------------------------------------: | :----------------------------------------------------------: |
-| ![VRM 0.0 Collision](docs/collision_with_environment_v0.png) | ![VRM 1.0 Collision](docs/collision_with_environment_v1.png) |
+> **Known Issue:** Spring bones may occasionally pass through colliders (clipping). I honestly suck at collision algorithms, so if you are a math wizard, PRs to help improve collision stability are very much needed and welcome!
 
 ### VRM Import & Spring Bone Gizmos
 
