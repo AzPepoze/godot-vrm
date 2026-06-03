@@ -5,13 +5,9 @@ compatibility_minimum = "4.3"
 
 [libraries]
 
-linux.double.debug.x86_64 = "res://addons/vrm/bin/libvrm_physics.linux.template_debug.double.x86_64.so"
-linux.double.release.x86_64 = "res://addons/vrm/bin/libvrm_physics.linux.template_release.double.x86_64.so"
 linux.debug.x86_64 = "res://addons/vrm/bin/libvrm_physics.linux.template_debug.x86_64.so"
 linux.release.x86_64 = "res://addons/vrm/bin/libvrm_physics.linux.template_release.x86_64.so"
 
-windows.double.debug.x86_64 = "res://addons/vrm/bin/libvrm_physics.windows.template_debug.double.x86_64.dll"
-windows.double.release.x86_64 = "res://addons/vrm/bin/libvrm_physics.windows.template_release.double.x86_64.dll"
 windows.debug.x86_64 = "res://addons/vrm/bin/libvrm_physics.windows.template_debug.x86_64.dll"
 windows.release.x86_64 = "res://addons/vrm/bin/libvrm_physics.windows.template_release.x86_64.dll"
 
