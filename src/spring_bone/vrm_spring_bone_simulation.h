@@ -20,226 +20,243 @@
 #include <godot_cpp/classes/capsule_shape3d.hpp>
 #include <godot_cpp/classes/physics_shape_query_parameters3d.hpp>
 
-namespace godot {
+namespace godot
+{
 
-class VRMSpringBoneSimulation : public SkeletonModifier3D {
-  GDCLASS(VRMSpringBoneSimulation, SkeletonModifier3D);
+	class VRMSpringBoneSimulation : public SkeletonModifier3D
+	{
+		GDCLASS(VRMSpringBoneSimulation, SkeletonModifier3D);
 
-public:
-  enum GizmoDisplayMode {
-    GIZMO_LINE_CIRCLE = 0,
-    GIZMO_CAPSULE = 1,
-  };
+	public:
+		enum GizmoDisplayMode
+		{
+			GIZMO_LINE_CIRCLE = 0,
+			GIZMO_CAPSULE = 1,
+		};
 
-  struct CPPSpringBoneJoint {
-    int bone_idx = -1;
-    int parent_idx = -1;
-    float radius = 0.0f;
-    float length = 0.0f;
-    Vector3 bone_axis;
-    Vector3 current_tail;
-    Vector3 prev_tail;
-    Transform3D initial_transform;
-    Transform3D global_pose;
-    // Environment collision contact state (center-local space)
-    bool env_in_contact = false;
-    Vector3 env_contact_normal;
-  };
+		struct CPPSpringBoneJoint
+		{
+			int bone_idx = -1;
+			int parent_idx = -1;
+			float radius = 0.0f;
+			float length = 0.0f;
+			Vector3 bone_axis;
+			Vector3 current_tail;
+			Vector3 prev_tail;
+			Transform3D initial_transform;
+			Transform3D global_pose;
+			// Environment collision contact state (center-local space)
+			bool env_in_contact = false;
+			Vector3 env_contact_normal;
+		};
 
-  struct CPPCollisionImpact {
-    Vector3 position;
-    Vector3 normal;
-    float age = 0.0f;
-  };
+		struct CPPCollisionImpact
+		{
+			Vector3 position;
+			Vector3 normal;
+			float age = 0.0f;
+		};
 
-  struct CPPSpringBoneCollider {
-    int bone_idx = -1;
-    Node3D *node = nullptr;
-    Vector3 offset;
-    Vector3 tail; // For capsule
-    float radius = 0.0f;
-    bool is_capsule = false;
-    Vector3 position;
-    Vector3 tail_position;
-    Color gizmo_color;
-  };
+		struct CPPSpringBoneCollider
+		{
+			int bone_idx = -1;
+			Node3D *node = nullptr;
+			Vector3 offset;
+			Vector3 tail; // For capsule
+			float radius = 0.0f;
+			bool is_capsule = false;
+			Vector3 position;
+			Vector3 tail_position;
+			Color gizmo_color;
+		};
 
-  struct CPPSpringBoneColliderGroup {
-    std::vector<int> collider_indices;
-  };
+		struct CPPSpringBoneColliderGroup
+		{
+			std::vector<int> collider_indices;
+		};
 
-  struct CPPSpringBoneChain {
-    std::vector<CPPSpringBoneJoint> joints;
-    std::vector<int> collider_group_indices;
+		struct CPPSpringBoneChain
+		{
+			std::vector<CPPSpringBoneJoint> joints;
+			std::vector<int> collider_group_indices;
 
-    float stiffness_scale = 1.0f;
-    float drag_force_scale = 1.0f;
-    float hit_radius_scale = 1.0f;
-    float gravity_scale = 1.0f;
-    Vector3 gravity_dir_default = Vector3(0, -1, 0);
+			float stiffness_scale = 1.0f;
+			float drag_force_scale = 1.0f;
+			float hit_radius_scale = 1.0f;
+			float gravity_scale = 1.0f;
+			Vector3 gravity_dir_default = Vector3(0, -1, 0);
 
-    // Per-joint arrays (if provided)
-    std::vector<float> stiffness_force;
-    std::vector<float> gravity_power;
-    std::vector<Vector3> gravity_dir;
-    std::vector<float> drag_force;
-    std::vector<float> hit_radius;
+			// Per-joint arrays (if provided)
+			std::vector<float> stiffness_force;
+			std::vector<float> gravity_power;
+			std::vector<Vector3> gravity_dir;
+			std::vector<float> drag_force;
+			std::vector<float> hit_radius;
 
-    Node3D *center_node = nullptr;
-    int center_bone = -1;
+			Node3D *center_node = nullptr;
+			int center_bone = -1;
 
-    // Game Object Collision settings (per chain)
-    bool enable_environment_collision = false;
-    uint32_t environment_collision_mask = 1;
-  };
+			// Game Object Collision settings (per chain)
+			bool enable_environment_collision = false;
+			uint32_t environment_collision_mask = 1;
+		};
 
-private:
-  std::vector<CPPSpringBoneChain> chains;
-  std::vector<CPPSpringBoneCollider> all_colliders;
-  std::vector<CPPSpringBoneColliderGroup> all_collider_groups;
-  std::vector<CPPCollisionImpact> recent_impacts;
-  bool is_setup = false;
-  bool need_reset = true;
+	private:
+		std::vector<CPPSpringBoneChain> chains;
+		std::vector<CPPSpringBoneCollider> all_colliders;
+		std::vector<CPPSpringBoneColliderGroup> all_collider_groups;
+		std::vector<CPPCollisionImpact> recent_impacts;
+		bool is_setup = false;
+		bool need_reset = true;
 
-  float gravity_multiplier = 1.0f;
-  float stiffness_multiplier = 1.0f;
-  float drag_multiplier = 1.0f;
-  float hit_radius_multiplier = 1.0f;
-  float body_collider_radius_multiplier = 1.0f;
-  bool enable_body_collisions = true;
-  bool simulate_in_local_space = false;
-  Quaternion gravity_rotation;
-  Vector3 add_force;
+		float gravity_multiplier = 1.0f;
+		float stiffness_multiplier = 1.0f;
+		float drag_multiplier = 1.0f;
+		float hit_radius_multiplier = 1.0f;
+		float body_collider_radius_multiplier = 1.0f;
+		bool enable_body_collisions = true;
+		bool simulate_in_local_space = false;
+		Quaternion gravity_rotation;
+		Vector3 add_force;
 
-  // Wind System Global settings
-  Vector3 wind_direction = Vector3(0, 0, 0);
-  float wind_strength = 0.0f;
-  float wind_turbulence = 0.0f;
-  float wind_frequency = 1.0f;
-  float wind_time = 0.0f;
+		// Wind System Global settings
+		Vector3 wind_direction = Vector3(0, 0, 0);
+		float wind_strength = 0.0f;
+		float wind_turbulence = 0.0f;
+		float wind_frequency = 1.0f;
+		float wind_time = 0.0f;
 
-  bool debug_collision = false;
+		bool debug_collision = false;
 
-  // Environment Collision Global switches/options
-  bool environment_collision_enabled = false;
-  uint32_t environment_collision_mask = 1;
-  float environment_collision_bounce_damping = 0.8f;
+		// Environment Collision Global switches/options
+		bool environment_collision_enabled = false;
+		uint32_t environment_collision_mask = 1;
+		float environment_collision_bounce_damping = 0.8f;
 
-  GizmoDisplayMode gizmo_display_mode = GIZMO_LINE_CIRCLE;
+		GizmoDisplayMode gizmo_display_mode = GIZMO_LINE_CIRCLE;
 
-protected:
-  static void _bind_methods();
+	protected:
+		static void _bind_methods();
 
-public:
-  VRMSpringBoneSimulation();
-  ~VRMSpringBoneSimulation();
+	public:
+		VRMSpringBoneSimulation();
+		~VRMSpringBoneSimulation();
 
-  void setup(Array p_spring_bones, Array p_collider_groups);
-  void update_parameters(float p_gravity_multiplier,
-                         Quaternion p_gravity_rotation, Vector3 p_add_force,
-                         float p_stiffness_multiplier = 1.0f,
-                         float p_drag_multiplier = 1.0f,
-                         float p_hit_radius_multiplier = 1.0f,
-                         float p_body_collider_radius_multiplier = 1.0f);
-  void step_simulation();
-  void _process_modification() override;
+		void setup(Array p_spring_bones, Array p_collider_groups);
+		void update_parameters(float p_gravity_multiplier,
+							   Quaternion p_gravity_rotation, Vector3 p_add_force,
+							   float p_stiffness_multiplier = 1.0f,
+							   float p_drag_multiplier = 1.0f,
+							   float p_hit_radius_multiplier = 1.0f,
+							   float p_body_collider_radius_multiplier = 1.0f);
+		void step_simulation();
+		void _process_modification() override;
 
-  int get_chain_count() const;
-  int get_joint_count(int p_chain_idx) const;
-  Vector3 get_joint_current_tail(int p_chain_idx, int p_joint_idx) const;
-  Vector3 get_joint_prev_tail(int p_chain_idx, int p_joint_idx) const;
-  void draw_gizmo(Object *p_mesh_obj, Transform3D p_skel_to_gizmo, Color p_color, bool p_draw_spring_bones,
-                  bool p_draw_colliders);
+		int get_chain_count() const;
+		int get_joint_count(int p_chain_idx) const;
+		Vector3 get_joint_current_tail(int p_chain_idx, int p_joint_idx) const;
+		Vector3 get_joint_prev_tail(int p_chain_idx, int p_joint_idx) const;
+		void draw_gizmo(Object *p_mesh_obj, Transform3D p_skel_to_gizmo, Color p_color, bool p_draw_spring_bones,
+						bool p_draw_colliders);
 
-  // Getters/Setters for Multipliers
-  void set_stiffness_multiplier(float p_multiplier) {
-    stiffness_multiplier = p_multiplier;
-  }
-  float get_stiffness_multiplier() const { return stiffness_multiplier; }
-  void set_drag_multiplier(float p_multiplier) {
-    drag_multiplier = p_multiplier;
-  }
-  float get_drag_multiplier() const { return drag_multiplier; }
-  void set_hit_radius_multiplier(float p_multiplier) {
-    hit_radius_multiplier = p_multiplier;
-  }
-  float get_hit_radius_multiplier() const { return hit_radius_multiplier; }
-  void set_body_collider_radius_multiplier(float p_multiplier) {
-    body_collider_radius_multiplier = p_multiplier;
-  }
-  float get_body_collider_radius_multiplier() const {
-    return body_collider_radius_multiplier;
-  }
+		// Getters/Setters for Multipliers
+		void set_stiffness_multiplier(float p_multiplier)
+		{
+			stiffness_multiplier = p_multiplier;
+		}
+		float get_stiffness_multiplier() const { return stiffness_multiplier; }
+		void set_drag_multiplier(float p_multiplier)
+		{
+			drag_multiplier = p_multiplier;
+		}
+		float get_drag_multiplier() const { return drag_multiplier; }
+		void set_hit_radius_multiplier(float p_multiplier)
+		{
+			hit_radius_multiplier = p_multiplier;
+		}
+		float get_hit_radius_multiplier() const { return hit_radius_multiplier; }
+		void set_body_collider_radius_multiplier(float p_multiplier)
+		{
+			body_collider_radius_multiplier = p_multiplier;
+		}
+		float get_body_collider_radius_multiplier() const
+		{
+			return body_collider_radius_multiplier;
+		}
 
-  void set_enable_body_collisions(bool p_enabled) {
-    enable_body_collisions = p_enabled;
-  }
-  bool get_enable_body_collisions() const { return enable_body_collisions; }
+		void set_enable_body_collisions(bool p_enabled)
+		{
+			enable_body_collisions = p_enabled;
+		}
+		bool get_enable_body_collisions() const { return enable_body_collisions; }
 
-  void set_simulate_in_local_space(bool p_enabled) {
-    if (simulate_in_local_space != p_enabled) {
-      simulate_in_local_space = p_enabled;
-      need_reset = true;
-    }
-  }
-  bool get_simulate_in_local_space() const { return simulate_in_local_space; }
+		void set_simulate_in_local_space(bool p_enabled)
+		{
+			if (simulate_in_local_space != p_enabled)
+			{
+				simulate_in_local_space = p_enabled;
+				need_reset = true;
+			}
+		}
+		bool get_simulate_in_local_space() const { return simulate_in_local_space; }
 
-  // Getters/Setters for Wind parameters
-  void set_wind_direction(Vector3 p_dir);
-  Vector3 get_wind_direction() const;
+		// Getters/Setters for Wind parameters
+		void set_wind_direction(Vector3 p_dir);
+		Vector3 get_wind_direction() const;
 
-  void set_wind_strength(float p_strength);
-  float get_wind_strength() const;
+		void set_wind_strength(float p_strength);
+		float get_wind_strength() const;
 
-  void set_wind_turbulence(float p_turbulence);
-  float get_wind_turbulence() const;
+		void set_wind_turbulence(float p_turbulence);
+		float get_wind_turbulence() const;
 
-  void set_wind_frequency(float p_frequency);
-  float get_wind_frequency() const;
+		void set_wind_frequency(float p_frequency);
+		float get_wind_frequency() const;
 
-  // Getters/Setters for Environment Collision parameters
-  void set_environment_collision_enabled(bool p_enabled);
-  bool is_environment_collision_enabled() const;
+		// Getters/Setters for Environment Collision parameters
+		void set_environment_collision_enabled(bool p_enabled);
+		bool is_environment_collision_enabled() const;
 
-  void set_environment_collision_mask(uint32_t p_mask);
-  uint32_t get_environment_collision_mask() const;
+		void set_environment_collision_mask(uint32_t p_mask);
+		uint32_t get_environment_collision_mask() const;
 
-  void set_environment_collision_bounce_damping(float p_damping);
-  float get_environment_collision_bounce_damping() const;
+		void set_environment_collision_bounce_damping(float p_damping);
+		float get_environment_collision_bounce_damping() const;
 
-  void set_debug_collision(bool p_enabled) { debug_collision = p_enabled; }
-  bool is_debug_collision_enabled() const { return debug_collision; }
+		void set_debug_collision(bool p_enabled) { debug_collision = p_enabled; }
+		bool is_debug_collision_enabled() const { return debug_collision; }
 
-  void set_gizmo_display_mode(int p_mode) {
-    gizmo_display_mode = (GizmoDisplayMode)p_mode;
-  }
-  int get_gizmo_display_mode() const { return (int)gizmo_display_mode; }
+		void set_gizmo_display_mode(int p_mode)
+		{
+			gizmo_display_mode = (GizmoDisplayMode)p_mode;
+		}
+		int get_gizmo_display_mode() const { return (int)gizmo_display_mode; }
 
-private:
-  void _update_colliders(Skeleton3D *skel);
-  void _reset_chains(Skeleton3D *skel, const Transform3D &skel_global_inv);
-  void _simulate_chains(Skeleton3D *skel, const Transform3D &skel_global_inv,
-                        float delta);
-  void _query_game_object_collisions(Skeleton3D *skel,
-                                     const Vector3 &origin_world,
-                                     const Vector3 &tail_world, float radius,
-                                     uint32_t mask, Vector3 &out_push,
-                                     float &out_t);
-  void _resolve_angular_collisions(Skeleton3D *skel, const Transform3D &center,
-                                   const Transform3D &center_inv,
-                                   CPPSpringBoneChain &chain,
-                                   CPPSpringBoneJoint &joint,
-                                   const Vector3 &origin, float radius);
-  bool _resolve_angular_env_push(Skeleton3D *skel, const Transform3D &center,
-                                 const Transform3D &center_inv,
-                                 const Vector3 &origin, float radius,
-                                 uint32_t mask, Vector3 &current_tail,
-                                 Vector3 &prev_tail, Vector3 &out_contact_normal,
-                                 float &out_contact_t, Vector3 &out_impact_point_world);
+	private:
+		void _update_colliders(Skeleton3D *skel);
+		void _reset_chains(Skeleton3D *skel, const Transform3D &skel_global_inv);
+		void _simulate_chains(Skeleton3D *skel, const Transform3D &skel_global_inv,
+							  float delta);
+		void _query_game_object_collisions(Skeleton3D *skel,
+										   const Vector3 &origin_world,
+										   const Vector3 &tail_world, float radius,
+										   uint32_t mask, Vector3 &out_push,
+										   float &out_t);
+		void _resolve_angular_collisions(Skeleton3D *skel, const Transform3D &center,
+										 const Transform3D &center_inv,
+										 CPPSpringBoneChain &chain,
+										 CPPSpringBoneJoint &joint,
+										 const Vector3 &origin, float radius);
+		bool _resolve_angular_env_push(Skeleton3D *skel, const Transform3D &center,
+									   const Transform3D &center_inv,
+									   const Vector3 &origin, float radius,
+									   uint32_t mask, Vector3 &current_tail,
+									   Vector3 &prev_tail, Vector3 &out_contact_normal,
+									   float &out_contact_t, Vector3 &out_impact_point_world);
 
-  Ref<CapsuleShape3D> env_query_shape;
-  Ref<PhysicsShapeQueryParameters3D> env_query_params;
-};
+		Ref<CapsuleShape3D> env_query_shape;
+		Ref<PhysicsShapeQueryParameters3D> env_query_params;
+	};
 
 } // namespace godot
 

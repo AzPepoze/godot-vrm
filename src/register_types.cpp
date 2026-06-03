@@ -11,35 +11,41 @@
 
 using namespace godot;
 
-void initialize_vrm_physics_module(ModuleInitializationLevel p_level) {
-  if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
-    return;
-  }
+void initialize_vrm_physics_module(ModuleInitializationLevel p_level)
+{
+	if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE)
+	{
+		return;
+	}
 
-  GDREGISTER_CLASS(VRMConstraintSimulator);
-  GDREGISTER_CLASS(VRMSpringBoneSimulation);
+	GDREGISTER_CLASS(VRMConstraintSimulator);
+	GDREGISTER_CLASS(VRMSpringBoneSimulation);
 }
 
-void uninitialize_vrm_physics_module(ModuleInitializationLevel p_level) {
-  if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
-    return;
-  }
+void uninitialize_vrm_physics_module(ModuleInitializationLevel p_level)
+{
+	if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE)
+	{
+		return;
+	}
 }
 
-extern "C" {
-// Initialization.
-GDExtensionBool GDE_EXPORT
-vrm_physics_library_init(GDExtensionInterfaceGetProcAddress p_get_proc_address,
-                         GDExtensionClassLibraryPtr p_library,
-                         GDExtensionInitialization *r_initialization) {
-  godot::GDExtensionBinding::InitObject init_obj(p_get_proc_address, p_library,
-                                                 r_initialization);
+extern "C"
+{
+	// Initialization.
+	GDExtensionBool GDE_EXPORT
+	vrm_physics_library_init(GDExtensionInterfaceGetProcAddress p_get_proc_address,
+							 GDExtensionClassLibraryPtr p_library,
+							 GDExtensionInitialization *r_initialization)
+	{
+		godot::GDExtensionBinding::InitObject init_obj(p_get_proc_address, p_library,
+													   r_initialization);
 
-  init_obj.register_initializer(initialize_vrm_physics_module);
-  init_obj.register_terminator(uninitialize_vrm_physics_module);
-  init_obj.set_minimum_library_initialization_level(
-      MODULE_INITIALIZATION_LEVEL_SCENE);
+		init_obj.register_initializer(initialize_vrm_physics_module);
+		init_obj.register_terminator(uninitialize_vrm_physics_module);
+		init_obj.set_minimum_library_initialization_level(
+			MODULE_INITIALIZATION_LEVEL_SCENE);
 
-  return init_obj.init();
-}
+		return init_obj.init();
+	}
 }
