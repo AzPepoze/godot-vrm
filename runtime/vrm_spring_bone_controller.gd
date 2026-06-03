@@ -91,11 +91,18 @@ const SpringBoneGizmo = preload("./vrm_spring_bone_controller_gizmo.gd")
 		if Engine.is_editor_hint():
 			update_configuration_warnings()
 
+
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings = PackedStringArray()
-	if not update_in_editor and (gizmo_spring_bone or gizmo_show_body_collisions or gizmo_show_wind):
-		warnings.append("Please enable 'Update In Editor' to correctly display the spring bone gizmos.")
+	if (
+		not update_in_editor
+		and (gizmo_spring_bone or gizmo_show_body_collisions or gizmo_show_wind)
+	):
+		warnings.append(
+			"Please enable 'Update In Editor' to correctly display the spring bone gizmos."
+		)
 	return warnings
+
 
 @export var gizmo_wind_color: Color:
 	get:
@@ -131,6 +138,7 @@ var spring_bone_adapter: RefCounted = null
 var _gizmo: MeshInstance3D = null
 var _settings: VRMSettings = null
 
+
 func _get_settings() -> VRMSettings:
 	if _settings == null:
 		_settings = VRMSettings.new()
@@ -141,7 +149,7 @@ func _enter_tree() -> void:
 	_parent_ref = get_parent()
 	if _parent_ref != null and _parent_ref.has_method("is_vrm_root"):
 		is_child_of_vrm = true
-		_parent_ref.set("spring_bone_controller", self )
+		_parent_ref.set("spring_bone_controller", self)
 		# Pull settings resource
 		var parent_settings = _parent_ref.get("settings")
 		if parent_settings is VRMSettings:
@@ -211,7 +219,7 @@ func _setup_spring_bone_adapter() -> void:
 
 func _setup_gizmo() -> void:
 	if _gizmo == null:
-		_gizmo = SpringBoneGizmo.new(self )
+		_gizmo = SpringBoneGizmo.new(self)
 		add_child(_gizmo, false, Node.INTERNAL_MODE_BACK)
 
 
@@ -255,7 +263,7 @@ func _draw_wind_arrow(
 	# Gizmo is in skeleton space because of the skel_to_gizmo transform
 	# Find Head bone for positioning
 	var head_idx = skel.find_bone("Head")
-	var start_pos_skel = Vector3(0, 1.5, 0) # Fallback
+	var start_pos_skel = Vector3(0, 1.5, 0)  # Fallback
 	if head_idx != -1:
 		start_pos_skel = skel.get_bone_global_pose(head_idx).origin
 

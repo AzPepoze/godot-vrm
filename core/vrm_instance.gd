@@ -10,15 +10,19 @@ var spring_bone_controller: Node3D:
 		spring_bone_controller = value
 		_sync_all_arrays()
 
+
 func _sync_all_arrays() -> void:
-	if not spring_bone_controller: return
+	if not spring_bone_controller:
+		return
 	spring_bones = _sync_from_controller(&"spring_bones", spring_bones)
 	collider_groups = _sync_from_controller(&"collider_groups", collider_groups)
 	collider_library = _sync_from_controller(&"collider_library", collider_library)
 
+
 func _sync_from_controller(prop: StringName, parent_val: Array) -> Array:
 	var child_val = spring_bone_controller.get(prop)
-	if not (child_val is Array): return parent_val
+	if not (child_val is Array):
+		return parent_val
 	if parent_val.is_empty() and not child_val.is_empty():
 		return child_val
 	if not parent_val.is_empty() and child_val.is_empty():
@@ -27,14 +31,17 @@ func _sync_from_controller(prop: StringName, parent_val: Array) -> Array:
 		spring_bone_controller.set(prop, parent_val)
 	return parent_val
 
+
 func _sync_to_controller(prop: StringName, value: Array) -> Array:
-	if not spring_bone_controller: return value
+	if not spring_bone_controller:
+		return value
 	var child_val = spring_bone_controller.get(prop)
 	if child_val is Array and not child_val.is_empty() and value.is_empty():
 		return child_val
 	if spring_bone_controller.get(prop) != value:
 		spring_bone_controller.set(prop, value)
 	return value
+
 
 @export var vrm_meta: Resource
 
