@@ -18,7 +18,7 @@ jobs:
       matrix:
         platform: [linux, windows, macos]
         target: [template_debug, template_release]
-        precision: [float, double]
+        precision: [single, double]
         include:
           - platform: linux
             os: ubuntu-latest
