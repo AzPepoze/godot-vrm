@@ -2,7 +2,7 @@ name: "Push to Asset Lib"
 
 on:
   release:
-    types: [published]
+    types: [published, prereleased]
 
 permissions:
   contents: write
