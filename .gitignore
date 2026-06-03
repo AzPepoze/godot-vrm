@@ -24,6 +24,9 @@ data_*/
 *.a
 *.lib
 
+# Local secrets for act
+.secrets
+
 # GDExtension binaries
 addons/*/bin/*.so
 addons/*/bin/*.dll

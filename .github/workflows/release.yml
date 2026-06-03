@@ -1,9 +1,8 @@
-name: Release
+name: "Push to Asset Lib"
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
 
 permissions:
   contents: write
@@ -52,8 +51,8 @@ jobs:
           path: ${{ matrix.artifact-path }}
           if-no-files-found: error
 
-  release:
-    name: Create Release
+  publish:
+    name: Package and Publish
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -65,6 +64,11 @@ jobs:
         with:
           path: artifacts
 
+      - name: Update plugin.cfg version
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          sed -i "s/version=\".*\"/version=\"$VERSION\"/" addons/vrm/plugin.cfg
+
       - name: Package addon
         run: |
           mkdir -p addons/vrm/bin
@@ -72,8 +76,15 @@ jobs:
           find artifacts -name "*.dll" -exec cp {} addons/vrm/bin/ \;
           zip -r godot-vrm-${{ github.ref_name }}.zip addons/ vrm_samples/ -x "*.import" -x "*.unwrap_cache"
 
-      - name: Create Release
+      - name: Update Release
         uses: softprops/action-gh-release@v2
         with:
           files: godot-vrm-${{ github.ref_name }}.zip
-          generate_release_notes: true
+
+      - name: Godot Asset Lib
+        uses: deep-entertainment/godot-asset-lib-action@v0.4.0
+        with:
+          username: ${{ secrets.GODOT_ASSET_LIB_USER }}
+          password: ${{ secrets.GODOT_ASSET_LIB_PASSWORD }}
+          assetId: ${{ secrets.GODOT_ASSET_ID }}
+          assetTemplate: ".asset-template.json.hb"
