@@ -97,7 +97,11 @@ void VRMSpringBoneSimulation::_resolve_angular_collisions(
 
     if (collision_happened) {
       Vector3 velocity = joint.current_tail - joint.prev_tail;
-      Vector3 contact_normal_local = center_inv.basis.xform(skel->get_global_transform().affine_inverse().basis.xform(contact_normal)).normalized();
+      Vector3 contact_normal_local =
+          center_inv.basis
+              .xform(skel->get_global_transform().affine_inverse().basis.xform(
+                  contact_normal))
+              .normalized();
       const float normal_velocity = velocity.dot(contact_normal_local);
       if (normal_velocity < 0.0f) {
         velocity -= contact_normal_local * normal_velocity;

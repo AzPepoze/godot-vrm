@@ -7,7 +7,7 @@
 #include <godot_cpp/godot.hpp>
 
 #include "constraints/vrm_constraint_simulator.h"
-#include "spring_bone/vrm_spring_bone_simulation.h"
+#include "spring_bone/godot/vrm_spring_bone_simulation.h"
 
 namespace godot {
 

@@ -30,7 +30,8 @@ test:
 	godot --headless -s tests/test_runner.gd
 
 clean:
-	rm -rf src/*.o src/*.os src/*.obj .sconsign.dblite
+	find src/ -name "*.o" -o -name "*.os" -o -name "*.obj" | xargs -r rm -f
+	rm -rf .sconsign.dblite
 	rm -f addons/vrm/bin/libvrm_physics.*
 
 format:

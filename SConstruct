@@ -4,7 +4,13 @@ import os
 
 env = SConscript("godot-cpp/SConstruct")
 
-env.Append(CPPPATH=["src/"])
+env.Append(CPPPATH=[
+    "src/",
+    "src/constraints",
+    "src/spring_bone/core",
+    "src/spring_bone/godot",
+    "src/spring_bone/editor",
+])
 sources = []
 for root, _, files in os.walk("src"):
     for file_name in files:
