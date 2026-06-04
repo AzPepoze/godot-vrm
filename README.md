@@ -35,6 +35,7 @@
      - [Method 1: Godot Asset Library](#method-1-godot-asset-library)
      - [Method 2: Git Submodules](#method-2-git-submodules)
      - [Method 3: Manual Install](#method-3-manual-install)
+- [Updating](#updating)
 - [Showcase](#showcase)
      - [Spring Bone \& Environment Collision](#spring-bone--environment-collision)
      - [VRM Import \& Spring Bone Gizmos](#vrm-import--spring-bone-gizmos)
@@ -78,8 +79,9 @@ Download and install directly via the [Godot Asset Library](https://godotengine.
 If you use Git, you can add the specific branch for the addon as a submodule to map it cleanly to the `addons` folder.
 
 ```bash
+# vrm
 git submodule add -b vrm https://github.com/AzPepoze/godot-vrm addons/vrm
-# If you also need the MToon shader:
+# mtoon
 git submodule add -b mtoon https://github.com/AzPepoze/godot-vrm addons/mtoon
 ```
 
@@ -89,6 +91,21 @@ git submodule add -b mtoon https://github.com/AzPepoze/godot-vrm addons/mtoon
 2. Copy `addons/vrm` into your project's `addons/` — **do not rename**
 3. Copy `addons/mtoon` into `addons/mtoon` — **do not rename**
 4. Enable both in **Project Settings → Plugins → VRM** and **mtoon**
+
+---
+
+## Updating
+
+If you installed via Git Submodules, you can update the addon by pulling the latest changes:
+
+```bash
+# vrm
+git submodule update --remote addons/vrm
+# mtoon
+git submodule update --remote addons/mtoon
+```
+
+For manual installations, simply download the latest release and replace the files in your `addons` folder.
 
 ---
 
