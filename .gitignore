@@ -26,9 +26,3 @@ data_*/
 
 # Local secrets for act
 .secrets
-
-# GDExtension binaries
-addons/*/bin/*.so
-addons/*/bin/*.dll
-addons/*/bin/*.dylib
-addons/*/bin/*.wasm
