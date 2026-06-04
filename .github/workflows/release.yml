@@ -112,8 +112,10 @@ jobs:
 
                - name: Package addon
                  run: |
-                      # Create the zip with addons/vrm and addons/mtoon
-                      zip -r godot-vrm-${{ github.ref_name }}.zip addons/ -x "*.import" -x "*.unwrap_cache"
+                      # Create the zip with godot-vrm/addons/
+                      mkdir godot-vrm
+                      mv addons godot-vrm/
+                      zip -r godot-vrm-${{ github.ref_name }}.zip godot-vrm/ -x "*.import" -x "*.unwrap_cache"
 
                - name: Update Release
                  uses: softprops/action-gh-release@v2
