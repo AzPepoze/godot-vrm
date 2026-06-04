@@ -56,9 +56,9 @@ jobs:
                  with:
                       path: |
                            ${{ github.workspace }}/.scons_cache/
-                           ${{ github.workspace }}/godot-cpp/.scons_cache/
-                      key: scons-${{ matrix.platform }}-${{ matrix.target }}-${{ matrix.precision }}-${{ hashFiles('**/SConstruct', 'godot-cpp/SConstruct') }}
+                      key: scons-${{ matrix.platform }}-${{ matrix.target }}-${{ matrix.precision }}-${{ github.ref }}-${{ github.sha }}
                       restore-keys: |
+                           scons-${{ matrix.platform }}-${{ matrix.target }}-${{ matrix.precision }}-${{ github.ref }}-
                            scons-${{ matrix.platform }}-${{ matrix.target }}-${{ matrix.precision }}-
 
                - name: Build (${{ matrix.platform }})
