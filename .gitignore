@@ -33,5 +33,6 @@ addons/*/bin/*.dll
 addons/*/bin/*.dylib
 addons/*/bin/*.wasm
 
-# BUT allow the release versions to be committed by the workflow
+# BUT allow the release and debug versions to be committed by the workflow
 !addons/*/bin/*.template_release.*
+!addons/*/bin/*.template_debug.*
