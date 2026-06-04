@@ -1,9 +1,9 @@
-name: "Release Build"
+name: "Build and Update Binaries"
 
 on:
      push:
-          tags:
-               - "v*"
+          branches:
+               - main
      workflow_dispatch:
 
 permissions:
@@ -76,13 +76,18 @@ jobs:
                            addons/vrm/bin/*.framework
                       if-no-files-found: error
 
-     publish:
-          name: Package and Publish
+     update:
+          name: Commit and Update Branches
           needs: build
           runs-on: ubuntu-latest
           steps:
                - name: Checkout
                  uses: actions/checkout@v4
+                 with:
+                      fetch-depth: 0
+
+               - name: Switch to main branch
+                 run: git checkout -B main origin/main
 
                - name: Download artifacts
                  uses: actions/download-artifact@v4
@@ -98,22 +103,16 @@ jobs:
                       find artifacts -name "*.dll" -exec cp {} addons/vrm/bin/ \;
                       find artifacts -name "*.framework" -exec cp -r {} addons/vrm/bin/ \;
 
-               - name: Update plugin.cfg version
+               - name: Commit and Push Binaries
                  run: |
-                      VERSION=${GITHUB_REF_NAME#v}
-                      if [[ "$VERSION" != "workflow_dispatch" ]]; then
-                        sed -i "s/version=\".*\"/version=\"$VERSION\"/" addons/vrm/plugin.cfg
-                      fi
-
-               - name: Package addon
-                 run: |
-                      mkdir godot-vrm
-                      mv addons godot-vrm/
-                      zip -r godot-vrm-${{ github.ref_name }}.zip godot-vrm/ -x "*.import" -x "*.unwrap_cache"
-
-               - name: Update Release
-                 uses: softprops/action-gh-release@v2
-                 with:
-                      files: godot-vrm-${{ github.ref_name }}.zip
-                      generate_release_notes: true
-                      tag_name: ${{ github.ref_name }}
+                      git config user.name "github-actions[bot]"
+                      git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                      
+                      git add addons/vrm/bin/
+                      git commit -m "Auto-update compiled binaries [skip ci]" || echo "No changes"
+                      git push origin main
+                      
+                      git subtree split -P addons/vrm -b vrm-split
+                      git push -f origin vrm-split:vrm
+                      git subtree split -P addons/mtoon -b mtoon-split
+                      git push -f origin mtoon-split:mtoon

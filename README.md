@@ -33,7 +33,8 @@
 - [What this fork mainly improves](#what-this-fork-mainly-improves)
 - [Installation](#installation)
      - [Method 1: Godot Asset Library](#method-1-godot-asset-library)
-     - [Method 2: Manual Install](#method-2-manual-install)
+     - [Method 2: Git Submodules](#method-2-git-submodules)
+     - [Method 3: Manual Install](#method-3-manual-install)
 - [Showcase](#showcase)
      - [Spring Bone \& Environment Collision](#spring-bone--environment-collision)
      - [VRM Import \& Spring Bone Gizmos](#vrm-import--spring-bone-gizmos)
@@ -72,7 +73,17 @@
 
 Download and install directly via the [Godot Asset Library](https://godotengine.org/asset-library/asset/5222).
 
-### Method 2: Manual Install
+### Method 2: Git Submodules
+
+If you use Git, you can add the specific branch for the addon as a submodule to map it cleanly to the `addons` folder.
+
+```bash
+git submodule add -b vrm https://github.com/AzPepoze/godot-vrm addons/vrm
+# If you also need the MToon shader:
+git submodule add -b mtoon https://github.com/AzPepoze/godot-vrm addons/mtoon
+```
+
+### Method 3: Manual Install
 
 1. Download the latest `.zip` from the [Releases page](https://github.com/AzPepoze/godot-vrm/releases/latest).
 2. Copy `addons/vrm` into your project's `addons/` — **do not rename**
