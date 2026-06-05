@@ -524,3 +524,22 @@ func test_vrm1_end_bone_removal_keeps_skeleton_bones():
 		"Skeleton must retain 50+ bones after cleanup, got %d" % _skeleton.get_bone_count()
 	)
 	test_completed = true
+
+
+func test_vrm1_root_node_rotation():
+	assert_not_null(_scene_root, "Scene root must exist")
+	if _scene_root:
+		var rotated_node: Node3D = null
+		for child in _scene_root.get_children():
+			if child is Node3D and child.has_node("GeneralSkeleton"):
+				rotated_node = child
+				break
+		assert_not_null(rotated_node, "Rotated root wrapper node containing GeneralSkeleton must exist")
+		if rotated_node:
+			var y_rot = rotated_node.rotation_degrees.y
+			assert_true(
+				abs(abs(y_rot) - 180.0) < 0.1,
+				"VRM root node must be rotated by 180 degrees around Y (got %f)" % y_rot
+			)
+	test_completed = true
+

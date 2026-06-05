@@ -3,7 +3,7 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bphayojtnhqu6"
+uid="uid://bkudqvwy3sn3e"
 path="res://.godot/imported/AvatarSample_M.vrm-e2dbf6e837c4e0ded883fa02f2c155ae.scn"
 
 [deps]
@@ -37,25 +37,7 @@ import_script/path=""
 materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
-_subresources={
-"meshes": {
-"AvatarSample_M_Face (merged)(Clone)": {
-"generate/lightmap_uv": 0,
-"generate/lods": 0,
-"generate/shadow_meshes": 0,
-"lods/normal_merge_angle": 20.0,
-"save_to_file/enabled": false,
-"save_to_file/fallback_path": "res://adad.tres",
-"save_to_file/path": "uid://ckbuqdea57joy"
-}
-},
-"nodes": {
-"PATH:GeneralSkeleton": {
-"retarget/bone_map": Object(BoneMap,"resource_local_to_scene":false,"resource_name":"","profile":null,"bonemap":null,"script":null)
-
-}
-}
-}
+_subresources={}
 vrm/head_hiding_method=0
 vrm/only_if_head_hiding_uses_layers/first_person_layers=2
 vrm/only_if_head_hiding_uses_layers/third_person_layers=4
