@@ -172,6 +172,39 @@ func _import_post_parse(state: GLTFState) -> Error:
 	if not _add_vrm_nodes_to_skin(gltf_json_parsed):
 		VRMLogger.error("vrmc_vrm.gd", "Failed to find required VRM keys in json")
 		return ERR_INVALID_DATA
+
+	var flip_basis = Basis.looking_at(Vector3.MODEL_FRONT, Vector3.UP)
+	var flip_xform = Transform3D(flip_basis, Vector3.ZERO)
+	
+	var is_child = {}
+	for i in range(state.nodes.size()):
+		var gltf_node: GLTFNode = state.nodes[i]
+		for child_idx in gltf_node.children:
+			is_child[child_idx] = true
+
+	var original_roots = []
+	for i in range(state.nodes.size()):
+		if not is_child.has(i):
+			original_roots.append(i)
+
+	var new_root_node = GLTFNode.new()
+	new_root_node.original_name = "VRM_Root_Rotation"
+	new_root_node.xform = flip_xform
+	new_root_node.rotation = flip_basis.get_rotation_quaternion()
+	new_root_node.position = Vector3.ZERO
+	new_root_node.scale = Vector3.ONE
+	new_root_node.children = PackedInt32Array(original_roots)
+
+	var nodes = state.nodes
+	var new_root_idx = nodes.size()
+	nodes.append(new_root_node)
+	
+	for root_idx in original_roots:
+		nodes[root_idx].parent = new_root_idx
+
+	state.nodes = nodes
+	state.root_nodes = PackedInt32Array([new_root_idx])
+
 	return OK
 
 
