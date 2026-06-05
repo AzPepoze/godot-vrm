@@ -27,9 +27,13 @@ func test_vrm_spring_force_displacement():
     state.set_additional_data(
         &"vrm/head_hiding_method", VRMConstants.HeadHidingSetting.ThirdPersonOnly
     )
+    state.set_meta(&"vrm/head_hiding_method", true)
     state.set_additional_data(&"vrm/first_person_layers", 2)
+    state.set_meta(&"vrm/first_person_layers", true)
     state.set_additional_data(&"vrm/third_person_layers", 4)
+    state.set_meta(&"vrm/third_person_layers", true)
     state.set_additional_data(&"vrm/remove_end_bones", true)
+    state.set_meta(&"vrm/remove_end_bones", true)
 
     var err = gltf.append_from_file("res://assets/vrm/AvatarSample_M.vrm", state, 8)
     assert_eq(err, OK, "Should load VRM 1.0 sample")

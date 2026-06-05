@@ -51,10 +51,15 @@ func before_each():
     state.set_additional_data(
         &"vrm/head_hiding_method", VRMConstants.HeadHidingSetting.ThirdPersonOnly
     )
+    state.set_meta(&"vrm/head_hiding_method", true)
     state.set_additional_data(&"vrm/first_person_layers", 2)
+    state.set_meta(&"vrm/first_person_layers", true)
     state.set_additional_data(&"vrm/third_person_layers", 4)
+    state.set_meta(&"vrm/third_person_layers", true)
     state.set_additional_data(&"vrm/remove_end_bones", true)
+    state.set_meta(&"vrm/remove_end_bones", true)
     state.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
+    state.set_meta(&"vrm/skeleton_name", true)
     _import_error = _gltf.append_from_file(VRM_FILE, state, 8)
 
     if _import_error == OK:
@@ -557,10 +562,15 @@ func test_vrm1_import_none_bone_rename():
     state.set_additional_data(
         &"vrm/head_hiding_method", VRMConstants.HeadHidingSetting.ThirdPersonOnly
     )
+    state.set_meta(&"vrm/head_hiding_method", true)
     state.set_additional_data(&"vrm/first_person_layers", 2)
+    state.set_meta(&"vrm/first_person_layers", true)
     state.set_additional_data(&"vrm/third_person_layers", 4)
+    state.set_meta(&"vrm/third_person_layers", true)
     state.set_additional_data(&"vrm/remove_end_bones", true)
+    state.set_meta(&"vrm/remove_end_bones", true)
     state.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
+    state.set_meta(&"vrm/skeleton_name", true)
     state.set_meta(&"vrm_bone_rename", 0) # BoneRenameMode.NONE
 
     var err = gltf.append_from_file(VRM_FILE, state, 8)
@@ -607,10 +617,15 @@ func test_vrm1_import_symmetrize_bone_rename():
     state.set_additional_data(
         &"vrm/head_hiding_method", VRMConstants.HeadHidingSetting.ThirdPersonOnly
     )
+    state.set_meta(&"vrm/head_hiding_method", true)
     state.set_additional_data(&"vrm/first_person_layers", 2)
+    state.set_meta(&"vrm/first_person_layers", true)
     state.set_additional_data(&"vrm/third_person_layers", 4)
+    state.set_meta(&"vrm/third_person_layers", true)
     state.set_additional_data(&"vrm/remove_end_bones", true)
+    state.set_meta(&"vrm/remove_end_bones", true)
     state.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
+    state.set_meta(&"vrm/skeleton_name", true)
     state.set_meta(&"vrm_bone_rename", 2) # BoneRenameMode.SYMMETRIZE_VROID
 
     var err = gltf.append_from_file(VRM_FILE, state, 8)
