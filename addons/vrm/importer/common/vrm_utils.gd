@@ -8,6 +8,7 @@ const VRMHeadHiding = preload("./vrm_head_hiding.gd")
 const VRMGLTFLookups = preload("./vrm_gltf_lookups.gd")
 const VRMTransformUtils = preload("./vrm_transform_utils.gd")
 const VRMSkeletonCleanup = preload("./vrm_skeleton_cleanup.gd")
+const VRMConstants = preload("../../core/vrm_constants.gd")
 
 # Re-export constants from VRMMeshOrientation
 const ROTATE_180_BASIS = VRMMeshOrientation.ROTATE_180_BASIS
@@ -112,3 +113,24 @@ static func remove_end_bone_nodes(root_node: Node, skeleton: Skeleton3D) -> int:
 
 static func clear_all_bone_attachments(skeleton: Skeleton3D) -> void:
     VRMSkeletonCleanup.clear_all_bone_attachments(skeleton)
+
+
+static func apply_default_import_settings(gstate: GLTFState) -> void:
+    # Set default additional_data values so get_additional_data()
+    # doesn't trigger Godot 4.6 operator[] dict bug on missing keys.
+    # These may be overridden later by the import dialog (import_vrm.gd).
+    
+    var additional_data_defaults = {
+        &"vrm_head_hiding_method": [&"vrm/head_hiding_method", VRMConstants.HeadHidingSetting.ThirdPersonOnly],
+        &"vrm_first_person_layers": [&"vrm/first_person_layers", 2],
+        &"vrm_third_person_layers": [&"vrm/third_person_layers", 4],
+        &"vrm_remove_end_bones": [&"vrm/remove_end_bones", true],
+    }
+    
+    for meta_key in additional_data_defaults:
+        if not gstate.has_meta(meta_key):
+            gstate.set_additional_data(additional_data_defaults[meta_key][0], additional_data_defaults[meta_key][1])
+            
+    if not gstate.has_meta(&"vrm_skeleton_name"):
+        gstate.set_meta(&"vrm_skeleton_name", "Skeleton3D")
+

@@ -164,10 +164,9 @@ func _import_preflight(
 ) -> Error:
     if not extensions.has("VRMC_vrm"):
         return ERR_SKIP
-    if not _state.has_meta(&"vrm/remove_end_bones"):
-        _state.set_additional_data(&"vrm/remove_end_bones", true)
-    if not _state.has_meta(&"vrm/skeleton_name"):
-        _state.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
+        
+    vrm_utils.apply_default_import_settings(_state)
+    
     return OK
 
 
@@ -203,10 +202,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
         gstate, human_bone_to_idx, false
     )
 
-    var skeleton_name_val = gstate.get_additional_data(&"vrm/skeleton_name")
-    var skeleton_name: String = "Skeleton3D"
-    if skeleton_name_val is String and not skeleton_name_val.is_empty():
-        skeleton_name = skeleton_name_val
+    var skeleton_name: String = gstate.get_meta(&"vrm_skeleton_name", "Skeleton3D") as String
 
     var do_retarget = true
 

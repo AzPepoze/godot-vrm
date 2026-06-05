@@ -51,15 +51,14 @@ func before_each():
     state.set_additional_data(
         &"vrm/head_hiding_method", VRMConstants.HeadHidingSetting.ThirdPersonOnly
     )
-    state.set_meta(&"vrm/head_hiding_method", true)
+    state.set_meta(&"vrm_head_hiding_method", true)
     state.set_additional_data(&"vrm/first_person_layers", 2)
-    state.set_meta(&"vrm/first_person_layers", true)
+    state.set_meta(&"vrm_first_person_layers", true)
     state.set_additional_data(&"vrm/third_person_layers", 4)
-    state.set_meta(&"vrm/third_person_layers", true)
+    state.set_meta(&"vrm_third_person_layers", true)
     state.set_additional_data(&"vrm/remove_end_bones", true)
-    state.set_meta(&"vrm/remove_end_bones", true)
-    state.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
-    state.set_meta(&"vrm/skeleton_name", true)
+    state.set_meta(&"vrm_remove_end_bones", true)
+    state.set_meta(&"vrm_skeleton_name", "Skeleton3D")
     _import_error = _gltf.append_from_file(VRM_FILE, state, 8)
 
     if _import_error == OK:
@@ -562,15 +561,14 @@ func test_vrm1_import_none_bone_rename():
     state.set_additional_data(
         &"vrm/head_hiding_method", VRMConstants.HeadHidingSetting.ThirdPersonOnly
     )
-    state.set_meta(&"vrm/head_hiding_method", true)
+    state.set_meta(&"vrm_head_hiding_method", true)
     state.set_additional_data(&"vrm/first_person_layers", 2)
-    state.set_meta(&"vrm/first_person_layers", true)
+    state.set_meta(&"vrm_first_person_layers", true)
     state.set_additional_data(&"vrm/third_person_layers", 4)
-    state.set_meta(&"vrm/third_person_layers", true)
+    state.set_meta(&"vrm_third_person_layers", true)
     state.set_additional_data(&"vrm/remove_end_bones", true)
-    state.set_meta(&"vrm/remove_end_bones", true)
-    state.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
-    state.set_meta(&"vrm/skeleton_name", true)
+    state.set_meta(&"vrm_remove_end_bones", true)
+    state.set_meta(&"vrm_skeleton_name", "Skeleton3D")
     state.set_meta(&"vrm_bone_rename", 0) # BoneRenameMode.NONE
 
     var err = gltf.append_from_file(VRM_FILE, state, 8)
@@ -617,15 +615,14 @@ func test_vrm1_import_symmetrize_bone_rename():
     state.set_additional_data(
         &"vrm/head_hiding_method", VRMConstants.HeadHidingSetting.ThirdPersonOnly
     )
-    state.set_meta(&"vrm/head_hiding_method", true)
+    state.set_meta(&"vrm_head_hiding_method", true)
     state.set_additional_data(&"vrm/first_person_layers", 2)
-    state.set_meta(&"vrm/first_person_layers", true)
+    state.set_meta(&"vrm_first_person_layers", true)
     state.set_additional_data(&"vrm/third_person_layers", 4)
-    state.set_meta(&"vrm/third_person_layers", true)
+    state.set_meta(&"vrm_third_person_layers", true)
     state.set_additional_data(&"vrm/remove_end_bones", true)
-    state.set_meta(&"vrm/remove_end_bones", true)
-    state.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
-    state.set_meta(&"vrm/skeleton_name", true)
+    state.set_meta(&"vrm_remove_end_bones", true)
+    state.set_meta(&"vrm_skeleton_name", "Skeleton3D")
     state.set_meta(&"vrm_bone_rename", 2) # BoneRenameMode.SYMMETRIZE_VROID
 
     var err = gltf.append_from_file(VRM_FILE, state, 8)
@@ -641,6 +638,60 @@ func test_vrm1_import_symmetrize_bone_rename():
                     skel.find_bone("J_Bip_L_UpperLeg"), -1, "J_Bip_L_UpperLeg should be renamed"
                 )
                 assert_gt(skel.find_bone("UpperLeg_L"), -1, "UpperLeg_L must exist")
+            scene.free()
+
+    for ext in extensions:
+        GLTFDocument.unregister_gltf_document_extension(ext)
+    test_completed = true
+
+
+func test_vrm1_import_custom_skeleton_name():
+    """Verify that a custom skeleton_name set via meta is respected during import."""
+    var gltf = GLTFDocument.new()
+    var extensions = [
+        VRMC_NODE_CONSTRAINT.new(),
+        VRMC_SPRING_BONE.new(),
+        VRMC_MTOON.new(),
+        VRMC_HDR_EMISSIVE.new(),
+        VRMC_VRM.new(),
+        VRMC_VRM_ANIMATION.new(),
+    ]
+
+    for ext in extensions:
+        GLTFDocument.register_gltf_document_extension(ext, true)
+
+    var state := GLTFState.new()
+    const VRMConstants = preload("res://addons/vrm/core/vrm_constants.gd")
+    state.set_additional_data(
+        &"vrm/head_hiding_method", VRMConstants.HeadHidingSetting.ThirdPersonOnly
+    )
+    state.set_meta(&"vrm_head_hiding_method", true)
+    state.set_additional_data(&"vrm/first_person_layers", 2)
+    state.set_meta(&"vrm_first_person_layers", true)
+    state.set_additional_data(&"vrm/third_person_layers", 4)
+    state.set_meta(&"vrm_third_person_layers", true)
+    state.set_additional_data(&"vrm/remove_end_bones", true)
+    state.set_meta(&"vrm_remove_end_bones", true)
+    state.set_meta(&"vrm_skeleton_name", "MyCustomSkeleton")
+    state.set_meta(&"vrm_bone_rename", 1)  # BoneRenameMode.HUMANBONES
+
+    var err = gltf.append_from_file(VRM_FILE, state, 8)
+    assert_eq(err, OK, "Import with custom skeleton name must succeed")
+    if err == OK:
+        var scene = gltf.generate_scene(state)
+        if scene:
+            # Search for skeleton by type, not by hardcoded name
+            var skeletons := scene.find_children("*", "Skeleton3D", true, false)
+            assert_gt(skeletons.size(), 0, "Scene must contain at least one Skeleton3D")
+            if skeletons.size() > 0:
+                var skel: Skeleton3D = skeletons[0]
+                assert_eq(
+                    skel.name,
+                    "MyCustomSkeleton",
+                    "Skeleton must be named 'MyCustomSkeleton', got '%s'" % skel.name
+                )
+                # Verify it's still a valid skeleton with bones
+                assert_ge(skel.find_bone("Hips"), 0, "Hips bone must exist under custom name")
             scene.free()
 
     for ext in extensions:

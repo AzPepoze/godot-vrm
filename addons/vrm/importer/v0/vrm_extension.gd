@@ -93,28 +93,18 @@ func _import_preflight(
     if extensions.has("VRMC_vrm"):
         # VRM 1.0 file. Do not parse as a VRM 0.0.
         return ERR_INVALID_DATA
+        
     # Godot 4.6 bug: get_additional_data uses [] internally, triggering
     # "Dictionary::operator[] used when there was no value for the given key".
     # Workaround: use GLTFState meta instead of additional_data for this sentinel.
     if gstate.has_meta(&"vrm_already_processed"):
         return ERR_SKIP
     gstate.set_meta(&"vrm_already_processed", true)
+    
     VRMLogger.debug("vrm_extension.gd", "_import_preflight: processing VRM 0.0 file")
-    # Set default additional_data values so get_additional_data()
-    # doesn't trigger Godot 4.6 operator[] dict bug on missing keys.
-    # These may be overridden later by the import dialog (import_vrm.gd).
-    if not gstate.has_meta(&"vrm/head_hiding_method"):
-        gstate.set_additional_data(
-            &"vrm/head_hiding_method", vrm_constants_class.HeadHidingSetting.ThirdPersonOnly
-        )
-    if not gstate.has_meta(&"vrm/first_person_layers"):
-        gstate.set_additional_data(&"vrm/first_person_layers", 2)
-    if not gstate.has_meta(&"vrm/third_person_layers"):
-        gstate.set_additional_data(&"vrm/third_person_layers", 4)
-    if not gstate.has_meta(&"vrm/remove_end_bones"):
-        gstate.set_additional_data(&"vrm/remove_end_bones", true)
-    if not gstate.has_meta(&"vrm/skeleton_name"):
-        gstate.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
+    
+    vrm_utils.apply_default_import_settings(gstate)
+    
     var gltf_json_parsed: Dictionary = gstate.json
     var gltf_nodes = gltf_json_parsed["nodes"]
     if not _add_vrm_nodes_to_skin(gltf_json_parsed):
@@ -161,10 +151,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
         "vrm_extension.gd", "BoneMap configured with %d bones" % human_bone_to_idx.size()
     )
 
-    var skeleton_name_val = gstate.get_additional_data(&"vrm/skeleton_name")
-    var skeleton_name: String = "Skeleton3D"
-    if skeleton_name_val is String and not skeleton_name_val.is_empty():
-        skeleton_name = skeleton_name_val
+    var skeleton_name: String = gstate.get_meta(&"vrm_skeleton_name", "Skeleton3D") as String
 
 
     var pose_diffs: Array[Basis] = vrm_utils.perform_retarget(

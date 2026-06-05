@@ -39,6 +39,7 @@ static func rename_skeleton_bones(
                 p_skeleton.set_bone_parent(root_bone_id, new_root_bone_id)
 
     p_skeleton.name = skeleton_name
+    print("VRM: Renamed skeleton node to ", p_skeleton.name)
 
     p_skeleton.set_unique_name_in_owner(true)
 

@@ -419,3 +419,43 @@ func test_v0_godette_end_bones_removed():
     await runner.wait_frame
     GLTFDocument.unregister_gltf_document_extension(vrm_ext)
     test_completed = true
+
+
+func test_v0_custom_skeleton_name():
+    """Verify that a custom skeleton_name set via meta is respected during v0 import."""
+    var gltf := GLTFDocument.new()
+    var vrm_ext := VRM_EXTENSION.new()
+    GLTFDocument.register_gltf_document_extension(vrm_ext, true)
+
+    var state := GLTFState.new()
+    state.set_meta(&"vrm_skeleton_name", "MyV0Skeleton")
+    state.set_meta(&"vrm_bone_rename", 1)  # BoneRenameMode.HUMANBONES
+
+    var err := gltf.append_from_file("res://assets/vrm/AliciaSolid_vrm-0.51.vrm", state, 8)
+    assert_eq(err, OK, "Import with custom skeleton name must succeed")
+    if err != OK:
+        GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+        test_completed = true
+        return
+
+    var scene_root := gltf.generate_scene(state)
+    runner.root.add_child(scene_root)
+    await runner.wait_frame
+
+    # Search for skeleton by type, not by hardcoded name
+    var skeletons := scene_root.find_children("*", "Skeleton3D", true, false)
+    assert_gt(skeletons.size(), 0, "Scene must contain at least one Skeleton3D")
+    if skeletons.size() > 0:
+        var skel: Skeleton3D = skeletons[0]
+        assert_eq(
+            skel.name,
+            "MyV0Skeleton",
+            "Skeleton must be named 'MyV0Skeleton', got '%s'" % skel.name
+        )
+        # Verify it's still a valid skeleton with bones
+        assert_ge(skel.find_bone("Hips"), 0, "Hips bone must exist under custom name")
+
+    scene_root.queue_free()
+    await runner.wait_frame
+    GLTFDocument.unregister_gltf_document_extension(vrm_ext)
+    test_completed = true
