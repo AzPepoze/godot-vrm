@@ -14,7 +14,7 @@ static func skeleton_rename(
     skeleton_name: String = "Skeleton3D",
     
 ):
-    var bone_rename_mode: int = 1  # default to HUMANBONES (humanbones = 1)
+    var bone_rename_mode: int = 1 # default to HUMANBONES (humanbones = 1)
     if gstate.has_meta(&"vrm_bone_rename"):
         bone_rename_mode = gstate.get_meta(&"vrm_bone_rename") as int
     VRMBoneRenamer.rename_skeleton_bones(
@@ -100,8 +100,7 @@ static func perform_retarget(
     root_node: Node,
     skeleton: Skeleton3D,
     bone_map: BoneMap,
-    skeleton_name: String = "Skeleton3D",
-    
+    skeleton_name: String = "Skeleton3D"
 ) -> Array[Basis]:
     var global_transform_scale_local: Vector3 = VRMTransformUtils.apply_node_transforms(
         root_node, skeleton
