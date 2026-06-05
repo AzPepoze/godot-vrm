@@ -109,6 +109,7 @@ func _import_preflight(
     gstate.set_additional_data(&"vrm/first_person_layers", 2)
     gstate.set_additional_data(&"vrm/third_person_layers", 4)
     gstate.set_additional_data(&"vrm/remove_end_bones", true)
+    gstate.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
     var gltf_json_parsed: Dictionary = gstate.json
     var gltf_nodes = gltf_json_parsed["nodes"]
     if not _add_vrm_nodes_to_skin(gltf_json_parsed):
@@ -155,9 +156,10 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
         "vrm_extension.gd", "BoneMap configured with %d bones" % human_bone_to_idx.size()
     )
 
-    var skeleton_name: String = gstate.get_additional_data(&"vrm/skeleton_name")
-    if skeleton_name == null or skeleton_name.is_empty():
-        skeleton_name = "GeneralSkeleton"
+    var skeleton_name_val = gstate.get_additional_data(&"vrm/skeleton_name")
+    var skeleton_name: String = "Skeleton3D"
+    if skeleton_name_val is String and not skeleton_name_val.is_empty():
+        skeleton_name = skeleton_name_val
 
 
     var pose_diffs: Array[Basis] = vrm_utils.perform_retarget(

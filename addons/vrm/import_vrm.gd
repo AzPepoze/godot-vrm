@@ -26,7 +26,7 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
 
     var head_hiding: int = options.get(&"vrm/head_hiding_method", 0) as int
     var bone_rename: int = options.get(&"vrm/bone_rename", 0) as int
-    var skeleton_name: String = options.get(&"vrm/skeleton_name", "GeneralSkeleton") as String
+    var skeleton_name: String = options.get(&"vrm/skeleton_name", "Skeleton3D") as String
     var remove_end: bool = options.get(&"vrm/remove_end_bones", true) as bool
 
     if use_global:

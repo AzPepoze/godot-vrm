@@ -3,7 +3,7 @@ extends "res://tests/test_base.gd"
 
 func test_springbone_joints():
     var skel = Skeleton3D.new()
-    skel.name = "GeneralSkeleton"
+    skel.name = "Skeleton3D"
     skel.add_bone("Root")
     skel.add_bone("Joint1")
     skel.set_bone_parent(1, 0)

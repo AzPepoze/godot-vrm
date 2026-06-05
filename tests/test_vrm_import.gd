@@ -322,7 +322,7 @@ func test_load_godette_small_file():
 
 
 func _find_skeleton(root: Node) -> Skeleton3D:
-    var children := root.find_children("*", "GeneralSkeleton", true, false)
+    var children := root.find_children("*", "Skeleton3D", true, false)
     if children.size() > 0:
         return children[0]
     return null

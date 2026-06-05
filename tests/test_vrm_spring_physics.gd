@@ -48,7 +48,7 @@ func test_vrm_spring_force_displacement():
 
     var skeleton: Skeleton3D = spring_bone_controller.skel
     if skeleton == null:
-        skeleton = scene_root.find_child("GeneralSkeleton", true, false)
+        skeleton = scene_root.find_child("Skeleton3D", true, false)
         if skeleton:
             spring_bone_controller.skeleton = spring_bone_controller.get_path_to(skeleton)
             await runner.process_frame

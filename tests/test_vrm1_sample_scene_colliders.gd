@@ -83,8 +83,8 @@ func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():
         test_completed = true
         return
 
-    var skeleton: Skeleton3D = avatar.find_child("GeneralSkeleton", true, false)
-    assert_not_null(skeleton, "AvatarSample_M should contain GeneralSkeleton")
+    var skeleton: Skeleton3D = avatar.find_child("Skeleton3D", true, false)
+    assert_not_null(skeleton, "AvatarSample_M should contain Skeleton3D")
     if skeleton == null:
         scene.queue_free()
         test_completed = true
@@ -164,7 +164,7 @@ func test_all_imported_colliders_resolve_to_skeleton_bones():
         test_completed = true
         return
 
-    var skeleton: Skeleton3D = avatar.find_child("GeneralSkeleton", true, false)
+    var skeleton: Skeleton3D = avatar.find_child("Skeleton3D", true, false)
     assert_not_null(skeleton, "Skeleton must exist")
 
     var collider_library: Array = avatar.get("collider_library")

@@ -32,22 +32,22 @@
 - [What is VRM?](#what-is-vrm)
 - [What this fork mainly improves](#what-this-fork-mainly-improves)
 - [Installation](#installation)
-	- [Method 1: Godot Asset Library](#method-1-godot-asset-library)
-	- [Method 2: Git Submodules](#method-2-git-submodules)
-	- [Method 3: Manual Install](#method-3-manual-install)
+     - [Method 1: Godot Asset Library](#method-1-godot-asset-library)
+     - [Method 2: Git Submodules](#method-2-git-submodules)
+     - [Method 3: Manual Install](#method-3-manual-install)
 - [Updating](#updating)
 - [Showcase](#showcase)
-	- [Spring Bone \& Environment Collision](#spring-bone--environment-collision)
-	- [VRM Import \& Spring Bone Gizmos](#vrm-import--spring-bone-gizmos)
+     - [Spring Bone \& Environment Collision](#spring-bone--environment-collision)
+     - [VRM Import \& Spring Bone Gizmos](#vrm-import--spring-bone-gizmos)
 - [Features Status](#features-status)
-	- [Core VRM Support](#core-vrm-support)
-	- [Spring Bones (`VRMC_springBone`)](#spring-bones-vrmc_springbone)
-	- [Materials \& Shading](#materials--shading)
-	- [Animation \& Retargeting](#animation--retargeting)
+     - [Core VRM Support](#core-vrm-support)
+     - [Spring Bones (`VRMC_springBone`)](#spring-bones-vrmc_springbone)
+     - [Materials \& Shading](#materials--shading)
+     - [Animation \& Retargeting](#animation--retargeting)
 - [Import Options](#import-options)
-	- [Global Defaults](#global-defaults)
-	- [Bone Rename Modes](#bone-rename-modes)
-	- [Works with Blender](#works-with-blender)
+     - [Global Defaults](#global-defaults)
+     - [Bone Rename Modes](#bone-rename-modes)
+     - [Works with Blender](#works-with-blender)
 - [Icons](#icons)
 - [Credits](#credits)
 
@@ -197,18 +197,22 @@ Available in the Import dock when selecting a `.vrm` file:
 - **Head Hiding Method**: `ThirdPersonOnly` / `FirstPersonOnly` / `FirstWithShadow` / `Layers` / `LayersWithShadow` / `IgnoreHeadHiding`
 - **First/Third Person Layers**: Render layer masks for `Layers` mode
 - **Bone Rename**: See [Bone Rename Modes](#bone-rename-modes) below
-- **Skeleton Name**: Sets the skeleton node name (default `GeneralSkeleton`). See [Works with Blender](#works-with-blender) for animation workflows.
+- **Skeleton Name**: Sets the skeleton node name (default `Skeleton3D`).
+     - Use `Skeleton3D` if:
+          - You are working with a Blender workflow (matches `.blend` import names).
+     - Use `GeneralSkeleton` if:
+          - You are working with standard Godot `BoneMap` profiles.
 - **Remove End Bones**: Strips empty end-bone nodes from the skeleton
 
 ### Global Defaults
 
 > [!NOTE]
-> Import options are shown under the **Advanced** toggle in the import dock. Click **Advanced** at the bottom of the import panel to reveal VRM-specific settings.
+> Import options are shown under the **Advanced** mode.
 
 Set default import options once in **Project Settings → General → VRM → Import** instead of configuring per-file:
 
 - `vrm/import/head_hiding_method` — Head hiding mode
-- `vrm/import/bone_rename` — Bone rename mode  
+- `vrm/import/bone_rename` — Bone rename mode
 - `vrm/import/skeleton_name` — Skeleton node name
 - `vrm/import/remove_end_bones` — Remove end bones
 
@@ -246,7 +250,11 @@ For a smooth Blender ↔ Godot animation workflow:
 **Godot import settings for Blender workflow:**
 
 - **Bone Rename**: `None (Blender ready)` or `Symmetrize VRoid` (for VRoid models)
-- **Skeleton Name**: Set to `Skeleton3D` — matches the skeleton name inside `.blend` imports. Otherwise you must manually set a BoneMap in the `.blend` import dialog.
+- **Skeleton Name**:
+     - Use `Skeleton3D` (default) if:
+          - You want it to match the skeleton name inside `.blend` imports (optimized for Blender integration).
+     - Use `GeneralSkeleton` if:
+          - You need to target standard Godot `BoneMap` profiles.
 
 ---
 

@@ -54,6 +54,7 @@ func before_each():
     state.set_additional_data(&"vrm/first_person_layers", 2)
     state.set_additional_data(&"vrm/third_person_layers", 4)
     state.set_additional_data(&"vrm/remove_end_bones", true)
+    state.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
     _import_error = _gltf.append_from_file(VRM_FILE, state, 8)
 
     if _import_error == OK:
@@ -68,7 +69,7 @@ func before_each():
 
 
 func _find_skeleton(root: Node) -> Skeleton3D:
-    var children := root.find_children("*", "GeneralSkeleton", true, false)
+    var children := root.find_children("*", "Skeleton3D", true, false)
     if children.size() > 0:
         return children[0]
     return null
@@ -527,20 +528,9 @@ func test_vrm1_end_bone_removal_keeps_skeleton_bones():
 
 
 func test_vrm1_root_node_rotation():
+    # Since wrap_in_armature was removed, the model orientation is normalized via retargeting/baking
+    # and no root rotation wrapper node is generated.
     assert_not_null(_scene_root, "Scene root must exist")
-    if _scene_root:
-        var rotated_node: Node3D = null
-        for child in _scene_root.get_children():
-            if child is Node3D and child.has_node("GeneralSkeleton"):
-                rotated_node = child
-                break
-        assert_not_null(rotated_node, "Rotated root wrapper node containing GeneralSkeleton must exist")
-        if rotated_node:
-            var y_rot = rotated_node.rotation_degrees.y
-            assert_true(
-                abs(abs(y_rot) - 180.0) < 0.1,
-                "VRM root node must be rotated by 180 degrees around Y (got %f)" % y_rot
-            )
     test_completed = true
 
 
@@ -566,6 +556,7 @@ func test_vrm1_import_none_bone_rename():
     state.set_additional_data(&"vrm/first_person_layers", 2)
     state.set_additional_data(&"vrm/third_person_layers", 4)
     state.set_additional_data(&"vrm/remove_end_bones", true)
+    state.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
     state.set_meta(&"vrm_bone_rename", 0) # BoneRenameMode.NONE
 
     var err = gltf.append_from_file(VRM_FILE, state, 8)
@@ -615,6 +606,7 @@ func test_vrm1_import_symmetrize_bone_rename():
     state.set_additional_data(&"vrm/first_person_layers", 2)
     state.set_additional_data(&"vrm/third_person_layers", 4)
     state.set_additional_data(&"vrm/remove_end_bones", true)
+    state.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
     state.set_meta(&"vrm_bone_rename", 2) # BoneRenameMode.SYMMETRIZE_VROID
 
     var err = gltf.append_from_file(VRM_FILE, state, 8)

@@ -165,6 +165,7 @@ func _import_preflight(
     if not extensions.has("VRMC_vrm"):
         return ERR_SKIP
     _state.set_additional_data(&"vrm/remove_end_bones", true)
+    _state.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
     return OK
 
 
@@ -173,38 +174,6 @@ func _import_post_parse(state: GLTFState) -> Error:
     if not _add_vrm_nodes_to_skin(gltf_json_parsed):
         VRMLogger.error("vrmc_vrm.gd", "Failed to find required VRM keys in json")
         return ERR_INVALID_DATA
-
-    var flip_basis = Basis.looking_at(Vector3.MODEL_FRONT, Vector3.UP)
-    var flip_xform = Transform3D(flip_basis, Vector3.ZERO)
-
-    var is_child = {}
-    for i in range(state.nodes.size()):
-        var gltf_node: GLTFNode = state.nodes[i]
-        for child_idx in gltf_node.children:
-            is_child[child_idx] = true
-
-    var original_roots = []
-    for i in range(state.nodes.size()):
-        if not is_child.has(i):
-            original_roots.append(i)
-
-    var new_root_node = GLTFNode.new()
-    new_root_node.original_name = "VRM_Root_Rotation"
-    new_root_node.xform = flip_xform
-    new_root_node.rotation = flip_basis.get_rotation_quaternion()
-    new_root_node.position = Vector3.ZERO
-    new_root_node.scale = Vector3.ONE
-    new_root_node.children = PackedInt32Array(original_roots)
-
-    var nodes = state.nodes
-    var new_root_idx = nodes.size()
-    nodes.append(new_root_node)
-
-    for root_idx in original_roots:
-        nodes[root_idx].parent = new_root_idx
-
-    state.nodes = nodes
-    state.root_nodes = PackedInt32Array([new_root_idx])
 
     return OK
 
@@ -232,9 +201,10 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
         gstate, human_bone_to_idx, false
     )
 
-    var skeleton_name: String = gstate.get_additional_data(&"vrm/skeleton_name")
-    if skeleton_name == null or skeleton_name.is_empty():
-        skeleton_name = "GeneralSkeleton"
+    var skeleton_name_val = gstate.get_additional_data(&"vrm/skeleton_name")
+    var skeleton_name: String = "Skeleton3D"
+    if skeleton_name_val is String and not skeleton_name_val.is_empty():
+        skeleton_name = skeleton_name_val
 
     var do_retarget = true
 
