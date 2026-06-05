@@ -102,6 +102,10 @@ func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():
 		return
 
 	var root_bone := str(hair_spring.joint_nodes[0])
+	print("DEBUG: root_bone = ", root_bone)
+	print("DEBUG: skeleton bones count = ", skeleton.get_bone_count())
+	for i in range(min(10, skeleton.get_bone_count())):
+		print("  bone ", i, ": ", skeleton.get_bone_name(i))
 	var root_bone_idx := skeleton.find_bone(root_bone)
 	assert_gt(root_bone_idx, -1, "Hair spring root bone should exist in skeleton")
 	if root_bone_idx == -1:

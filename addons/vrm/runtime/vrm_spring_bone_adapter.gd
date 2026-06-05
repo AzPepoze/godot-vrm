@@ -58,17 +58,40 @@ func _setup_cpp(
 		if simulation.get_parent() == null:
 			skeleton.add_child(simulation)
 
+		var rename_map: Dictionary = {}
+		if skeleton.has_meta("vrm_rename_map"):
+			rename_map = skeleton.get_meta("vrm_rename_map")
+
 		var modified_spring_bones: Array = []
 		for sb in spring_bones:
 			if sb == null:
 				continue
+			var sb_copy: VRMSpringBone = sb.duplicate()
+
+			# 1. Update joint_nodes
+			var joints: PackedStringArray = sb_copy.joint_nodes
+			var updated_joints := PackedStringArray()
+			for joint in joints:
+				var sn := StringName(joint)
+				if rename_map.has(sn):
+					updated_joints.append(String(rename_map[sn]))
+				else:
+					updated_joints.append(joint)
+			sb_copy.joint_nodes = updated_joints
+
+			# 2. Update center_bone
+			var cb: String = sb_copy.center_bone
+			var cb_sn := StringName(cb)
+			if cb != "" and rename_map.has(cb_sn):
+				sb_copy.center_bone = String(rename_map[cb_sn])
+
+			# Apply group multipliers
 			var multiplier = 1.0
 			for gm in group_multipliers:
 				if gm != null and gm.group_name == sb.group:
 					multiplier = gm.hit_radius_multiplier
 					break
 			if multiplier != 1.0:
-				var sb_copy: VRMSpringBone = sb.duplicate()
 				# PackedFloat64Array is passed by value, but modifying the property directly works
 				# However, since it is a copy, we can just replace the array
 				var new_hit_radius = PackedFloat64Array()
@@ -77,11 +100,28 @@ func _setup_cpp(
 				sb_copy.hit_radius = new_hit_radius
 				# also scale hit_radius_scale
 				sb_copy.hit_radius_scale *= multiplier
-				modified_spring_bones.append(sb_copy)
-			else:
-				modified_spring_bones.append(sb)
+			
+			modified_spring_bones.append(sb_copy)
 
-		simulation.setup(modified_spring_bones, collider_groups)
+		var modified_collider_groups: Array = []
+		for cg in collider_groups:
+			if cg == null:
+				continue
+			var cg_copy: VRMColliderGroup = cg.duplicate()
+			var colliders_copy: Array[VRMCollider] = []
+			for col in cg_copy.colliders:
+				if col == null:
+					continue
+				var col_copy: VRMCollider = col.duplicate()
+				var b := col_copy.bone
+				var b_sn := StringName(b)
+				if b != "" and rename_map.has(b_sn):
+					col_copy.bone = String(rename_map[b_sn])
+				colliders_copy.append(col_copy)
+			cg_copy.colliders = colliders_copy
+			modified_collider_groups.append(cg_copy)
+
+		simulation.setup(modified_spring_bones, modified_collider_groups)
 		if _settings:
 			update_parameters(_settings)
 		else:
