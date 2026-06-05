@@ -7,6 +7,11 @@ signal foo
 func _get_import_options(path: String):
     if path.is_empty() or path.get_extension().to_lower() == "vrm":
         add_import_option_advanced(
+            TYPE_BOOL,
+            "vrm/use_global_defaults",
+            true
+        )
+        add_import_option_advanced(
             TYPE_INT,
             "vrm/head_hiding_method",
             0,
@@ -29,23 +34,21 @@ func _get_import_options(path: String):
             TYPE_INT,
             "vrm/bone_rename",
             0,
-            PROPERTY_HINT_ENUM
+            PROPERTY_HINT_ENUM,
+            "None (Blender ready),Humanoid,Symmetrize VRoid Bone Names on X-Axis (Blender ready)"
         )
         add_import_option_advanced(
             TYPE_STRING,
             "vrm/skeleton_name",
-            "GeneralSkeleton",
-            PROPERTY_HINT_NONE
+            "GeneralSkeleton"
         )
         add_import_option_advanced(
             TYPE_BOOL,
             "vrm/wrap_in_armature",
-            false,
-            PROPERTY_HINT_NONE
+            false
         )
         add_import_option_advanced(
             TYPE_BOOL,
             "vrm/remove_end_bones",
-            true,
-            PROPERTY_HINT_NONEป
+            true
         )

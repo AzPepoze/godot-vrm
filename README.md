@@ -32,21 +32,22 @@
 - [What is VRM?](#what-is-vrm)
 - [What this fork mainly improves](#what-this-fork-mainly-improves)
 - [Installation](#installation)
-     - [Method 1: Godot Asset Library](#method-1-godot-asset-library)
-     - [Method 2: Git Submodules](#method-2-git-submodules)
-     - [Method 3: Manual Install](#method-3-manual-install)
+	- [Method 1: Godot Asset Library](#method-1-godot-asset-library)
+	- [Method 2: Git Submodules](#method-2-git-submodules)
+	- [Method 3: Manual Install](#method-3-manual-install)
 - [Updating](#updating)
 - [Showcase](#showcase)
-     - [Spring Bone \& Environment Collision](#spring-bone--environment-collision)
-     - [VRM Import \& Spring Bone Gizmos](#vrm-import--spring-bone-gizmos)
+	- [Spring Bone \& Environment Collision](#spring-bone--environment-collision)
+	- [VRM Import \& Spring Bone Gizmos](#vrm-import--spring-bone-gizmos)
 - [Features Status](#features-status)
-     - [Core VRM Support](#core-vrm-support)
-     - [Spring Bones (`VRMC_springBone`)](#spring-bones-vrmc_springbone)
-     - [Materials \& Shading](#materials--shading)
-     - [Animation \& Retargeting](#animation--retargeting)
+	- [Core VRM Support](#core-vrm-support)
+	- [Spring Bones (`VRMC_springBone`)](#spring-bones-vrmc_springbone)
+	- [Materials \& Shading](#materials--shading)
+	- [Animation \& Retargeting](#animation--retargeting)
 - [Import Options](#import-options)
-     - [Bone Rename Modes](#bone-rename-modes)
-     - [Works with Blender](#works-with-blender)
+	- [Global Defaults](#global-defaults)
+	- [Bone Rename Modes](#bone-rename-modes)
+	- [Works with Blender](#works-with-blender)
 - [Icons](#icons)
 - [Credits](#credits)
 
@@ -199,6 +200,21 @@ Available in the Import dock when selecting a `.vrm` file:
 - **Skeleton Name**: `GeneralSkeleton` / `Skeleton3D` / `Armature` — sets the skeleton node name
 - **Wrap in Armature**: Wraps the skeleton in an `Armature` parent node to match Blender's `.blend` import structure. Enable this if importing `.blend` files from Blender — no need to manually set BoneMap in the blend import dialog.
 - **Remove End Bones**: Strips empty end-bone nodes from the skeleton
+
+### Global Defaults
+
+> [!NOTE]
+> Import options are shown under the **Advanced** toggle in the import dock. Click **Advanced** at the bottom of the import panel to reveal VRM-specific settings.
+
+Set default import options once in **Project Settings → General → VRM → Import** instead of configuring per-file:
+
+- `vrm/import/head_hiding_method` — Head hiding mode
+- `vrm/import/bone_rename` — Bone rename mode  
+- `vrm/import/skeleton_name` — Skeleton node name
+- `vrm/import/wrap_in_armature` — Wrap in Armature node
+- `vrm/import/remove_end_bones` — Remove end bones
+
+In the import dialog, **Use Global Defaults** (enabled by default) reads from these project settings. Uncheck it to override settings for a specific file.
 
 ### Bone Rename Modes
 

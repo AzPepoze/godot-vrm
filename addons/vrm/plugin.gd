@@ -35,8 +35,54 @@ var file_export_lib: EditorFileDialog
 var accept_dialog: AcceptDialog
 
 
+func register_import_settings() -> void:
+    var import_settings := {
+        "vrm/import/head_hiding_method": {
+            "type": TYPE_INT,
+            "hint": PROPERTY_HINT_ENUM,
+            "hint_string": "ThirdPersonOnly,FirstPersonOnly,FirstWithShadow,Layers,LayersWithShadow,IgnoreHeadHiding",
+            "default": 0,
+        },
+        "vrm/import/bone_rename": {
+            "type": TYPE_INT,
+            "hint": PROPERTY_HINT_ENUM,
+            "hint_string": "None (Blender ready),Humanoid,Symmetrize VRoid Bone Names on X-Axis (Blender ready)",
+            "default": 0,
+        },
+        "vrm/import/skeleton_name": {
+            "type": TYPE_STRING,
+            "hint": PROPERTY_HINT_NONE,
+            "default": "GeneralSkeleton",
+        },
+        "vrm/import/wrap_in_armature": {
+            "type": TYPE_BOOL,
+            "hint": PROPERTY_HINT_NONE,
+            "default": false,
+        },
+        "vrm/import/remove_end_bones": {
+            "type": TYPE_BOOL,
+            "hint": PROPERTY_HINT_NONE,
+            "default": true,
+        },
+    }
+    for setting_name in import_settings:
+        if not ProjectSettings.has_setting(setting_name):
+            var s = import_settings[setting_name]
+            ProjectSettings.set_setting(setting_name, s["default"])
+            var info := {
+                "name": setting_name,
+                "type": s["type"],
+                "hint": s["hint"],
+            }
+            if s.get("hint_string", "") != "":
+                info["hint_string"] = s["hint_string"]
+            ProjectSettings.add_property_info(info)
+            ProjectSettings.set_initial_value(setting_name, s["default"])
+
+
 func _enter_tree():
     VRMLogger.register_settings()
+    register_import_settings()
     # Instantiate and register GLTF extensions
     for extension_class in gltf_extension_classes:
         var instance = extension_class.new()

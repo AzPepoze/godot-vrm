@@ -37,3 +37,7 @@ textures/vram_compression/import_etc2_astc=true
 anti_aliasing/quality/msaa_3d=2
 quality/skinning/software_skinning_fallback=false
 quality/filters/msaa=8
+
+[vrm]
+
+import/wrap_in_armature=true
