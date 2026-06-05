@@ -45,6 +45,8 @@
      - [Materials \& Shading](#materials--shading)
      - [Animation \& Retargeting](#animation--retargeting)
 - [Import Options](#import-options)
+     - [Bone Rename Modes](#bone-rename-modes)
+     - [Works with Blender](#works-with-blender)
 - [Icons](#icons)
 - [Credits](#credits)
 
@@ -179,7 +181,7 @@ In the debug images above:
 
 | Feature                | Status | Details                                                           |
 | ---------------------- | :----: | ----------------------------------------------------------------- |
-| `humanoid`             |   ✅   | `SkeletonProfileHumanoid` via `%GeneralSkeleton`                  |
+| `humanoid`             |   ✅   | `SkeletonProfileHumanoid` via unique skeleton name                |
 | `expressions`          |   ✅   | Blend shape / material animation tracks                           |
 | `firstPerson`          |   ⚠️   | Head hiding supported via import options                          |
 | `lookAt`               |   ⚠️   | Generates animation tracks (app must use `BlendSpace2D` manually) |
@@ -193,7 +195,47 @@ Available in the Import dock when selecting a `.vrm` file:
 
 - **Head Hiding Method**: `ThirdPersonOnly` / `FirstPersonOnly` / `FirstWithShadow` / `Layers` / `LayersWithShadow` / `IgnoreHeadHiding`
 - **First/Third Person Layers**: Render layer masks for `Layers` mode
+- **Bone Rename**: See [Bone Rename Modes](#bone-rename-modes) below
+- **Skeleton Name**: `GeneralSkeleton` / `Skeleton3D` / `Armature` — sets the skeleton node name
+- **Wrap in Armature**: Wraps the skeleton in an `Armature` parent node to match Blender's `.blend` import structure. Enable this if importing `.blend` files from Blender — no need to manually set BoneMap in the blend import dialog.
 - **Remove End Bones**: Strips empty end-bone nodes from the skeleton
+
+### Bone Rename Modes
+
+**None (Blender ready)**
+
+- Animate in Blender with the VRM addon
+- Import `.blend` files directly into Godot
+
+**Humanoid**
+
+- Standard Godot humanoid bone names (`Hips`, `Spine`, etc.)
+- Retarget animations across different avatars
+- Export from Godot and re-import via glTF
+- ⚠️ Works but not yet fully tested — may need extra setup
+
+**Symmetrize VRoid**
+
+- For VRoid Studio models
+- Symmetrize bones in Blender first
+- Blender menu: Armature → Object → VRM → Humanoid → Symmetrize VRoid Bone Names on X-Axis
+
+### Works with Blender
+
+For a smooth Blender ↔ Godot animation workflow:
+
+1. Install the [VRM Add-on for Blender](https://vrm-addon-for-blender.info/en/)
+2. Import your `.vrm` into Blender with the addon
+3. Animate your model in Blender
+4. Export as `.blend` or `.glb` and import into Godot
+
+**Godot import settings for Blender workflow:**
+
+- **Bone Rename**: `None (Blender ready)` or `Symmetrize VRoid` (for VRoid models)
+- **Skeleton Name**: `Armature` — matches Blender's default armature object name
+- **Wrap in Armature**: Enable this so the VRM skeleton structure matches what `.blend` imports produce, skipping the need to manually set a BoneMap in the blend import dialog
+
+With these settings, animations created in Blender work directly on the imported VRM model without extra configuration.
 
 ---
 

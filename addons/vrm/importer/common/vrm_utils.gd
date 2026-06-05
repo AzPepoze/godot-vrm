@@ -61,10 +61,11 @@ static func perform_retarget(
     root_node: Node,
     skeleton: Skeleton3D,
     bone_map: BoneMap,
-    skeleton_name: String = "GeneralSkeleton"
+    skeleton_name: String = "GeneralSkeleton",
+    wrap_in_armature: bool = false
 ) -> Array[Basis]:
     return VRMSkeletonRetargeting.perform_retarget(
-        gstate, root_node, skeleton, bone_map, skeleton_name
+        gstate, root_node, skeleton, bone_map, skeleton_name, wrap_in_armature
     )
 
 

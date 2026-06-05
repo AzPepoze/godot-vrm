@@ -40,6 +40,9 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
     state.set_additional_data(
         &"vrm/skeleton_name", options.get(&"vrm/skeleton_name", "GeneralSkeleton") as String
     )
+    state.set_additional_data(
+        &"vrm/wrap_in_armature", options.get(&"vrm/wrap_in_armature", false) as bool
+    )
     # HANDLE_BINARY_EMBED_AS_BASISU crashes on some files in 4.0 and 4.1
     state.handle_binary_image = GLTFState.HANDLE_BINARY_EMBED_AS_UNCOMPRESSED # GLTFState.HANDLE_BINARY_EXTRACT_TEXTURES
     VRMLogger.info("import_vrm.gd", "_import_scene: importing %s" % path)

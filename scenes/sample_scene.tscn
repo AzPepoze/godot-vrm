@@ -10,6 +10,7 @@
 [ext_resource type="Resource" uid="uid://co3a34c0yn7yj" path="res://scenes/TestVRMSetting.tres" id="8_e351d"]
 [ext_resource type="PackedScene" uid="uid://bkudqvwy3sn3e" path="res://assets/vrm/AvatarSample_M.vrm" id="9_fenef"]
 [ext_resource type="Script" uid="uid://d25c3tmrypsh8" path="res://addons/vrm/core/vrm_spring_bone_group_setting.gd" id="10_6yaw1"]
+[ext_resource type="Animation" uid="uid://blnmxpxy8if78" path="res://assets/animations/anim_none.anim" id="11_kg8jk"]
 
 [sub_resource type="ProceduralSkyMaterial" id="68"]
 sky_top_color = Color(0.454902, 0.678431, 0.87451, 1)
@@ -2305,6 +2306,11 @@ gizmo_show_body_collisions = true
 gizmo_show_wind = true
 update_in_editor = true
 
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_6idux"]
+_data = {
+&"anim_none": ExtResource("11_kg8jk")
+}
+
 [node name="Spatial" type="Node3D" unique_id=2048687081]
 script = ExtResource("1_udu4s")
 
@@ -2454,6 +2460,9 @@ spring_bones = Array[ExtResource("3_6idux")]([SubResource("Resource_xqgyt"), Sub
 collider_groups = Array[ExtResource("4_oiwk8")]([SubResource("Resource_ldpdc"), SubResource("Resource_4pa5q"), SubResource("Resource_6b8rs"), SubResource("Resource_3f4cn"), SubResource("Resource_2u2bi"), SubResource("Resource_pduf0"), SubResource("Resource_i3bxh"), SubResource("Resource_t26o3"), SubResource("Resource_jhbmj"), SubResource("Resource_umn7d"), SubResource("Resource_arvku"), SubResource("Resource_5qm1q")])
 collider_library = Array[ExtResource("5_s5ll8")]([SubResource("Resource_7we05"), SubResource("Resource_uvrql"), SubResource("Resource_tj4in"), SubResource("Resource_v203g"), SubResource("Resource_fgr4g"), SubResource("Resource_gaenb"), SubResource("Resource_vfkli"), SubResource("Resource_brrgq"), SubResource("Resource_a04t5"), SubResource("Resource_mn1jr"), SubResource("Resource_n5yjh"), SubResource("Resource_iks5m"), SubResource("Resource_5e5wj"), SubResource("Resource_u2nh6"), SubResource("Resource_i8eqf"), SubResource("Resource_2oc71"), SubResource("Resource_y3he5"), SubResource("Resource_b708d"), SubResource("Resource_lgij5"), SubResource("Resource_0g6um"), SubResource("Resource_edxt8"), SubResource("Resource_e00nh"), SubResource("Resource_lwjl8"), SubResource("Resource_2nmks"), SubResource("Resource_o6mln"), SubResource("Resource_tso64"), SubResource("Resource_5xd53"), SubResource("Resource_x2b3g")])
 settings = SubResource("Resource_f2ryh")
+
+[node name="AnimationPlayer" parent="AvatarSample_M" index="1" unique_id=1875902200]
+libraries/test = SubResource("AnimationLibrary_6idux")
 
 [node name="VRMSpringBoneController" parent="AvatarSample_M" index="2" unique_id=152815911]
 update_in_editor = true
