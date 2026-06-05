@@ -15,7 +15,7 @@ const VRMC_HDR_EMISSIVE = preload(
 const VRMC_VRM = preload("res://addons/vrm/importer/v1/vrmc/vrmc_vrm.gd")
 const VRMC_VRM_ANIMATION = preload("res://addons/vrm/importer/v1/vrmc/vrmc_vrm_animation.gd")
 
-const VRM_FILE := "res://vrm_samples/AvatarSample_M.vrm"
+const VRM_FILE := "res://assets/vrm/AvatarSample_M.vrm"
 
 # Cached import results — imported once, shared across all test methods
 var _scene_root: Node = null
@@ -68,7 +68,7 @@ func before_each():
 
 
 func _find_skeleton(root: Node) -> Skeleton3D:
-    var children := root.find_children("*", "Skeleton3D", true, false)
+    var children := root.find_children("*", "GeneralSkeleton", true, false)
     if children.size() > 0:
         return children[0]
     return null
@@ -507,7 +507,7 @@ func test_vrm1_end_bone_nodes_removed():
         0,
         (
             "Skeleton should have zero children named '*_end*' after cleanup, "
-            + "but found %d: %s" % [end_bone_nodes.size(), str(end_bone_nodes)]
+            +"but found %d: %s" % [end_bone_nodes.size(), str(end_bone_nodes)]
         )
     )
     test_completed = true
@@ -531,10 +531,10 @@ func test_vrm1_root_node_rotation():
     if _scene_root:
         var rotated_node: Node3D = null
         for child in _scene_root.get_children():
-            if child is Node3D and child.has_node("Skeleton3D"):
+            if child is Node3D and child.has_node("GeneralSkeleton"):
                 rotated_node = child
                 break
-        assert_not_null(rotated_node, "Rotated root wrapper node containing Skeleton3D must exist")
+        assert_not_null(rotated_node, "Rotated root wrapper node containing GeneralSkeleton must exist")
         if rotated_node:
             var y_rot = rotated_node.rotation_degrees.y
             assert_true(
@@ -566,7 +566,7 @@ func test_vrm1_import_none_bone_rename():
     state.set_additional_data(&"vrm/first_person_layers", 2)
     state.set_additional_data(&"vrm/third_person_layers", 4)
     state.set_additional_data(&"vrm/remove_end_bones", true)
-    state.set_meta(&"vrm_bone_rename", 0)  # BoneRenameMode.NONE
+    state.set_meta(&"vrm_bone_rename", 0) # BoneRenameMode.NONE
 
     var err = gltf.append_from_file(VRM_FILE, state, 8)
     assert_eq(err, OK, "Import under NONE mode must succeed")
@@ -615,7 +615,7 @@ func test_vrm1_import_symmetrize_bone_rename():
     state.set_additional_data(&"vrm/first_person_layers", 2)
     state.set_additional_data(&"vrm/third_person_layers", 4)
     state.set_additional_data(&"vrm/remove_end_bones", true)
-    state.set_meta(&"vrm_bone_rename", 2)  # BoneRenameMode.SYMMETRIZE_VROID
+    state.set_meta(&"vrm_bone_rename", 2) # BoneRenameMode.SYMMETRIZE_VROID
 
     var err = gltf.append_from_file(VRM_FILE, state, 8)
     assert_eq(err, OK, "Import under SYMMETRIZE mode must succeed")

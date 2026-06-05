@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bnfv1j076kirx"
-path="res://.godot/imported/AliciaSolid_vrm-0.51.vrm-c9e900691069ab8ef0f12ff91e9425da.scn"
+path="res://.godot/imported/AliciaSolid_vrm-0.51.vrm-13eceb9d650749b224e2ef5ba1c98522.scn"
 
 [deps]
 
-source_file="res://vrm_samples/AliciaSolid_vrm-0.51.vrm"
-dest_files=["res://.godot/imported/AliciaSolid_vrm-0.51.vrm-c9e900691069ab8ef0f12ff91e9425da.scn"]
+source_file="res://assets/vrm/AliciaSolid_vrm-0.51.vrm"
+dest_files=["res://.godot/imported/AliciaSolid_vrm-0.51.vrm-13eceb9d650749b224e2ef5ba1c98522.scn"]
 
 [params]
 
@@ -47,4 +47,6 @@ _subresources={
 vrm/head_hiding_method=0
 vrm/only_if_head_hiding_uses_layers/first_person_layers=2
 vrm/only_if_head_hiding_uses_layers/third_person_layers=4
+vrm/bone_rename=0
+vrm/skeleton_name="GeneralSkeleton"
 vrm/remove_end_bones=true

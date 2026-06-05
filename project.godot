@@ -15,7 +15,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="VRM Project (Godot 4.x)"
-run/main_scene="res://vrm_samples/sample_scene.tscn"
+run/main_scene="res://scenes/sample_scene.tscn"
 config/features=PackedStringArray("4.6")
 config/icon="res://icon.png"
 enabled=PackedStringArray("vrm")

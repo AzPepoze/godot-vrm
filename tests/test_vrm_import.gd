@@ -9,7 +9,7 @@ func test_load_alicia_v0_skeleton():
     GLTFDocument.register_gltf_document_extension(vrm_ext, true)
 
     var state := GLTFState.new()
-    var err := gltf.append_from_file("res://vrm_samples/AliciaSolid_vrm-0.51.vrm", state, 8)
+    var err := gltf.append_from_file("res://assets/vrm/AliciaSolid_vrm-0.51.vrm", state, 8)
     assert_eq(err, OK, "append_from_file for Alicia should succeed")
 
     if err != OK:
@@ -64,7 +64,7 @@ func test_v0_alicia_secondary_to_springbone_clean_rename():
     GLTFDocument.register_gltf_document_extension(vrm_ext, true)
 
     var state := GLTFState.new()
-    var err := gltf.append_from_file("res://vrm_samples/AliciaSolid_vrm-0.51.vrm", state, 8)
+    var err := gltf.append_from_file("res://assets/vrm/AliciaSolid_vrm-0.51.vrm", state, 8)
     assert_eq(err, OK, "append_from_file should succeed")
     if err != OK:
         GLTFDocument.unregister_gltf_document_extension(vrm_ext)
@@ -192,7 +192,7 @@ func test_load_alicia_spring_bones():
     GLTFDocument.register_gltf_document_extension(vrm_ext, true)
 
     var state := GLTFState.new()
-    var err := gltf.append_from_file("res://vrm_samples/AliciaSolid_vrm-0.51.vrm", state, 8)
+    var err := gltf.append_from_file("res://assets/vrm/AliciaSolid_vrm-0.51.vrm", state, 8)
     assert_eq(err, OK, "append_from_file should succeed")
     if err != OK:
         GLTFDocument.unregister_gltf_document_extension(vrm_ext)
@@ -236,7 +236,7 @@ func test_load_alicia_collider_groups():
     GLTFDocument.register_gltf_document_extension(vrm_ext, true)
 
     var state := GLTFState.new()
-    var err := gltf.append_from_file("res://vrm_samples/AliciaSolid_vrm-0.51.vrm", state, 8)
+    var err := gltf.append_from_file("res://assets/vrm/AliciaSolid_vrm-0.51.vrm", state, 8)
     assert_eq(err, OK, "append_from_file should succeed")
     if err != OK:
         GLTFDocument.unregister_gltf_document_extension(vrm_ext)
@@ -300,7 +300,7 @@ func test_load_godette_small_file():
     GLTFDocument.register_gltf_document_extension(vrm_ext, true)
 
     var state := GLTFState.new()
-    var err := gltf.append_from_file("res://vrm_samples/Godette_vrm_v4.vrm", state, 8)
+    var err := gltf.append_from_file("res://assets/vrm/Godette_vrm_v4.vrm", state, 8)
     assert_eq(err, OK, "append_from_file for Godette should succeed")
     if err != OK:
         GLTFDocument.unregister_gltf_document_extension(vrm_ext)
@@ -322,7 +322,7 @@ func test_load_godette_small_file():
 
 
 func _find_skeleton(root: Node) -> Skeleton3D:
-    var children := root.find_children("*", "Skeleton3D", true, false)
+    var children := root.find_children("*", "GeneralSkeleton", true, false)
     if children.size() > 0:
         return children[0]
     return null
@@ -337,7 +337,7 @@ func test_v0_alicia_end_bones_removed():
     GLTFDocument.register_gltf_document_extension(vrm_ext, true)
 
     var state := GLTFState.new()
-    var err := gltf.append_from_file("res://vrm_samples/AliciaSolid_vrm-0.51.vrm", state, 8)
+    var err := gltf.append_from_file("res://assets/vrm/AliciaSolid_vrm-0.51.vrm", state, 8)
     assert_eq(err, OK, "append_from_file should succeed")
     if err != OK:
         GLTFDocument.unregister_gltf_document_extension(vrm_ext)
@@ -383,7 +383,7 @@ func test_v0_godette_end_bones_removed():
     GLTFDocument.register_gltf_document_extension(vrm_ext, true)
 
     var state := GLTFState.new()
-    var err := gltf.append_from_file("res://vrm_samples/Godette_vrm_v4.vrm", state, 8)
+    var err := gltf.append_from_file("res://assets/vrm/Godette_vrm_v4.vrm", state, 8)
     assert_eq(err, OK, "append_from_file for Godette should succeed")
     if err != OK:
         GLTFDocument.unregister_gltf_document_extension(vrm_ext)

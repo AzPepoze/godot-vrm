@@ -25,7 +25,7 @@ func _ready():
 		add_child(model)
 	)
 	
-	_model = _load_model("res://vrm_samples/AliciaSolid_vrm-0.51.vrm")
+	_model = _load_model("res://assets/vrm/AliciaSolid_vrm-0.51.vrm")
 	add_child(_model)
 
 func _load_model(path: String) -> Node3D:

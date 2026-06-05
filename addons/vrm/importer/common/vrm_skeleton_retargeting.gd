@@ -11,7 +11,7 @@ static func skeleton_rename(
     p_base_scene: Node,
     p_skeleton: Skeleton3D,
     p_bone_map: BoneMap,
-    skeleton_name: String = "Skeleton3D"
+    skeleton_name: String = "GeneralSkeleton"
 ):
     var bone_rename_mode: int = 1  # default to HUMANBONES (humanbones = 1)
     if gstate.has_meta(&"vrm_bone_rename"):
@@ -99,7 +99,7 @@ static func perform_retarget(
     root_node: Node,
     skeleton: Skeleton3D,
     bone_map: BoneMap,
-    skeleton_name: String = "Skeleton3D"
+    skeleton_name: String = "GeneralSkeleton"
 ) -> Array[Basis]:
     var global_transform_scale_local: Vector3 = VRMTransformUtils.apply_node_transforms(
         root_node, skeleton

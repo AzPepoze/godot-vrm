@@ -5,7 +5,7 @@ var frames = 0
 
 func _initialize():
     # Load the AvatarSample_M VRM scene
-    var scene = load("res://vrm_samples/AvatarSample_M.vrm")
+    var scene = load("res://assets/vrm/AvatarSample_M.vrm")
     if scene == null:
         print("ERROR: Could not load AvatarSample_M.vrm")
         return

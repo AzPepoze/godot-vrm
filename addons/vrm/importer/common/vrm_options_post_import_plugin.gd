@@ -35,7 +35,7 @@ func _get_import_options(path: String):
         add_import_option_advanced(
             TYPE_STRING,
             "vrm/skeleton_name",
-            "Skeleton3D",
+            "GeneralSkeleton",
             PROPERTY_HINT_NONE,
             "",
             PROPERTY_USAGE_DEFAULT

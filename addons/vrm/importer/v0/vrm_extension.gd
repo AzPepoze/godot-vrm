@@ -157,7 +157,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 
     var skeleton_name: String = gstate.get_additional_data(&"vrm/skeleton_name")
     if skeleton_name == null or skeleton_name.is_empty():
-        skeleton_name = "Skeleton3D"
+        skeleton_name = "GeneralSkeleton"
 
     var pose_diffs: Array[Basis] = vrm_utils.perform_retarget(
         gstate, root_node, skeleton, humanBones, skeleton_name

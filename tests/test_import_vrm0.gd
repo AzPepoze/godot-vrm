@@ -5,7 +5,7 @@ extends SceneTree
 func _init():
     print("Loading VRM...")
     var packed_scene = ResourceLoader.load(
-        "res://vrm_samples/AliciaSolid_vrm-0.51.vrm",
+        "res://assets/vrm/AliciaSolid_vrm-0.51.vrm",
         "PackedScene",
         ResourceLoader.CACHE_MODE_REPLACE
     )

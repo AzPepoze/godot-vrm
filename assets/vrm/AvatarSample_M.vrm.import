@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://2yf18ir612b6"
-path="res://.godot/imported/Godette_vrm_v4.vrm-1a2ca6e7be5caea1e98f4dbd2f3c4108.scn"
+uid="uid://bkudqvwy3sn3e"
+path="res://.godot/imported/AvatarSample_M.vrm-7aff8babb20f74bc55331c71890230a2.scn"
 
 [deps]
 
-source_file="res://vrm_samples/Godette_vrm_v4.vrm"
-dest_files=["res://.godot/imported/Godette_vrm_v4.vrm-1a2ca6e7be5caea1e98f4dbd2f3c4108.scn"]
+source_file="res://assets/vrm/AvatarSample_M.vrm"
+dest_files=["res://.godot/imported/AvatarSample_M.vrm-7aff8babb20f74bc55331c71890230a2.scn"]
 
 [params]
 
@@ -41,4 +41,6 @@ _subresources={}
 vrm/head_hiding_method=0
 vrm/only_if_head_hiding_uses_layers/first_person_layers=2
 vrm/only_if_head_hiding_uses_layers/third_person_layers=4
+vrm/bone_rename=0
+vrm/skeleton_name="GeneralSkeleton"
 vrm/remove_end_bones=true

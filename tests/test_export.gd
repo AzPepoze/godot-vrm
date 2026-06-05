@@ -20,7 +20,7 @@ func _init():
     var state = GLTFState.new()
 
     print("Loading AvatarSample_M.vrm...")
-    var err = doc.append_from_file("res://vrm_samples/AvatarSample_M.vrm", state)
+    var err = doc.append_from_file("res://assets/vrm/AvatarSample_M.vrm", state)
     if err != OK:
         print("Failed to append from file: ", err)
         quit()

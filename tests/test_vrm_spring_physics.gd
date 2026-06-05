@@ -31,7 +31,7 @@ func test_vrm_spring_force_displacement():
     state.set_additional_data(&"vrm/third_person_layers", 4)
     state.set_additional_data(&"vrm/remove_end_bones", true)
 
-    var err = gltf.append_from_file("res://vrm_samples/AvatarSample_M.vrm", state, 8)
+    var err = gltf.append_from_file("res://assets/vrm/AvatarSample_M.vrm", state, 8)
     assert_eq(err, OK, "Should load VRM 1.0 sample")
 
     var scene_root = gltf.generate_scene(state)
@@ -48,7 +48,7 @@ func test_vrm_spring_force_displacement():
 
     var skeleton: Skeleton3D = spring_bone_controller.skel
     if skeleton == null:
-        skeleton = scene_root.find_child("Skeleton3D", true, false)
+        skeleton = scene_root.find_child("GeneralSkeleton", true, false)
         if skeleton:
             spring_bone_controller.skeleton = spring_bone_controller.get_path_to(skeleton)
             await runner.process_frame

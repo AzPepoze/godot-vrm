@@ -234,7 +234,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 
     var skeleton_name: String = gstate.get_additional_data(&"vrm/skeleton_name")
     if skeleton_name == null or skeleton_name.is_empty():
-        skeleton_name = "Skeleton3D"
+        skeleton_name = "GeneralSkeleton"
 
     var do_retarget = true
 
