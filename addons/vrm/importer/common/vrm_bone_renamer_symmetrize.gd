@@ -29,7 +29,7 @@ static func symmetrize_vroid_bone_name(name: String) -> String:
 
 static func rename_bones(
 	gstate: GLTFState, p_base_scene: Node, p_skeleton: Skeleton3D, p_bone_map: BoneMap
-) -> void:
+) -> Dictionary:
 	var skellen: int = p_skeleton.get_bone_count()
 
 	# 1. Gather all name changes
@@ -74,3 +74,5 @@ static func rename_bones(
 		var profile_bone_name: StringName = p_bone_map.find_profile_bone_name(old_name)
 		if profile_bone_name != StringName():
 			p_bone_map.set_skeleton_bone_name(profile_bone_name, rename_map[old_name])
+
+	return rename_map
