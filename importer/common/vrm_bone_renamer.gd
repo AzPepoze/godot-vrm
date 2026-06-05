@@ -17,8 +17,7 @@ static func rename_skeleton_bones(
     p_skeleton: Skeleton3D,
     p_bone_map: BoneMap,
     mode: int,
-    skeleton_name: String = "GeneralSkeleton",
-    wrap_in_armature: bool = false
+    skeleton_name: String = "GeneralSkeleton"
 ) -> void:
     var rename_map: Dictionary = {}
     if mode == BoneRenameMode.HUMANBONES:
@@ -40,16 +39,8 @@ static func rename_skeleton_bones(
                 p_skeleton.set_bone_parent(root_bone_id, new_root_bone_id)
 
     p_skeleton.name = skeleton_name
-    p_skeleton.set_unique_name_in_owner(true)
 
-    if wrap_in_armature:
-        var armature_node = Node3D.new()
-        armature_node.name = "Armature"
-        var parent_node = p_skeleton.get_parent()
-        if parent_node:
-            parent_node.add_child(armature_node)
-            p_skeleton.reparent(armature_node)
-        armature_node.owner = p_base_scene
+    p_skeleton.set_unique_name_in_owner(true)
 
     # Notify descendant nodes about bone name changes (e.g. springbone, secondary, etc.)
     var nodes = p_base_scene.find_children("*")

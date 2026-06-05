@@ -44,11 +44,6 @@ func _get_import_options(path: String):
         )
         add_import_option_advanced(
             TYPE_BOOL,
-            "vrm/wrap_in_armature",
-            false
-        )
-        add_import_option_advanced(
-            TYPE_BOOL,
             "vrm/remove_end_bones",
             true
         )

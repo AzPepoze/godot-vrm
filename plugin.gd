@@ -54,11 +54,6 @@ func register_import_settings() -> void:
             "hint": PROPERTY_HINT_NONE,
             "default": "GeneralSkeleton",
         },
-        "vrm/import/wrap_in_armature": {
-            "type": TYPE_BOOL,
-            "hint": PROPERTY_HINT_NONE,
-            "default": false,
-        },
         "vrm/import/remove_end_bones": {
             "type": TYPE_BOOL,
             "hint": PROPERTY_HINT_NONE,
