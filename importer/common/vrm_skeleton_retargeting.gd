@@ -13,6 +13,8 @@ static func skeleton_rename(
 	if gstate.has_meta(&"vrm_bone_rename"):
 		bone_rename_mode = gstate.get_meta(&"vrm_bone_rename") as int
 	VRMBoneRenamer.rename_skeleton_bones(gstate, p_base_scene, p_skeleton, p_bone_map, bone_rename_mode)
+	p_skeleton.set_meta("vrm_humanoid_bone_mapping", p_bone_map)
+
 
 
 static func skeleton_rotate(
