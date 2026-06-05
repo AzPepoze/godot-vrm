@@ -103,13 +103,18 @@ func _import_preflight(
     # Set default additional_data values so get_additional_data()
     # doesn't trigger Godot 4.6 operator[] dict bug on missing keys.
     # These may be overridden later by the import dialog (import_vrm.gd).
-    gstate.set_additional_data(
-        &"vrm/head_hiding_method", vrm_constants_class.HeadHidingSetting.ThirdPersonOnly
-    )
-    gstate.set_additional_data(&"vrm/first_person_layers", 2)
-    gstate.set_additional_data(&"vrm/third_person_layers", 4)
-    gstate.set_additional_data(&"vrm/remove_end_bones", true)
-    gstate.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
+    if not gstate.has_meta(&"vrm/head_hiding_method"):
+        gstate.set_additional_data(
+            &"vrm/head_hiding_method", vrm_constants_class.HeadHidingSetting.ThirdPersonOnly
+        )
+    if not gstate.has_meta(&"vrm/first_person_layers"):
+        gstate.set_additional_data(&"vrm/first_person_layers", 2)
+    if not gstate.has_meta(&"vrm/third_person_layers"):
+        gstate.set_additional_data(&"vrm/third_person_layers", 4)
+    if not gstate.has_meta(&"vrm/remove_end_bones"):
+        gstate.set_additional_data(&"vrm/remove_end_bones", true)
+    if not gstate.has_meta(&"vrm/skeleton_name"):
+        gstate.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
     var gltf_json_parsed: Dictionary = gstate.json
     var gltf_nodes = gltf_json_parsed["nodes"]
     if not _add_vrm_nodes_to_skin(gltf_json_parsed):

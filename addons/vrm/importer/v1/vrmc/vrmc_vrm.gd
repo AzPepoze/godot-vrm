@@ -164,8 +164,10 @@ func _import_preflight(
 ) -> Error:
     if not extensions.has("VRMC_vrm"):
         return ERR_SKIP
-    _state.set_additional_data(&"vrm/remove_end_bones", true)
-    _state.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
+    if not _state.has_meta(&"vrm/remove_end_bones"):
+        _state.set_additional_data(&"vrm/remove_end_bones", true)
+    if not _state.has_meta(&"vrm/skeleton_name"):
+        _state.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
     return OK
 
 

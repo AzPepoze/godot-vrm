@@ -8,8 +8,8 @@ func _get_import_options(path: String):
     if path.is_empty() or path.get_extension().to_lower() == "vrm":
         add_import_option_advanced(
             TYPE_BOOL,
-            "vrm/use_global_defaults",
-            true
+            "vrm/override_global_defaults",
+            false
         )
         add_import_option_advanced(
             TYPE_INT,
