@@ -61,7 +61,7 @@ static func perform_retarget(
     root_node: Node,
     skeleton: Skeleton3D,
     bone_map: BoneMap,
-    skeleton_name: String = "Skeleton3D"
+    skeleton_name: String = "GeneralSkeleton"
 ) -> Array[Basis]:
     return VRMSkeletonRetargeting.perform_retarget(
         gstate, root_node, skeleton, bone_map, skeleton_name

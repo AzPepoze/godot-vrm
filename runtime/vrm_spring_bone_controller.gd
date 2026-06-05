@@ -162,7 +162,9 @@ func _ready() -> void:
         if parent is Skeleton3D:
             skel = parent
         else:
-            skel = parent.find_child("*", "Skeleton3D", true, false)
+            var children = parent.find_children("*", "Skeleton3D", true, false)
+            if not children.is_empty():
+                skel = children[0]
         if skel:
             skeleton = get_path_to(skel)
     else:
