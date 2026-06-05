@@ -151,3 +151,44 @@ func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():
 	assert_gt(simulation.get_joint_count(0), 0, "First chain should have joints")
 	scene.queue_free()
 	test_completed = true
+
+
+func test_all_imported_colliders_resolve_to_skeleton_bones():
+	var scene := await _instantiate_sample_scene()
+	if scene == null:
+		test_completed = true
+		return
+	var avatar := _find_avatar_sample(scene)
+	if avatar == null:
+		scene.queue_free()
+		test_completed = true
+		return
+
+	var skeleton: Skeleton3D = avatar.find_child("GeneralSkeleton", true, false)
+	assert_not_null(skeleton, "Skeleton must exist")
+
+	var collider_library: Array = avatar.get("collider_library")
+	print("[DEBUG] Collider library size: ", collider_library.size())
+	
+	var bone_map: BoneMap = null
+	if skeleton.has_meta("vrm_humanoid_bone_mapping"):
+		bone_map = skeleton.get_meta("vrm_humanoid_bone_mapping")
+
+	for col in collider_library:
+		if col == null:
+			continue
+		var b: String = col.bone
+		if skeleton.find_bone(b) == -1:
+			# Try mapping using bone_map
+			if bone_map != null:
+				var actual = bone_map.get_skeleton_bone_name(b)
+				if actual != &"" and skeleton.find_bone(actual) != -1:
+					b = String(actual)
+		var idx := skeleton.find_bone(b)
+		print("[DEBUG] Collider bone resolved: ", col.bone, " -> ", b, " -> idx: ", idx)
+		assert_gt(idx, -1, "Resolved collider bone '%s' should exist in the skeleton" % b)
+
+	scene.queue_free()
+	test_completed = true
+
+

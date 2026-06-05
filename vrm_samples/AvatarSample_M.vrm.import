@@ -41,5 +41,5 @@ _subresources={}
 vrm/head_hiding_method=0
 vrm/only_if_head_hiding_uses_layers/first_person_layers=2
 vrm/only_if_head_hiding_uses_layers/third_person_layers=4
-vrm/bone_rename=0
+vrm/bone_rename=2
 vrm/remove_end_bones=true
