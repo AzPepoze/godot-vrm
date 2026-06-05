@@ -528,9 +528,13 @@ func test_vrm1_end_bone_removal_keeps_skeleton_bones():
 
 
 func test_vrm1_root_node_rotation():
-    # Since wrap_in_armature was removed, the model orientation is normalized via retargeting/baking
-    # and no root rotation wrapper node is generated.
     assert_not_null(_scene_root, "Scene root must exist")
+    if _scene_root is Node3D:
+        var y_rot = _scene_root.rotation_degrees.y
+        assert_true(
+            abs(abs(y_rot) - 180.0) < 0.1,
+            "VRM instance root node must be rotated by 180 degrees around Y (got %f)" % y_rot
+        )
     test_completed = true
 
 
