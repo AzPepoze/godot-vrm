@@ -102,10 +102,11 @@ func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():
 		return
 
 	var root_bone := str(hair_spring.joint_nodes[0])
-	print("DEBUG: root_bone = ", root_bone)
-	print("DEBUG: skeleton bones count = ", skeleton.get_bone_count())
-	for i in range(min(10, skeleton.get_bone_count())):
-		print("  bone ", i, ": ", skeleton.get_bone_name(i))
+	if skeleton.has_meta("vrm_rename_map"):
+		var rename_map = skeleton.get_meta("vrm_rename_map")
+		if rename_map.has(StringName(root_bone)):
+			root_bone = String(rename_map[StringName(root_bone)])
+
 	var root_bone_idx := skeleton.find_bone(root_bone)
 	assert_gt(root_bone_idx, -1, "Hair spring root bone should exist in skeleton")
 	if root_bone_idx == -1:
@@ -120,10 +121,24 @@ func test_avatar_sample_scene_hair_chain_reacts_to_assigned_collider():
 	var group := VRM_COLLIDER_GROUP.new()
 	group.colliders.append(collider)
 
+	var hair_spring_copy := hair_spring.duplicate() as VRMSpringBone
+	var joints := PackedStringArray()
+	if skeleton.has_meta("vrm_rename_map"):
+		var rename_map = skeleton.get_meta("vrm_rename_map")
+		for joint in hair_spring_copy.joint_nodes:
+			var sn := StringName(joint)
+			if rename_map.has(sn):
+				joints.append(String(rename_map[sn]))
+			else:
+				joints.append(joint)
+	else:
+		joints = hair_spring_copy.joint_nodes
+	hair_spring_copy.joint_nodes = joints
+
 	var simulation: Node = ClassDB.instantiate("VRMSpringBoneSimulation")
 	simulation.name = "VRMSpringBoneSimulationSampleTest"
 	skeleton.add_child(simulation)
-	simulation.setup([hair_spring], [group])
+	simulation.setup([hair_spring_copy], [group])
 	simulation.active = true
 
 	for i in range(5):
