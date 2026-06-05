@@ -17,7 +17,7 @@ static func rename_skeleton_bones(
     p_skeleton: Skeleton3D,
     p_bone_map: BoneMap,
     mode: int,
-    skeleton_name: String = "GeneralSkeleton"
+    skeleton_name: String = "Skeleton3D"
 ) -> void:
     var rename_map: Dictionary = {}
     if mode == BoneRenameMode.HUMANBONES:

@@ -52,7 +52,7 @@ func register_import_settings() -> void:
         "vrm/import/skeleton_name": {
             "type": TYPE_STRING,
             "hint": PROPERTY_HINT_NONE,
-            "default": "GeneralSkeleton",
+            "default": "Skeleton3D",
         },
         "vrm/import/remove_end_bones": {
             "type": TYPE_BOOL,

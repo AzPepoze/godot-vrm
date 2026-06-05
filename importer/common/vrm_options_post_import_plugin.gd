@@ -40,7 +40,7 @@ func _get_import_options(path: String):
         add_import_option_advanced(
             TYPE_STRING,
             "vrm/skeleton_name",
-            "GeneralSkeleton"
+            "Skeleton3D"
         )
         add_import_option_advanced(
             TYPE_BOOL,
