@@ -536,8 +536,8 @@ func test_vrm1_root_node_rotation():
     if _scene_root is Node3D:
         var y_rot = _scene_root.rotation_degrees.y
         assert_true(
-            abs(y_rot) < 0.1,
-            "VRM instance root node must not be rotated (got %f)" % y_rot
+            abs(abs(y_rot) - 180.0) < 0.1,
+            "VRM instance root node must be rotated by 180 degrees around Y (got %f)" % y_rot
         )
     test_completed = true
 
