@@ -45,6 +45,9 @@
      - [Materials \& Shading](#materials--shading)
      - [Animation \& Retargeting](#animation--retargeting)
 - [Import Options](#import-options)
+     - [Global Defaults](#global-defaults)
+     - [Bone Rename Modes](#bone-rename-modes)
+     - [Works with Blender](#works-with-blender)
 - [Icons](#icons)
 - [Credits](#credits)
 
@@ -179,7 +182,7 @@ In the debug images above:
 
 | Feature                | Status | Details                                                           |
 | ---------------------- | :----: | ----------------------------------------------------------------- |
-| `humanoid`             |   ✅   | `SkeletonProfileHumanoid` via `%GeneralSkeleton`                  |
+| `humanoid`             |   ✅   | `SkeletonProfileHumanoid` via unique skeleton name                |
 | `expressions`          |   ✅   | Blend shape / material animation tracks                           |
 | `firstPerson`          |   ⚠️   | Head hiding supported via import options                          |
 | `lookAt`               |   ⚠️   | Generates animation tracks (app must use `BlendSpace2D` manually) |
@@ -193,7 +196,65 @@ Available in the Import dock when selecting a `.vrm` file:
 
 - **Head Hiding Method**: `ThirdPersonOnly` / `FirstPersonOnly` / `FirstWithShadow` / `Layers` / `LayersWithShadow` / `IgnoreHeadHiding`
 - **First/Third Person Layers**: Render layer masks for `Layers` mode
+- **Bone Rename**: See [Bone Rename Modes](#bone-rename-modes) below
+- **Skeleton Name**: Sets the skeleton node name (default `Skeleton3D`).
+     - Use `Skeleton3D` if:
+          - You are working with a Blender workflow (matches `.blend` import names).
+     - Use `GeneralSkeleton` if:
+          - You are working with standard Godot `BoneMap` profiles.
 - **Remove End Bones**: Strips empty end-bone nodes from the skeleton
+
+### Global Defaults
+
+> [!NOTE]
+> Import options are shown under the **Advanced** mode.
+
+Set default import options once in **Project Settings → General → VRM → Import** instead of configuring per-file:
+
+- `vrm/import/head_hiding_method` — Head hiding mode
+- `vrm/import/bone_rename` — Bone rename mode
+- `vrm/import/skeleton_name` — Skeleton node name
+- `vrm/import/remove_end_bones` — Remove end bones
+
+In the import dialog, **Use Global Defaults** (enabled by default) reads from these project settings. Uncheck it to override settings for a specific file.
+
+### Bone Rename Modes
+
+**None (Blender ready)**
+
+- Animate in Blender with the VRM addon
+- Import `.blend` files directly into Godot
+
+**Humanoid**
+
+- Standard Godot humanoid bone names (`Hips`, `Spine`, etc.)
+- Retarget animations across different avatars
+- Export from Godot and re-import via glTF
+- ⚠️ Works but not yet fully tested — may need extra setup
+
+**Symmetrize VRoid**
+
+- For VRoid Studio models
+- Symmetrize bones in Blender first
+- Blender menu: Armature → Object → VRM → Humanoid → Symmetrize VRoid Bone Names on X-Axis
+
+### Works with Blender
+
+For a smooth Blender ↔ Godot animation workflow:
+
+1. Install the [VRM Add-on for Blender](https://vrm-addon-for-blender.info/en/)
+2. Import your `.vrm` into Blender with the addon
+3. Animate your model in Blender
+4. Export as `.blend` or `.glb` and import into Godot
+
+**Godot import settings for Blender workflow:**
+
+- **Bone Rename**: `None (Blender ready)` or `Symmetrize VRoid` (for VRoid models)
+- **Skeleton Name**:
+     - Use `Skeleton3D` (default) if:
+          - You want it to match the skeleton name inside `.blend` imports (optimized for Blender integration).
+     - Use `GeneralSkeleton` if:
+          - You need to target standard Godot `BoneMap` profiles.
 
 ---
 

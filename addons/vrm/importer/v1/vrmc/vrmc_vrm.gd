@@ -2,6 +2,7 @@ extends GLTFDocumentExtension
 
 const VRMLogger = preload("../../../core/logger.gd")
 const vrm_constants_class = preload("../../../core/vrm_constants.gd")
+const vrm_bone_renamer_humanoid = preload("../../../importer/common/vrm_bone_renamer_humanoid.gd")
 const vrm_meta_class = preload("../../../core/vrm_meta.gd")
 const vrm_instance = preload("../../../core/vrm_instance.gd")
 const vrm_utils = preload("../../../importer/common/vrm_utils.gd")
@@ -12,273 +13,246 @@ var vrm_meta: Resource = null
 
 
 func _get_skel_godot_node(gstate: GLTFState, nodes: Array, skeletons: Array, skel_id: int) -> Node:
-	if skel_id < 0 or skel_id >= skeletons.size():
-		return null
-	var gltfskel: GLTFSkeleton = skeletons[skel_id]
-	if gltfskel.roots.is_empty():
-		return null
-	var skel_node_idx = gltfskel.roots[0]
-	return gstate.get_scene_node(skel_node_idx)
+    if skel_id < 0 or skel_id >= skeletons.size():
+        return null
+    var gltfskel: GLTFSkeleton = skeletons[skel_id]
+    if gltfskel.roots.is_empty():
+        return null
+    var skel_node_idx = gltfskel.roots[0]
+    return gstate.get_scene_node(skel_node_idx)
 
 
 const vrm_resource_factory = preload("../../../importer/common/vrm_resource_factory.gd")
 
 
 func _create_meta(
-	_root_node: Node,
-	_animplayer: AnimationPlayer,
-	vrm_extension: Dictionary,
-	gstate: GLTFState,
-	_skeleton: Skeleton3D,
-	humanBones: BoneMap,
-	_human_bone_to_idx: Dictionary,
-	_pose_diffs: Array[Basis]
+    _root_node: Node,
+    _animplayer: AnimationPlayer,
+    vrm_extension: Dictionary,
+    gstate: GLTFState,
+    _skeleton: Skeleton3D,
+    humanBones: BoneMap,
+    _human_bone_to_idx: Dictionary,
+    _pose_diffs: Array[Basis]
 ) -> Resource:
-	return vrm_resource_factory.create_meta_v1(vrm_extension, gstate, humanBones)
+    return vrm_resource_factory.create_meta_v1(vrm_extension, gstate, humanBones)
 
 
 static func _validate_meta(vrm_meta: Resource) -> PackedStringArray:
-	if vrm_meta == null:
-		return PackedStringArray(["vrm_meta"])
-	var missing: PackedStringArray = []
-	for prop in [
-		"allowed_user_name",
-		"violent_usage",
-		"sexual_usage",
-		"commercial_usage_type",
-		"political_religious_usage",
-		"antisocial_hate_usage",
-		"credit_notation",
-		"allow_redistribution",
-		"modification",
-		"title"
-	]:
-		var val: Variant = vrm_meta.get(prop)
-		if typeof(val) != TYPE_STRING or val.strip_edges() == "":
-			missing.append(prop)
-	if vrm_meta.get("authors").is_empty():
-		missing.append("authors")
-	return missing
+    if vrm_meta == null:
+        return PackedStringArray(["vrm_meta"])
+    var missing: PackedStringArray = []
+    for prop in [
+        "allowed_user_name",
+        "violent_usage",
+        "sexual_usage",
+        "commercial_usage_type",
+        "political_religious_usage",
+        "antisocial_hate_usage",
+        "credit_notation",
+        "allow_redistribution",
+        "modification",
+        "title"
+    ]:
+        var val: Variant = vrm_meta.get(prop)
+        if typeof(val) != TYPE_STRING or val.strip_edges() == "":
+            missing.append(prop)
+    if vrm_meta.get("authors").is_empty():
+        missing.append("authors")
+    return missing
 
 
 func _export_meta(vrm_meta: Resource, vrm_extension: Dictionary, _gstate: GLTFState):
-	vrm_resource_factory.export_meta_v1(vrm_meta, vrm_extension)
+    vrm_resource_factory.export_meta_v1(vrm_meta, vrm_extension)
 
 
 const vrm_animation_service = preload("../../../importer/common/vrm_animation_service.gd")
 
 
 func _create_animation_player(
-	animplayer: AnimationPlayer,
-	vrm_extension: Dictionary,
-	gstate: GLTFState,
-	human_bone_to_idx: Dictionary,
-	pose_diffs: Array[Basis]
+    animplayer: AnimationPlayer,
+    vrm_extension: Dictionary,
+    gstate: GLTFState,
+    human_bone_to_idx: Dictionary,
+    pose_diffs: Array[Basis]
 ) -> AnimationPlayer:
-	return vrm_animation_service.setup_animation_player_v1(
-		animplayer, vrm_extension, gstate, human_bone_to_idx, pose_diffs
-	)
+    return vrm_animation_service.setup_animation_player_v1(
+        animplayer, vrm_extension, gstate, human_bone_to_idx, pose_diffs
+    )
 
 
 func _export_animations(
-	root_node: Node,
-	skel: Skeleton3D,
-	animplayer: AnimationPlayer,
-	vrm_extension: Dictionary,
-	gstate: GLTFState
+    root_node: Node,
+    skel: Skeleton3D,
+    animplayer: AnimationPlayer,
+    vrm_extension: Dictionary,
+    gstate: GLTFState
 ):
-	vrm_animation_service.export_animations_v1(root_node, skel, animplayer, vrm_extension, gstate)
+    vrm_animation_service.export_animations_v1(root_node, skel, animplayer, vrm_extension, gstate)
 
 
 func _add_joints_recursive(
-	new_joints_set: Dictionary, gltf_nodes: Array, bone: int, include_child_meshes: bool = false
+    new_joints_set: Dictionary, gltf_nodes: Array, bone: int, include_child_meshes: bool = false
 ) -> void:
-	vrm_animation_service.add_joints_recursive(
-		new_joints_set, gltf_nodes, bone, include_child_meshes
-	)
+    vrm_animation_service.add_joints_recursive(
+        new_joints_set, gltf_nodes, bone, include_child_meshes
+    )
 
 
 func _add_joint_set_as_skin(obj: Dictionary, new_joints_set: Dictionary) -> void:
-	vrm_animation_service.add_joint_set_as_skin(obj, new_joints_set)
+    vrm_animation_service.add_joint_set_as_skin(obj, new_joints_set)
 
 
 func _add_vrm_nodes_to_skin(obj: Dictionary) -> bool:
-	return vrm_animation_service.add_vrm_nodes_to_skin_v1(obj)
+    return vrm_animation_service.add_vrm_nodes_to_skin_v1(obj)
 
 
 func remove_null_owner(node: Node):
-	if node.owner == null:
-		var parent = node.get_parent()
-		if parent:
-			parent.remove_child(node)
-		node.queue_free()
-		return
-	for child in node.get_children():
-		remove_null_owner(child)
+    if node.owner == null:
+        var parent = node.get_parent()
+        if parent:
+            parent.remove_child(node)
+        node.queue_free()
+        return
+    for child in node.get_children():
+        remove_null_owner(child)
 
 
 func _export_preflight(state: GLTFState, root: Node) -> Error:
-	VRMLogger.info("vrmc_vrm.gd", "_export_preflight: starting VRM 1.0 export")
-	var vrm_meta_node = root.get("vrm_meta")
-	if vrm_meta_node == null:
-		VRMLogger.debug("vrmc_vrm.gd", "_export_preflight: no vrm_meta found, skipping")
-		return ERR_SKIP
+    VRMLogger.info("vrmc_vrm.gd", "_export_preflight: starting VRM 1.0 export")
+    var vrm_meta_node = root.get("vrm_meta")
+    if vrm_meta_node == null:
+        VRMLogger.debug("vrmc_vrm.gd", "_export_preflight: no vrm_meta found, skipping")
+        return ERR_SKIP
 
-	# Duplicate root so we can modify it.
-	var new_root = root.duplicate()
-	remove_null_owner(new_root)
+    # Duplicate root so we can modify it.
+    var new_root = root.duplicate()
+    remove_null_owner(new_root)
 
-	var vrm_extension: Dictionary = {}
-	vrm_extension["specVersion"] = "1.0"
-	_export_meta(vrm_meta_node, vrm_extension, state)
+    var vrm_extension: Dictionary = {}
+    vrm_extension["specVersion"] = "1.0"
+    _export_meta(vrm_meta_node, vrm_extension, state)
 
-	# TODO: humanoid, lookAt, expressions, secondaryAnimation, etc.
-	# This is a very barebones export.
+    # TODO: humanoid, lookAt, expressions, secondaryAnimation, etc.
+    # This is a very barebones export.
 
-	# Store the extension data to be injected in _export_post
-	state.set_additional_data(&"vrmc_vrm_dict", vrm_extension)
-	state.add_used_extension("VRMC_vrm", false)
+    # Store the extension data to be injected in _export_post
+    state.set_additional_data(&"vrmc_vrm_dict", vrm_extension)
+    state.add_used_extension("VRMC_vrm", false)
 
-	VRMLogger.info("vrmc_vrm.gd", "_export_preflight: VRM 1.0 export prepared OK")
-	return OK
+    VRMLogger.info("vrmc_vrm.gd", "_export_preflight: VRM 1.0 export prepared OK")
+    return OK
 
 
 func _export_post(state: GLTFState) -> Error:
-	print("--- _export_post called in vrmc_vrm.gd ---")
-	var vrm_extension = state.get_additional_data(&"vrmc_vrm_dict")
-	print("vrm_extension is: ", vrm_extension)
-	if vrm_extension == null:
-		return ERR_SKIP
+    print("--- _export_post called in vrmc_vrm.gd ---")
+    var vrm_extension = state.get_additional_data(&"vrmc_vrm_dict")
+    print("vrm_extension is: ", vrm_extension)
+    if vrm_extension == null:
+        return ERR_SKIP
 
-	if state.json.get("extensions") == null:
-		state.json["extensions"] = {}
-	state.json["extensions"]["VRMC_vrm"] = vrm_extension
+    if state.json.get("extensions") == null:
+        state.json["extensions"] = {}
+    state.json["extensions"]["VRMC_vrm"] = vrm_extension
 
-	VRMLogger.info("vrmc_vrm.gd", "_export_post: injected VRMC_vrm extension into JSON")
-	return OK
+    VRMLogger.info("vrmc_vrm.gd", "_export_post: injected VRMC_vrm extension into JSON")
+    return OK
 
 
 func _import_preflight(
-	_state: GLTFState, extensions: PackedStringArray = PackedStringArray(), _psa2: Variant = null
+    _state: GLTFState, extensions: PackedStringArray = PackedStringArray(), _psa2: Variant = null
 ) -> Error:
-	if not extensions.has("VRMC_vrm"):
-		return ERR_SKIP
-	_state.set_additional_data(&"vrm/remove_end_bones", true)
-	return OK
+    if not extensions.has("VRMC_vrm"):
+        return ERR_SKIP
+    _state.set_additional_data(&"vrm/remove_end_bones", true)
+    _state.set_additional_data(&"vrm/skeleton_name", "Skeleton3D")
+    return OK
 
 
 func _import_post_parse(state: GLTFState) -> Error:
-	var gltf_json_parsed: Dictionary = state.json
-	if not _add_vrm_nodes_to_skin(gltf_json_parsed):
-		VRMLogger.error("vrmc_vrm.gd", "Failed to find required VRM keys in json")
-		return ERR_INVALID_DATA
+    var gltf_json_parsed: Dictionary = state.json
+    if not _add_vrm_nodes_to_skin(gltf_json_parsed):
+        VRMLogger.error("vrmc_vrm.gd", "Failed to find required VRM keys in json")
+        return ERR_INVALID_DATA
 
-	var flip_basis = Basis.looking_at(Vector3.MODEL_FRONT, Vector3.UP)
-	var flip_xform = Transform3D(flip_basis, Vector3.ZERO)
-	
-	var is_child = {}
-	for i in range(state.nodes.size()):
-		var gltf_node: GLTFNode = state.nodes[i]
-		for child_idx in gltf_node.children:
-			is_child[child_idx] = true
-
-	var original_roots = []
-	for i in range(state.nodes.size()):
-		if not is_child.has(i):
-			original_roots.append(i)
-
-	var new_root_node = GLTFNode.new()
-	new_root_node.original_name = "VRM_Root_Rotation"
-	new_root_node.xform = flip_xform
-	new_root_node.rotation = flip_basis.get_rotation_quaternion()
-	new_root_node.position = Vector3.ZERO
-	new_root_node.scale = Vector3.ONE
-	new_root_node.children = PackedInt32Array(original_roots)
-
-	var nodes = state.nodes
-	var new_root_idx = nodes.size()
-	nodes.append(new_root_node)
-	
-	for root_idx in original_roots:
-		nodes[root_idx].parent = new_root_idx
-
-	state.nodes = nodes
-	state.root_nodes = PackedInt32Array([new_root_idx])
-
-	return OK
+    return OK
 
 
 func _import_post(gstate: GLTFState, node: Node) -> Error:
-	VRMLogger.info("vrmc_vrm.gd", "_import_post: starting VRM 1.0 import")
-	var root_node: Node = node
+    VRMLogger.info("vrmc_vrm.gd", "_import_post: starting VRM 1.0 import")
+    var root_node: Node = node
 
-	var vrm_extension: Dictionary = gstate.json["extensions"]["VRMC_vrm"]
+    var vrm_extension: Dictionary = gstate.json["extensions"]["VRMC_vrm"]
 
-	var humanBones_json: Dictionary = vrm_extension["humanoid"]["humanBones"]
-	var human_bone_to_idx: Dictionary = {}
-	for human_bone_name in humanBones_json:
-		human_bone_to_idx[human_bone_name] = int(humanBones_json[human_bone_name]["node"])
-	VRMLogger.debug("vrmc_vrm.gd", "_import_post: mapped %d human bones" % human_bone_to_idx.size())
+    var humanBones_json: Dictionary = vrm_extension["humanoid"]["humanBones"]
+    var human_bone_to_idx: Dictionary = {}
+    for human_bone_name in humanBones_json:
+        human_bone_to_idx[human_bone_name] = int(humanBones_json[human_bone_name]["node"])
+    VRMLogger.debug("vrmc_vrm.gd", "_import_post: mapped %d human bones" % human_bone_to_idx.size())
 
-	var skeletons = gstate.get_skeletons()
-	var hipsNode: GLTFNode = gstate.nodes[human_bone_to_idx["hips"]]
-	var skeleton: Skeleton3D = _get_skel_godot_node(
-		gstate, gstate.nodes, skeletons, hipsNode.skeleton
-	)
-	var gltfnodes: Array = gstate.nodes
+    var skeletons = gstate.get_skeletons()
+    var hipsNode: GLTFNode = gstate.nodes[human_bone_to_idx["hips"]]
+    var skeleton: Skeleton3D = _get_skel_godot_node(
+        gstate, gstate.nodes, skeletons, hipsNode.skeleton
+    )
+    var gltfnodes: Array = gstate.nodes
 
-	var humanBones: BoneMap = BoneMap.new()
-	humanBones.profile = SkeletonProfileHumanoid.new()
+    var humanBones: BoneMap = vrm_bone_renamer_humanoid.create_humanoid_bone_map(
+        gstate, human_bone_to_idx, false
+    )
 
-	for humanBoneName in human_bone_to_idx:
-		humanBones.set_skeleton_bone_name(
-			vrm_constants_class.vrm_to_human_bone[humanBoneName],
-			gltfnodes[human_bone_to_idx[humanBoneName]].resource_name
-		)
+    var skeleton_name_val = gstate.get_additional_data(&"vrm/skeleton_name")
+    var skeleton_name: String = "Skeleton3D"
+    if skeleton_name_val is String and not skeleton_name_val.is_empty():
+        skeleton_name = skeleton_name_val
 
-	var do_retarget = true
+    var do_retarget = true
 
-	var pose_diffs: Array[Basis]
-	if do_retarget:
-		VRMLogger.debug(
-			"vrmc_vrm.gd",
-			"_import_post: performing retarget for %d bones" % skeleton.get_bone_count()
-		)
-		pose_diffs = vrm_utils.perform_retarget(gstate, root_node, skeleton, humanBones)
-		VRMLogger.debug("vrmc_vrm.gd", "_import_post: retarget complete")
-	else:
-		# resize is busted for TypedArray and crashes Godot
-		for i in range(skeleton.get_bone_count()):
-			pose_diffs.append(Basis.IDENTITY)
+    var pose_diffs: Array[Basis]
+    if do_retarget:
+        VRMLogger.debug(
+            "vrmc_vrm.gd",
+            "_import_post: performing retarget for %d bones" % skeleton.get_bone_count()
+        )
+        pose_diffs = vrm_utils.perform_retarget(
+            gstate, root_node, skeleton, humanBones, skeleton_name
+        )
+        VRMLogger.debug("vrmc_vrm.gd", "_import_post: retarget complete")
+    else:
+        # resize is busted for TypedArray and crashes Godot
+        for i in range(skeleton.get_bone_count()):
+            pose_diffs.append(Basis.IDENTITY)
 
-	skeleton.set_meta("vrm_pose_diffs", pose_diffs)
+    skeleton.set_meta("vrm_pose_diffs", pose_diffs)
 
-	var animplayer: AnimationPlayer
-	if root_node.has_node("AnimationPlayer"):
-		animplayer = root_node.get_node("AnimationPlayer")
-	else:
-		animplayer = AnimationPlayer.new()
-		animplayer.name = "AnimationPlayer"
-		root_node.add_child(animplayer, true)
-		animplayer.owner = root_node
-	_create_animation_player(animplayer, vrm_extension, gstate, human_bone_to_idx, pose_diffs)
+    var animplayer: AnimationPlayer
+    if root_node.has_node("AnimationPlayer"):
+        animplayer = root_node.get_node("AnimationPlayer")
+    else:
+        animplayer = AnimationPlayer.new()
+        animplayer.name = "AnimationPlayer"
+        root_node.add_child(animplayer, true)
+        animplayer.owner = root_node
+    _create_animation_player(animplayer, vrm_extension, gstate, human_bone_to_idx, pose_diffs)
 
-	root_node.set_script(vrm_instance)
+    root_node.set_script(vrm_instance)
 
-	var vrm_meta: Resource = _create_meta(
-		root_node,
-		animplayer,
-		vrm_extension,
-		gstate,
-		skeleton,
-		humanBones,
-		human_bone_to_idx,
-		pose_diffs
-	)
-	root_node.set("vrm_meta", vrm_meta)
+    var vrm_meta: Resource = _create_meta(
+        root_node,
+        animplayer,
+        vrm_extension,
+        gstate,
+        skeleton,
+        humanBones,
+        human_bone_to_idx,
+        pose_diffs
+    )
+    root_node.set("vrm_meta", vrm_meta)
 
-	if gstate.get_additional_data(&"vrm/remove_end_bones"):
-		vrm_utils.remove_end_bone_nodes(root_node, skeleton)
+    if gstate.get_additional_data(&"vrm/remove_end_bones"):
+        vrm_utils.remove_end_bone_nodes(root_node, skeleton)
 
-	VRMLogger.info("vrmc_vrm.gd", "_import_post: VRM 1.0 import complete OK")
-	return OK
+    vrm_utils.clear_all_bone_attachments(skeleton)
+
+    VRMLogger.info("vrmc_vrm.gd", "_import_post: VRM 1.0 import complete OK")
+    return OK

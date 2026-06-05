@@ -10,116 +10,116 @@ const VRMLogger = preload("res://addons/vrm/core/logger.gd")
 
 
 func _init():
-	print("=========================================")
-	print("Running Godot-VRM Test Suite")
-	print("=========================================")
+    print("=========================================")
+    print("Running Godot-VRM Test Suite")
+    print("=========================================")
 
-	var dir = DirAccess.open("res://tests")
-	if not dir:
-		printerr("Failed to open res://tests directory")
-		quit(1)
-		return
+    var dir = DirAccess.open("res://tests")
+    if not dir:
+        printerr("Failed to open res://tests directory")
+        quit(1)
+        return
 
-	dir.list_dir_begin()
-	var file_name = dir.get_next()
-	var test_files = []
-	while file_name != "":
-		if (
-			not dir.current_is_dir()
-			and file_name.begins_with("test_")
-			and file_name.ends_with(".gd")
-			and file_name != "test_runner.gd"
-			and file_name != "test_base.gd"
-		):
-			test_files.append(file_name)
-		file_name = dir.get_next()
-	dir.list_dir_end()
+    dir.list_dir_begin()
+    var file_name = dir.get_next()
+    var test_files = []
+    while file_name != "":
+        if (
+            not dir.current_is_dir()
+            and file_name.begins_with("test_")
+            and file_name.ends_with(".gd")
+            and file_name != "test_runner.gd"
+            and file_name != "test_base.gd"
+        ):
+            test_files.append(file_name)
+        file_name = dir.get_next()
+    dir.list_dir_end()
 
-	test_files.sort()
+    test_files.sort()
 
-	for file in test_files:
-		await run_test_file("res://tests/" + file)
+    for file in test_files:
+        await run_test_file("res://tests/" + file)
 
-	print("=========================================")
-	print("Execution finished.")
-	print("Passed tests: %d, Failed tests: %d" % [passed_tests, failed_tests])
-	print("Total assertions passed: %d" % assertions_passed)
-	print("=========================================")
+    print("=========================================")
+    print("Execution finished.")
+    print("Passed tests: %d, Failed tests: %d" % [passed_tests, failed_tests])
+    print("Total assertions passed: %d" % assertions_passed)
+    print("=========================================")
 
-	if failed_tests > 0:
-		quit(1)
-	else:
-		quit(0)
+    if failed_tests > 0:
+        quit(1)
+    else:
+        quit(0)
 
 
 func run_test_file(path: String):
-	var script = load(path)
-	if not script:
-		printerr("  [ERROR] Failed to load test script: ", path)
-		failed_tests += 1
-		return
+    var script = load(path)
+    if not script:
+        printerr("  [ERROR] Failed to load test script: ", path)
+        failed_tests += 1
+        return
 
-	if script.get_instance_base_type() != "RefCounted":
-		return
+    if script.get_instance_base_type() != "RefCounted":
+        return
 
-	print("Running suite: %s" % path.get_file())
-	var test_obj = script.new()
-	test_obj.runner = self
+    print("Running suite: %s" % path.get_file())
+    var test_obj = script.new()
+    test_obj.runner = self
 
-	var methods = test_obj.get_method_list()
-	var has_tests = false
-	for method in methods:
-		var name = method["name"]
-		if name.begins_with("test_"):
-			has_tests = true
-			current_failed = false
-			current_error_message = ""
-			test_obj.current_test_name = name
-			test_obj.test_completed = false
-			VRMLogger.error_happened = false
+    var methods = test_obj.get_method_list()
+    var has_tests = false
+    for method in methods:
+        var name = method["name"]
+        if name.begins_with("test_"):
+            has_tests = true
+            current_failed = false
+            current_error_message = ""
+            test_obj.current_test_name = name
+            test_obj.test_completed = false
+            VRMLogger.error_happened = false
 
-			# Run optional setup
-			if test_obj.has_method("before_each"):
-				await test_obj.before_each()
+            # Run optional setup
+            if test_obj.has_method("before_each"):
+                await test_obj.before_each()
 
-			await test_obj.call(name)
+            await test_obj.call(name)
 
-			if VRMLogger.error_happened and not current_failed:
-				var allow_errors = (
-					test_obj.get("allow_errors") if "allow_errors" in test_obj else false
-				)
-				if not allow_errors:
-					fail_test(name, "VRMLogger recorded an error or warning during test.")
+            if VRMLogger.error_happened and not current_failed:
+                var allow_errors = (
+                    test_obj.get("allow_errors") if "allow_errors" in test_obj else false
+                )
+                if not allow_errors:
+                    fail_test(name, "VRMLogger recorded an error or warning during test.")
 
-			if not test_obj.test_completed and not current_failed:
-				fail_test(
-					name,
-					"Godot script error occurred during test (test did not complete). See logs above."
-				)
+            if not test_obj.test_completed and not current_failed:
+                fail_test(
+                    name,
+                    "Godot script error occurred during test (test did not complete). See logs above."
+                )
 
-			# Run optional teardown
-			if test_obj.has_method("after_each"):
-				await test_obj.after_each()
+            # Run optional teardown
+            if test_obj.has_method("after_each"):
+                await test_obj.after_each()
 
-			if current_failed:
-				failed_tests += 1
-				print("  [FAIL] %s: %s" % [name, current_error_message])
-			else:
-				passed_tests += 1
-				print("  [PASS] %s" % name)
+            if current_failed:
+                failed_tests += 1
+                print("  [FAIL] %s: %s" % [name, current_error_message])
+            else:
+                passed_tests += 1
+                print("  [PASS] %s" % name)
 
-	if not has_tests:
-		print("  [WARN] No test methods starting with 'test_' found.")
+    if not has_tests:
+        print("  [WARN] No test methods starting with 'test_' found.")
 
 
 func fail_test(_test_name: String, message: String):
-	current_failed = true
-	current_error_message = message
+    current_failed = true
+    current_error_message = message
 
 
 func pass_assertion():
-	assertions_passed += 1
+    assertions_passed += 1
 
 
 func wait_frame():
-	await process_frame
+    await process_frame
