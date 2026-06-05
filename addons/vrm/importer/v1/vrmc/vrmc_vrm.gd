@@ -2,6 +2,7 @@ extends GLTFDocumentExtension
 
 const VRMLogger = preload("../../../core/logger.gd")
 const vrm_constants_class = preload("../../../core/vrm_constants.gd")
+const vrm_bone_renamer_humanoid = preload("../../../importer/common/vrm_bone_renamer_humanoid.gd")
 const vrm_meta_class = preload("../../../core/vrm_meta.gd")
 const vrm_instance = preload("../../../core/vrm_instance.gd")
 const vrm_utils = preload("../../../importer/common/vrm_utils.gd")
@@ -227,14 +228,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 	)
 	var gltfnodes: Array = gstate.nodes
 
-	var humanBones: BoneMap = BoneMap.new()
-	humanBones.profile = SkeletonProfileHumanoid.new()
-
-	for humanBoneName in human_bone_to_idx:
-		humanBones.set_skeleton_bone_name(
-			vrm_constants_class.vrm_to_human_bone[humanBoneName],
-			gltfnodes[human_bone_to_idx[humanBoneName]].resource_name
-		)
+	var humanBones: BoneMap = vrm_bone_renamer_humanoid.create_humanoid_bone_map(gstate, human_bone_to_idx, false)
 
 	var do_retarget = true
 
@@ -279,6 +273,8 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 
 	if gstate.get_additional_data(&"vrm/remove_end_bones"):
 		vrm_utils.remove_end_bone_nodes(root_node, skeleton)
+
+	vrm_utils.clear_all_bone_attachments(skeleton)
 
 	VRMLogger.info("vrmc_vrm.gd", "_import_post: VRM 1.0 import complete OK")
 	return OK

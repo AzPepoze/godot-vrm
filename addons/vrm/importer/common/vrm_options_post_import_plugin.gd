@@ -25,4 +25,11 @@ func _get_import_options(path: String):
 			4,
 			PROPERTY_HINT_LAYERS_3D_RENDER
 		)
+		add_import_option_advanced(
+			TYPE_INT,
+			"vrm/bone_rename",
+			0,
+			PROPERTY_HINT_ENUM,
+			"None (Blender ready),Human Bones,Symmetrize VRoid Bone Names on X-Axis (Blender ready)"
+		)
 		add_import_option_advanced(TYPE_BOOL, "vrm/remove_end_bones", true, PROPERTY_HINT_NONE, "")

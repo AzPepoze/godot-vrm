@@ -50,3 +50,15 @@ static func _has_meaningful_descendant(node: Node) -> bool:
 		if _has_meaningful_descendant(child):
 			return true
 	return false
+
+
+static func clear_all_bone_attachments(skeleton: Skeleton3D) -> void:
+	if skeleton == null:
+		return
+	var to_remove: Array[Node] = []
+	for child in skeleton.find_children("*", "BoneAttachment3D", true, false):
+		to_remove.append(child)
+	for node in to_remove:
+		if is_instance_valid(node) and node.get_parent() != null:
+			node.get_parent().remove_child(node)
+			node.queue_free()

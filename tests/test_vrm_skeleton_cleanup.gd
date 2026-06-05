@@ -355,3 +355,25 @@ func test_has_meaningful_descendant_deeply_nested_mesh():
 	assert_true(Cleanup._has_meaningful_descendant(l1), "Deeply nested MeshInstance3D → true")
 	l1.queue_free()
 	test_completed = true
+
+
+func test_clear_all_bone_attachments():
+	var skel := Skeleton3D.new()
+	skel.add_bone("Head")
+	var attach := BoneAttachment3D.new()
+	attach.name = "HeadAttach"
+	attach.bone_name = "Head"
+	skel.add_child(attach)
+
+	var child := Node3D.new()
+	child.name = "LookOffset"
+	attach.add_child(child)
+
+	runner.root.add_child(skel)
+	await runner.process_frame
+
+	Cleanup.clear_all_bone_attachments(skel)
+	assert_eq(skel.get_child_count(), 0, "BoneAttachment3D and its descendants should be cleared")
+	skel.queue_free()
+	await runner.process_frame
+	test_completed = true

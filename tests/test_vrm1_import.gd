@@ -543,3 +543,84 @@ func test_vrm1_root_node_rotation():
 			)
 	test_completed = true
 
+
+func test_vrm1_import_none_bone_rename():
+	var gltf = GLTFDocument.new()
+	var extensions = [
+		VRMC_NODE_CONSTRAINT.new(),
+		VRMC_SPRING_BONE.new(),
+		VRMC_MTOON.new(),
+		VRMC_HDR_EMISSIVE.new(),
+		VRMC_VRM.new(),
+		VRMC_VRM_ANIMATION.new(),
+	]
+
+	for ext in extensions:
+		GLTFDocument.register_gltf_document_extension(ext, true)
+
+	var state := GLTFState.new()
+	const VRMConstants = preload("res://addons/vrm/core/vrm_constants.gd")
+	state.set_additional_data(&"vrm/head_hiding_method", VRMConstants.HeadHidingSetting.ThirdPersonOnly)
+	state.set_additional_data(&"vrm/first_person_layers", 2)
+	state.set_additional_data(&"vrm/third_person_layers", 4)
+	state.set_additional_data(&"vrm/remove_end_bones", true)
+	state.set_meta(&"vrm_bone_rename", 0) # BoneRenameMode.NONE
+
+	var err = gltf.append_from_file(VRM_FILE, state, 8)
+	assert_eq(err, OK, "Import under NONE mode must succeed")
+	if err == OK:
+		var scene = gltf.generate_scene(state)
+		if scene:
+			var skel = _find_skeleton(scene)
+			assert_not_null(skel, "Skeleton must exist")
+			if skel:
+				# Hips bone in AvatarSample_M.vrm is J_Bip_C_Hips originally
+				# Check that it did NOT get renamed to "Hips"
+				assert_eq(skel.find_bone("Hips"), -1, "Hips bone should not exist under NONE rename mode")
+				assert_gt(skel.find_bone("J_Bip_C_Hips"), -1, "J_Bip_C_Hips bone must exist under NONE rename mode")
+			scene.free()
+
+	for ext in extensions:
+		GLTFDocument.unregister_gltf_document_extension(ext)
+	test_completed = true
+
+
+func test_vrm1_import_symmetrize_bone_rename():
+	var gltf = GLTFDocument.new()
+	var extensions = [
+		VRMC_NODE_CONSTRAINT.new(),
+		VRMC_SPRING_BONE.new(),
+		VRMC_MTOON.new(),
+		VRMC_HDR_EMISSIVE.new(),
+		VRMC_VRM.new(),
+		VRMC_VRM_ANIMATION.new(),
+	]
+
+	for ext in extensions:
+		GLTFDocument.register_gltf_document_extension(ext, true)
+
+	var state := GLTFState.new()
+	const VRMConstants = preload("res://addons/vrm/core/vrm_constants.gd")
+	state.set_additional_data(&"vrm/head_hiding_method", VRMConstants.HeadHidingSetting.ThirdPersonOnly)
+	state.set_additional_data(&"vrm/first_person_layers", 2)
+	state.set_additional_data(&"vrm/third_person_layers", 4)
+	state.set_additional_data(&"vrm/remove_end_bones", true)
+	state.set_meta(&"vrm_bone_rename", 2) # BoneRenameMode.SYMMETRIZE_VROID
+
+	var err = gltf.append_from_file(VRM_FILE, state, 8)
+	assert_eq(err, OK, "Import under SYMMETRIZE mode must succeed")
+	if err == OK:
+		var scene = gltf.generate_scene(state)
+		if scene:
+			var skel = _find_skeleton(scene)
+			assert_not_null(skel, "Skeleton must exist")
+			if skel:
+				# J_Bip_L_UpperLeg should be renamed to UpperLeg_L
+				assert_eq(skel.find_bone("J_Bip_L_UpperLeg"), -1, "J_Bip_L_UpperLeg should be renamed")
+				assert_gt(skel.find_bone("UpperLeg_L"), -1, "UpperLeg_L must exist")
+			scene.free()
+
+	for ext in extensions:
+		GLTFDocument.unregister_gltf_document_extension(ext)
+	test_completed = true
+
