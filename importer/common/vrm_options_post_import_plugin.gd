@@ -29,15 +29,23 @@ func _get_import_options(path: String):
             TYPE_INT,
             "vrm/bone_rename",
             0,
-            PROPERTY_HINT_ENUM,
-            "None (Blender ready),Human Bones,Symmetrize VRoid Bone Names on X-Axis (Blender ready)"
+            PROPERTY_HINT_ENUM
         )
         add_import_option_advanced(
             TYPE_STRING,
             "vrm/skeleton_name",
             "GeneralSkeleton",
-            PROPERTY_HINT_NONE,
-            "",
-            PROPERTY_USAGE_DEFAULT
+            PROPERTY_HINT_NONE
         )
-        add_import_option_advanced(TYPE_BOOL, "vrm/remove_end_bones", true, PROPERTY_HINT_NONE, "")
+        add_import_option_advanced(
+            TYPE_BOOL,
+            "vrm/wrap_in_armature",
+            false,
+            PROPERTY_HINT_NONE
+        )
+        add_import_option_advanced(
+            TYPE_BOOL,
+            "vrm/remove_end_bones",
+            true,
+            PROPERTY_HINT_NONEป
+        )
