@@ -197,8 +197,7 @@ Available in the Import dock when selecting a `.vrm` file:
 - **Head Hiding Method**: `ThirdPersonOnly` / `FirstPersonOnly` / `FirstWithShadow` / `Layers` / `LayersWithShadow` / `IgnoreHeadHiding`
 - **First/Third Person Layers**: Render layer masks for `Layers` mode
 - **Bone Rename**: See [Bone Rename Modes](#bone-rename-modes) below
-- **Skeleton Name**: `GeneralSkeleton` / `Skeleton3D` / `Armature` — sets the skeleton node name
-- **Wrap in Armature**: Wraps the skeleton in an `Armature` parent node to match Blender's `.blend` import structure. Enable this if importing `.blend` files from Blender — no need to manually set BoneMap in the blend import dialog.
+- **Skeleton Name**: Sets the skeleton node name (default `GeneralSkeleton`). See [Works with Blender](#works-with-blender) for animation workflows.
 - **Remove End Bones**: Strips empty end-bone nodes from the skeleton
 
 ### Global Defaults
@@ -211,7 +210,6 @@ Set default import options once in **Project Settings → General → VRM → Im
 - `vrm/import/head_hiding_method` — Head hiding mode
 - `vrm/import/bone_rename` — Bone rename mode  
 - `vrm/import/skeleton_name` — Skeleton node name
-- `vrm/import/wrap_in_armature` — Wrap in Armature node
 - `vrm/import/remove_end_bones` — Remove end bones
 
 In the import dialog, **Use Global Defaults** (enabled by default) reads from these project settings. Uncheck it to override settings for a specific file.
@@ -248,10 +246,7 @@ For a smooth Blender ↔ Godot animation workflow:
 **Godot import settings for Blender workflow:**
 
 - **Bone Rename**: `None (Blender ready)` or `Symmetrize VRoid` (for VRoid models)
-- **Skeleton Name**: `Armature` — matches Blender's default armature object name
-- **Wrap in Armature**: Enable this so the VRM skeleton structure matches what `.blend` imports produce, skipping the need to manually set a BoneMap in the blend import dialog
-
-With these settings, animations created in Blender work directly on the imported VRM model without extra configuration.
+- **Skeleton Name**: Set to `Skeleton3D` — matches the skeleton name inside `.blend` imports. Otherwise you must manually set a BoneMap in the `.blend` import dialog.
 
 ---
 

@@ -12,13 +12,13 @@ static func skeleton_rename(
     p_skeleton: Skeleton3D,
     p_bone_map: BoneMap,
     skeleton_name: String = "GeneralSkeleton",
-    wrap_in_armature: bool = false
+    
 ):
     var bone_rename_mode: int = 1  # default to HUMANBONES (humanbones = 1)
     if gstate.has_meta(&"vrm_bone_rename"):
         bone_rename_mode = gstate.get_meta(&"vrm_bone_rename") as int
     VRMBoneRenamer.rename_skeleton_bones(
-        gstate, p_base_scene, p_skeleton, p_bone_map, bone_rename_mode, skeleton_name, wrap_in_armature
+        gstate, p_base_scene, p_skeleton, p_bone_map, bone_rename_mode, skeleton_name
     )
     p_skeleton.set_meta("vrm_humanoid_bone_mapping", p_bone_map)
 
@@ -101,12 +101,12 @@ static func perform_retarget(
     skeleton: Skeleton3D,
     bone_map: BoneMap,
     skeleton_name: String = "GeneralSkeleton",
-    wrap_in_armature: bool = false
+    
 ) -> Array[Basis]:
     var global_transform_scale_local: Vector3 = VRMTransformUtils.apply_node_transforms(
         root_node, skeleton
     )
-    skeleton_rename(gstate, root_node, skeleton, bone_map, skeleton_name, wrap_in_armature)
+    skeleton_rename(gstate, root_node, skeleton, bone_map, skeleton_name)
     var old_skeleton_global_rest: Array[Transform3D]
     var poses = skeleton_rotate(root_node, skeleton, bone_map, old_skeleton_global_rest)
     VRMMeshOrientation.apply_mesh_rotation(

@@ -236,8 +236,6 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
     if skeleton_name == null or skeleton_name.is_empty():
         skeleton_name = "GeneralSkeleton"
 
-    var wrap_in_armature: bool = gstate.get_additional_data(&"vrm/wrap_in_armature")
-
     var do_retarget = true
 
     var pose_diffs: Array[Basis]
@@ -247,7 +245,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
             "_import_post: performing retarget for %d bones" % skeleton.get_bone_count()
         )
         pose_diffs = vrm_utils.perform_retarget(
-            gstate, root_node, skeleton, humanBones, skeleton_name, wrap_in_armature
+            gstate, root_node, skeleton, humanBones, skeleton_name
         )
         VRMLogger.debug("vrmc_vrm.gd", "_import_post: retarget complete")
     else:
