@@ -49,10 +49,11 @@ static func setup_animation_player_v1(
 		var headNode: GLTFNode = nodes[head_bone_idx]
 		var skel: Skeleton3D = _get_skel_godot_node(gstate, nodes, skeletons, headNode.skeleton)
 
+		var head_bone_name: String = nodes[head_bone_idx].resource_name
 		var head_attach: BoneAttachment3D = null
 		for child in skel.find_children("*", "BoneAttachment3D"):
 			var child_attach: BoneAttachment3D = child as BoneAttachment3D
-			if child_attach.bone_name == "Head":
+			if child_attach.bone_name == head_bone_name:
 				head_attach = child_attach
 				break
 		if head_attach == null:
@@ -60,7 +61,7 @@ static func setup_animation_player_v1(
 			head_attach.name = "Head"
 			skel.add_child(head_attach)
 			head_attach.owner = skel.owner
-			head_attach.bone_name = "Head"
+			head_attach.bone_name = head_bone_name
 			var head_bone_offset: Node3D = Node3D.new()
 			head_bone_offset.name = "LookOffset"
 			head_attach.add_child(head_bone_offset)
@@ -69,17 +70,21 @@ static func setup_animation_player_v1(
 			var look_offset = Vector3(0, 0, 0)
 			if lookAt.has("offsetFromHeadBone"):
 				var gltf_look_offset = lookAt["offsetFromHeadBone"]
-				look_offset = (
-					pose_diffs[skel.find_bone("Head")]
-					* Vector3(gltf_look_offset[0], gltf_look_offset[1], gltf_look_offset[2])
-				)
+				var head_bone_idx_in_skel = skel.find_bone(head_bone_name)
+				if head_bone_idx_in_skel >= 0 and head_bone_idx_in_skel < pose_diffs.size():
+					look_offset = (
+						pose_diffs[head_bone_idx_in_skel]
+						* Vector3(gltf_look_offset[0], gltf_look_offset[1], gltf_look_offset[2])
+					)
+				else:
+					look_offset = Vector3(gltf_look_offset[0], gltf_look_offset[1], gltf_look_offset[2])
 			elif lefteye >= 0 and righteye >= 0:
 				look_offset = skel.get_bone_rest(lefteye).origin.lerp(
 					skel.get_bone_rest(righteye).origin, 0.5
 				)
 			head_bone_offset.position = look_offset
 
-		vrm_utils._recurse_bones(head_relative_bones, skel, skel.find_bone("Head"))
+		vrm_utils._recurse_bones(head_relative_bones, skel, skel.find_bone(head_bone_name))
 
 	var mesh_annotations_by_node = {}
 	for meshannotation in firstperson.get("meshAnnotations", []):

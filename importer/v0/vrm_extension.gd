@@ -19,6 +19,7 @@ enum FirstPersonFlag {
 
 const vrm_constants_class = preload("../../core/vrm_constants.gd")
 const vrm_meta_class = preload("../../core/vrm_meta.gd")
+const vrm_bone_renamer_humanoid = preload("../common/vrm_bone_renamer_humanoid.gd")
 const vrm_spring_bone_controller = preload("../../runtime/vrm_spring_bone_controller.gd")
 const vrm_collider_group = preload("../../runtime/vrm_collider_group.gd")
 const vrm_collider = preload("../../runtime/vrm_collider.gd")
@@ -147,17 +148,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 	)
 	var gltfnodes: Array = gstate.nodes
 
-	var humanBones: BoneMap = BoneMap.new()
-	humanBones.profile = SkeletonProfileHumanoid.new()
-
-	var vrm0_to_human_bone = vrm_constants_class.get_vrm_to_human_bone(true)
-
-	for vrm_bone_name in human_bone_to_idx:
-		if vrm0_to_human_bone.has(vrm_bone_name):
-			humanBones.set_skeleton_bone_name(
-				vrm0_to_human_bone[vrm_bone_name],
-				gltfnodes[human_bone_to_idx[vrm_bone_name]].resource_name
-			)
+	var humanBones: BoneMap = vrm_bone_renamer_humanoid.create_humanoid_bone_map(gstate, human_bone_to_idx, true)
 	VRMLogger.debug(
 		"vrm_extension.gd", "BoneMap configured with %d bones" % human_bone_to_idx.size()
 	)
@@ -228,6 +219,8 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 
 	if gstate.get_additional_data(&"vrm/remove_end_bones"):
 		vrm_utils.remove_end_bone_nodes(root_node, skeleton)
+
+	vrm_utils.clear_all_bone_attachments(skeleton)
 
 	VRMLogger.info("vrm_extension.gd", "_import_post: VRM 0.0 import complete OK")
 	return OK

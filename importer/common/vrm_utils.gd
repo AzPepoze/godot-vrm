@@ -101,3 +101,7 @@ static func apply_node_transforms(p_node: Node, p_skeleton: Skeleton3D) -> Vecto
 # Re-export functions from VRMSkeletonCleanup
 static func remove_end_bone_nodes(root_node: Node, skeleton: Skeleton3D) -> int:
 	return VRMSkeletonCleanup.remove_end_bone_nodes(root_node, skeleton)
+
+
+static func clear_all_bone_attachments(skeleton: Skeleton3D) -> void:
+	VRMSkeletonCleanup.clear_all_bone_attachments(skeleton)

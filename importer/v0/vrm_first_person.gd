@@ -14,7 +14,7 @@ static func first_person_head_hiding(
 	if head_bone_idx != -1:
 		var head_node: GLTFNode = nodes[head_bone_idx]
 		var skeleton: Skeleton3D = gstate.get_scene_node(skeletons[head_node.skeleton].roots[0])
-		vrm_utils._recurse_bones(head_relative_bones, skeleton, skeleton.find_bone("Head"))
+		vrm_utils._recurse_bones(head_relative_bones, skeleton, skeleton.find_bone(nodes[head_bone_idx].resource_name))
 
 	var mesh_annotations_by_node: Dictionary = {}
 	for meshannotation in vrm_extension["firstPerson"].get("meshAnnotations", []):
