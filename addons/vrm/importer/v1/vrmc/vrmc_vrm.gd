@@ -234,6 +234,8 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
     _create_animation_player(animplayer, vrm_extension, gstate, human_bone_to_idx, pose_diffs)
 
     root_node.set_script(vrm_instance)
+    if root_node is Node3D:
+        root_node.rotation.y = PI
 
     var vrm_meta: Resource = _create_meta(
         root_node,
