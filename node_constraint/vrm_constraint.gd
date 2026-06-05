@@ -77,14 +77,24 @@ func set_node_references_from_paths(applier: Node) -> void:
 		if source_bone_index != -1 and source_bone_name == &"":
 			source_bone_name = source_skel.get_bone_name(source_bone_index)
 		if source_bone_name != &"":
-			source_bone = source_skel.find_bone(source_bone_name)
+			var resolved_name = source_bone_name
+			if source_skel.has_meta("vrm_rename_map"):
+				var rename_map = source_skel.get_meta("vrm_rename_map")
+				if rename_map.has(source_bone_name):
+					resolved_name = rename_map[source_bone_name]
+			source_bone = source_skel.find_bone(resolved_name)
 	var target_skel := target_node as Skeleton3D
 	target_bone = -1
 	if target_skel != null:
 		if target_bone_index != -1 and target_bone_name == &"":
 			target_bone_name = target_skel.get_bone_name(target_bone_index)
 		if target_bone_name != &"":
-			target_bone = target_skel.find_bone(target_bone_name)
+			var resolved_name = target_bone_name
+			if target_skel.has_meta("vrm_rename_map"):
+				var rename_map = target_skel.get_meta("vrm_rename_map")
+				if rename_map.has(target_bone_name):
+					resolved_name = rename_map[target_bone_name]
+			target_bone = target_skel.find_bone(resolved_name)
 
 	same_skeleton = target_bone != -1 and source_bone != -1 and target_node == source_node
 

@@ -24,6 +24,7 @@ static func rename_skeleton_bones(
 		rename_map = symmetrize_strategy.rename_bones(gstate, p_base_scene, p_skeleton, p_bone_map)
 
 	if not rename_map.is_empty():
+		p_skeleton.set_meta("vrm_rename_map", rename_map)
 		_update_scene_bone_references(p_base_scene, rename_map)
 
 	# Ensure a single Root bone exists at the top level of the skeleton

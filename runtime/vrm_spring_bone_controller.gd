@@ -262,7 +262,15 @@ func _draw_wind_arrow(
 
 	# Gizmo is in skeleton space because of the skel_to_gizmo transform
 	# Find Head bone for positioning
-	var head_idx = skel.find_bone("Head")
+	var head_bone_name = "Head"
+	if is_child_of_vrm and _parent_ref != null:
+		var vrm_meta = _parent_ref.get("vrm_meta")
+		if vrm_meta != null and vrm_meta.humanoid_bone_mapping != null:
+			var mapped_head = vrm_meta.humanoid_bone_mapping.get_skeleton_bone_name("Head")
+			if mapped_head != StringName():
+				head_bone_name = String(mapped_head)
+
+	var head_idx = skel.find_bone(head_bone_name)
 	var start_pos_skel = Vector3(0, 1.5, 0)  # Fallback
 	if head_idx != -1:
 		start_pos_skel = skel.get_bone_global_pose(head_idx).origin
