@@ -47,3 +47,8 @@ func _get_import_options(path: String):
             "vrm/remove_end_bones",
             true
         )
+        add_import_option_advanced(
+            TYPE_BOOL,
+            "vrm/v1_rotate_180",
+            true
+        )

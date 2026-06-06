@@ -125,6 +125,7 @@ static func apply_default_import_settings(gstate: GLTFState) -> void:
         &"vrm_first_person_layers": [&"vrm/first_person_layers", 2],
         &"vrm_third_person_layers": [&"vrm/third_person_layers", 4],
         &"vrm_remove_end_bones": [&"vrm/remove_end_bones", true],
+        &"vrm_v1_rotate_180": [&"vrm/v1_rotate_180", true],
     }
     
     for meta_key in additional_data_defaults:
