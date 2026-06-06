@@ -51,10 +51,11 @@ static func skeleton_rotate(
     src_skeleton: Skeleton3D,
     p_bone_map: BoneMap,
     old_skeleton_global_rest: Array[Transform3D],
-    clear_bone_rotation: bool = false
+    clear_bone_rotation: bool = false,
+    blender_leg_fix: bool = false
 ) -> Array[Basis]:
     return VRMSkeletonRetargeting.skeleton_rotate(
-        _p_base_scene, src_skeleton, p_bone_map, old_skeleton_global_rest, clear_bone_rotation
+        _p_base_scene, src_skeleton, p_bone_map, old_skeleton_global_rest, clear_bone_rotation, blender_leg_fix
     )
 
 
@@ -128,6 +129,7 @@ static func apply_default_import_settings(gstate: GLTFState) -> void:
         &"vrm_remove_end_bones": [&"vrm/remove_end_bones", true],
         &"vrm_v1_rotate_180": [&"vrm/v1_rotate_180", true],
         &"vrm_clear_bone_rotation": [&"vrm/clear_bone_rotation", true],
+        &"vrm_blender_leg_fix": [&"vrm/blender_leg_fix", true],
     }
 
     for meta_key in additional_data_defaults:

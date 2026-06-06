@@ -26,3 +26,5 @@ data_*/
 
 # Local secrets for act
 .secrets
+
+*.blend1

@@ -27,7 +27,8 @@ static func skeleton_rotate(
     src_skeleton: Skeleton3D,
     p_bone_map: BoneMap,
     old_skeleton_global_rest: Array[Transform3D],
-    clear_bone_rotation: bool = false
+    clear_bone_rotation: bool = false,
+    blender_leg_fix: bool = false
 ) -> Array[Basis]:
     var is_renamed = true
     var profile = p_bone_map.profile
@@ -58,9 +59,9 @@ static func skeleton_rotate(
 
         var tgt_rot: Basis
         var src_bone_name: StringName = StringName(src_skeleton.get_bone_name(src_idx))
+        var src_parent_idx: int = src_skeleton.get_bone_parent(src_idx)
         if src_bone_name != StringName():
             var src_pg: Basis
-            var src_parent_idx: int = src_skeleton.get_bone_parent(src_idx)
             if src_parent_idx >= 0:
                 src_pg = src_skeleton.get_bone_global_rest(src_parent_idx).basis
             var prof_bone_name: StringName = p_bone_map.find_profile_bone_name(src_bone_name)
@@ -71,10 +72,33 @@ static func skeleton_rotate(
             if prof_bone_name != StringName():
                 prof_idx = profile.find_bone(prof_bone_name)
 
-            if clear_bone_rotation:
+            # Resolve canonical profile bone name (works with any naming scheme via BoneMap)
+            var prof_bone_name_for_check := prof_bone_name
+            if prof_bone_name_for_check == StringName() and prof_idx >= 0:
+                prof_bone_name_for_check = profile.get_bone_name(prof_idx)
+
+            var is_leg_bone := prof_bone_name_for_check in [
+                "LeftUpperLeg", "RightUpperLeg",
+                "LeftLowerLeg", "RightLowerLeg",
+                "LeftFoot", "RightFoot",
+                "LeftToes", "RightToes",
+            ]
+            if clear_bone_rotation and not is_leg_bone:
                 tgt_rot = Basis.IDENTITY
             elif prof_idx >= 0:
                 tgt_rot = src_pg.inverse() * prof_skeleton.get_bone_global_rest(prof_idx).basis
+
+            # Bone-specific rotation overrides for Blender-exported VRM animations
+            # Uses profile bone names so it works regardless of skeleton naming scheme
+            if blender_leg_fix:
+                var leg_overrides := {
+                    "LeftLowerLeg": Basis(Vector3(0, 1, 0), PI),
+                    "RightLowerLeg": Basis(Vector3(0, 1, 0), PI),
+                    "LeftFoot": Basis(Vector3(1, 0, 0), PI) * Basis(Vector3(0, 0, 1), PI),
+                    "RightFoot": Basis(Vector3(1, 0, 0), PI) * Basis(Vector3(0, 0, 1), PI),
+                }
+                if prof_bone_name_for_check in leg_overrides:
+                    tgt_rot = tgt_rot * leg_overrides[prof_bone_name_for_check]
 
         if src_skeleton.get_bone_parent(src_idx) >= 0:
             diffs[src_idx] = (
@@ -93,6 +117,7 @@ static func skeleton_rotate(
             src_idx, Transform3D(tgt_rot, diff * src_skeleton.get_bone_rest(src_idx).origin)
         )
 
+
     prof_skeleton.queue_free()
     return diffs
 
@@ -110,8 +135,9 @@ static func perform_retarget(
     skeleton_rename(gstate, root_node, skeleton, bone_map, skeleton_name)
     var old_skeleton_global_rest: Array[Transform3D]
     var clear_bone_rotation: bool = gstate.get_additional_data(&"vrm/clear_bone_rotation")
+    var blender_leg_fix: bool = gstate.get_additional_data(&"vrm/blender_leg_fix")
     var poses = skeleton_rotate(
-        root_node, skeleton, bone_map, old_skeleton_global_rest, clear_bone_rotation
+        root_node, skeleton, bone_map, old_skeleton_global_rest, clear_bone_rotation, blender_leg_fix
     )
     VRMMeshOrientation.apply_mesh_rotation(
         root_node, skeleton, old_skeleton_global_rest, global_transform_scale_local
