@@ -542,6 +542,55 @@ func test_vrm1_root_node_rotation():
     test_completed = true
 
 
+func test_vrm1_import_without_rotation():
+    var gltf = GLTFDocument.new()
+    var extensions = [
+        VRMC_NODE_CONSTRAINT.new(),
+        VRMC_SPRING_BONE.new(),
+        VRMC_MTOON.new(),
+        VRMC_HDR_EMISSIVE.new(),
+        VRMC_VRM.new(),
+        VRMC_VRM_ANIMATION.new(),
+    ]
+
+    for ext in extensions:
+        GLTFDocument.register_gltf_document_extension(ext, true)
+
+    var state := GLTFState.new()
+    const VRMConstants = preload("res://addons/vrm/core/vrm_constants.gd")
+    state.set_additional_data(
+        &"vrm/head_hiding_method", VRMConstants.HeadHidingSetting.ThirdPersonOnly
+    )
+    state.set_meta(&"vrm_head_hiding_method", true)
+    state.set_additional_data(&"vrm/first_person_layers", 2)
+    state.set_meta(&"vrm_first_person_layers", true)
+    state.set_additional_data(&"vrm/third_person_layers", 4)
+    state.set_meta(&"vrm_third_person_layers", true)
+    state.set_additional_data(&"vrm/remove_end_bones", true)
+    state.set_meta(&"vrm_remove_end_bones", true)
+    state.set_meta(&"vrm_skeleton_name", "Skeleton3D")
+    state.set_additional_data(&"vrm/v1_rotate_180", false)
+    state.set_meta(&"vrm_v1_rotate_180", true)
+
+    var err = gltf.append_from_file(VRM_FILE, state, 8)
+    assert_eq(err, OK, "Import with rotation disabled must succeed")
+    if err == OK:
+        var scene = gltf.generate_scene(state)
+        assert_not_null(scene, "Generated scene must not be null")
+        if scene is Node3D:
+            var y_rot = scene.rotation_degrees.y
+            assert_true(
+                abs(y_rot) < 0.1,
+                "VRM instance root node must NOT be rotated by 180 degrees around Y (got %f)" % y_rot
+            )
+        if scene:
+            scene.free()
+
+    for ext in extensions:
+        GLTFDocument.unregister_gltf_document_extension(ext)
+    test_completed = true
+
+
 func test_vrm1_import_none_bone_rename():
     var gltf = GLTFDocument.new()
     var extensions = [

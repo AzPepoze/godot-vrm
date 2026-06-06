@@ -59,6 +59,11 @@ func register_import_settings() -> void:
             "hint": PROPERTY_HINT_NONE,
             "default": true,
         },
+        "vrm/import/v1_rotate_180": {
+            "type": TYPE_BOOL,
+            "hint": PROPERTY_HINT_NONE,
+            "default": true,
+        },
     }
     for setting_name in import_settings:
         if not ProjectSettings.has_setting(setting_name):
