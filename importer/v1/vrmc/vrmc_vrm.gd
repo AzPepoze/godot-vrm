@@ -235,7 +235,9 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
 
     root_node.set_script(vrm_instance)
     if root_node is Node3D:
-        root_node.rotation.y = PI
+        var rotate_180 = gstate.get_additional_data(&"vrm/v1_rotate_180")
+        if rotate_180 == null or rotate_180:
+            root_node.rotation.y = PI
 
     var vrm_meta: Resource = _create_meta(
         root_node,
