@@ -71,12 +71,6 @@ func register_import_settings() -> void:
             "hint": PROPERTY_HINT_NONE,
             "default": true,
         },
-        "vrm/import/clear_bone_rotation":
-        {
-            "type": TYPE_BOOL,
-            "hint": PROPERTY_HINT_NONE,
-            "default": true,
-        },
         "vrm/import/blender_leg_fix":
         {
             "type": TYPE_BOOL,

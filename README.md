@@ -202,8 +202,7 @@ Available in the Import dock when selecting a `.vrm` file (under **Advanced** mo
 | **Skeleton Name** | `Skeleton3D` | Skeleton node name. Use `Skeleton3D` for Blender workflows, `GeneralSkeleton` for standard `BoneMap` profiles |
 | **Remove End Bones** | `true` | Strips empty `_end` marker nodes from the skeleton |
 | **V1 Rotate 180** | `true` | Rotates VRM 1.0 root node 180° around Y |
-| **Clear Bone Rotation** | `true` | Sets non-leg bone rest rotations to `(0,0,0,1)` (x,y,z,w). Leg bones keep their profile target rotation |
-| **Blender Leg Fix** | `true` | Fixes leg bone orientation for Blender-exported VRM animations. Applies 180° Y rotation to lower legs and 180° X+Z to feet. Requires **Clear Bone Rotation** to be enabled |
+| **Blender Leg Fix** | `true` | Fixes leg bone orientation for Blender-exported VRM animations. Applies 180° Y rotation to lower legs and 180° X+Z to feet |
 
 ### Global Defaults
 
@@ -216,8 +215,7 @@ Set defaults in **Project Settings → VRM → Import** (enable **Advanced** tog
 | `vrm/import/skeleton_name` | `Skeleton3D` | Skeleton node name |
 | `vrm/import/remove_end_bones` | `true` | Remove end bones |
 | `vrm/import/v1_rotate_180` | `true` | Rotate VRM 1.0 root 180° on Y |
-| `vrm/import/clear_bone_rotation` | `true` | Clear non-leg bone rest rotations to `(0,0,0,1)` (x,y,z,w) |
-| `vrm/import/blender_leg_fix` | `true` | Fix lower leg and foot bone orientation for Blender VRM animations |
+| `vrm/import/blender_leg_fix` | `true` | Fix lower leg and foot bone orientation for Blender VRM animations (180° Y lower legs, 180° X+Z feet) |
 
 In the import dialog, **Override Global Defaults** (disabled by default) reads from these project settings. Enable it to override settings for a specific file.
 
