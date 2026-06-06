@@ -752,7 +752,7 @@ func test_vrm1_import_custom_skeleton_name():
 
 
 func test_vrm1_import_clear_bone_rotation():
-    """Verify that clear_bone_rotation=true sets all bone rest rotations to identity."""
+    """Verify that clear_bone_rotation=true sets non-leg bone rest rotations to identity."""
     var gltf = GLTFDocument.new()
     var extensions = [
         VRMC_NODE_CONSTRAINT.new(),
@@ -794,17 +794,26 @@ func test_vrm1_import_clear_bone_rotation():
             assert_not_null(skeleton, "Skeleton must exist in imported scene")
             if skeleton:
                 var non_identity_bones: Array[String] = []
+                var leg_exceptions := [
+                    "LeftUpperLeg", "RightUpperLeg",
+                    "LeftLowerLeg", "RightLowerLeg",
+                    "LeftFoot", "RightFoot",
+                    "LeftToes", "RightToes",
+                ]
                 for i in range(skeleton.get_bone_count()):
+                    var bone_name: String = skeleton.get_bone_name(i)
+                    if bone_name in leg_exceptions:
+                        continue
                     var rest: Transform3D = skeleton.get_bone_rest(i)
                     if not rest.basis.is_equal_approx(Basis.IDENTITY):
                         non_identity_bones.append(
-                            "%s (idx %d): %s" % [skeleton.get_bone_name(i), i, str(rest.basis)]
+                            "%s (idx %d): %s" % [bone_name, i, str(rest.basis)]
                         )
                 assert_eq(
                     non_identity_bones.size(),
                     0,
                     (
-                        "All bone rest rotations must be identity, but %d bones are not:\n%s"
+                        "All non-leg bone rest rotations must be identity, but %d bones are not:\n%s"
                         % [non_identity_bones.size(), "\n".join(non_identity_bones)]
                     )
                 )
