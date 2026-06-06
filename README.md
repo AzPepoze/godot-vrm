@@ -206,7 +206,7 @@ Available in the Import dock when selecting a `.vrm` file (under **Advanced** mo
 
 ### Global Defaults
 
-Set defaults in **Project Settings → General → VRM → Import** instead of configuring per-file:
+Set defaults in **Project Settings → VRM → Import** (enable **Advanced** toggle in the top-right to see them) instead of configuring per-file:
 
 | Setting | Default | Description |
 | ------- | :-----: | ----------- |
@@ -217,7 +217,7 @@ Set defaults in **Project Settings → General → VRM → Import** instead of c
 | `vrm/import/v1_rotate_180` | `true` | Rotate VRM 1.0 root 180° on Y |
 | `vrm/import/clear_bone_rotation` | `true` | Clear bone rest rotations to identity |
 
-In the import dialog, **Use Global Defaults** (enabled by default) reads from these project settings. Uncheck it to override settings for a specific file.
+In the import dialog, **Override Global Defaults** (disabled by default) reads from these project settings. Enable it to override settings for a specific file.
 
 ### Bone Rename Modes
 
