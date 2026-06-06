@@ -448,9 +448,7 @@ func test_v0_custom_skeleton_name():
     if skeletons.size() > 0:
         var skel: Skeleton3D = skeletons[0]
         assert_eq(
-            skel.name,
-            "MyV0Skeleton",
-            "Skeleton must be named 'MyV0Skeleton', got '%s'" % skel.name
+            skel.name, "MyV0Skeleton", "Skeleton must be named 'MyV0Skeleton', got '%s'" % skel.name
         )
         # Verify it's still a valid skeleton with bones
         assert_ge(skel.find_bone("Hips"), 0, "Hips bone must exist under custom name")

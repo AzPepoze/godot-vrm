@@ -37,29 +37,42 @@ var accept_dialog: AcceptDialog
 
 func register_import_settings() -> void:
     var import_settings := {
-        "vrm/import/head_hiding_method": {
+        "vrm/import/head_hiding_method":
+        {
             "type": TYPE_INT,
             "hint": PROPERTY_HINT_ENUM,
-            "hint_string": "ThirdPersonOnly,FirstPersonOnly,FirstWithShadow,Layers,LayersWithShadow,IgnoreHeadHiding",
+            "hint_string":
+            "ThirdPersonOnly,FirstPersonOnly,FirstWithShadow,Layers,LayersWithShadow,IgnoreHeadHiding",
             "default": 0,
         },
-        "vrm/import/bone_rename": {
+        "vrm/import/bone_rename":
+        {
             "type": TYPE_INT,
             "hint": PROPERTY_HINT_ENUM,
-            "hint_string": "None (Blender ready),Humanoid,Symmetrize VRoid Bone Names on X-Axis (Blender ready)",
+            "hint_string":
+            "None (Blender ready),Humanoid,Symmetrize VRoid Bone Names on X-Axis (Blender ready)",
             "default": 0,
         },
-        "vrm/import/skeleton_name": {
+        "vrm/import/skeleton_name":
+        {
             "type": TYPE_STRING,
             "hint": PROPERTY_HINT_NONE,
             "default": "Skeleton3D",
         },
-        "vrm/import/remove_end_bones": {
+        "vrm/import/remove_end_bones":
+        {
             "type": TYPE_BOOL,
             "hint": PROPERTY_HINT_NONE,
             "default": true,
         },
-        "vrm/import/v1_rotate_180": {
+        "vrm/import/v1_rotate_180":
+        {
+            "type": TYPE_BOOL,
+            "hint": PROPERTY_HINT_NONE,
+            "default": true,
+        },
+        "vrm/import/clear_bone_rotation":
+        {
             "type": TYPE_BOOL,
             "hint": PROPERTY_HINT_NONE,
             "default": true,

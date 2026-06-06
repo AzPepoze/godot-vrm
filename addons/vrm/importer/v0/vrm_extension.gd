@@ -93,18 +93,18 @@ func _import_preflight(
     if extensions.has("VRMC_vrm"):
         # VRM 1.0 file. Do not parse as a VRM 0.0.
         return ERR_INVALID_DATA
-        
+
     # Godot 4.6 bug: get_additional_data uses [] internally, triggering
     # "Dictionary::operator[] used when there was no value for the given key".
     # Workaround: use GLTFState meta instead of additional_data for this sentinel.
     if gstate.has_meta(&"vrm_already_processed"):
         return ERR_SKIP
     gstate.set_meta(&"vrm_already_processed", true)
-    
+
     VRMLogger.debug("vrm_extension.gd", "_import_preflight: processing VRM 0.0 file")
-    
+
     vrm_utils.apply_default_import_settings(gstate)
-    
+
     var gltf_json_parsed: Dictionary = gstate.json
     var gltf_nodes = gltf_json_parsed["nodes"]
     if not _add_vrm_nodes_to_skin(gltf_json_parsed):
@@ -152,7 +152,6 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
     )
 
     var skeleton_name: String = gstate.get_meta(&"vrm_skeleton_name", "Skeleton3D") as String
-
 
     var pose_diffs: Array[Basis] = vrm_utils.perform_retarget(
         gstate, root_node, skeleton, humanBones, skeleton_name

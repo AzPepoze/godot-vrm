@@ -512,7 +512,7 @@ func test_vrm1_end_bone_nodes_removed():
         0,
         (
             "Skeleton should have zero children named '*_end*' after cleanup, "
-            +"but found %d: %s" % [end_bone_nodes.size(), str(end_bone_nodes)]
+            + "but found %d: %s" % [end_bone_nodes.size(), str(end_bone_nodes)]
         )
     )
     test_completed = true
@@ -581,7 +581,10 @@ func test_vrm1_import_without_rotation():
             var y_rot = scene.rotation_degrees.y
             assert_true(
                 abs(y_rot) < 0.1,
-                "VRM instance root node must NOT be rotated by 180 degrees around Y (got %f)" % y_rot
+                (
+                    "VRM instance root node must NOT be rotated by 180 degrees around Y (got %f)"
+                    % y_rot
+                )
             )
         if scene:
             scene.free()
@@ -618,7 +621,7 @@ func test_vrm1_import_none_bone_rename():
     state.set_additional_data(&"vrm/remove_end_bones", true)
     state.set_meta(&"vrm_remove_end_bones", true)
     state.set_meta(&"vrm_skeleton_name", "Skeleton3D")
-    state.set_meta(&"vrm_bone_rename", 0) # BoneRenameMode.NONE
+    state.set_meta(&"vrm_bone_rename", 0)  # BoneRenameMode.NONE
 
     var err = gltf.append_from_file(VRM_FILE, state, 8)
     assert_eq(err, OK, "Import under NONE mode must succeed")
@@ -672,7 +675,7 @@ func test_vrm1_import_symmetrize_bone_rename():
     state.set_additional_data(&"vrm/remove_end_bones", true)
     state.set_meta(&"vrm_remove_end_bones", true)
     state.set_meta(&"vrm_skeleton_name", "Skeleton3D")
-    state.set_meta(&"vrm_bone_rename", 2) # BoneRenameMode.SYMMETRIZE_VROID
+    state.set_meta(&"vrm_bone_rename", 2)  # BoneRenameMode.SYMMETRIZE_VROID
 
     var err = gltf.append_from_file(VRM_FILE, state, 8)
     assert_eq(err, OK, "Import under SYMMETRIZE mode must succeed")
@@ -741,6 +744,70 @@ func test_vrm1_import_custom_skeleton_name():
                 )
                 # Verify it's still a valid skeleton with bones
                 assert_ge(skel.find_bone("Hips"), 0, "Hips bone must exist under custom name")
+            scene.free()
+
+    for ext in extensions:
+        GLTFDocument.unregister_gltf_document_extension(ext)
+    test_completed = true
+
+
+func test_vrm1_import_clear_bone_rotation():
+    """Verify that clear_bone_rotation=true sets all bone rest rotations to identity."""
+    var gltf = GLTFDocument.new()
+    var extensions = [
+        VRMC_NODE_CONSTRAINT.new(),
+        VRMC_SPRING_BONE.new(),
+        VRMC_MTOON.new(),
+        VRMC_HDR_EMISSIVE.new(),
+        VRMC_VRM.new(),
+        VRMC_VRM_ANIMATION.new(),
+    ]
+
+    for ext in extensions:
+        GLTFDocument.register_gltf_document_extension(ext, true)
+
+    var state := GLTFState.new()
+    const VRMConstants = preload("res://addons/vrm/core/vrm_constants.gd")
+    state.set_additional_data(
+        &"vrm/head_hiding_method", VRMConstants.HeadHidingSetting.ThirdPersonOnly
+    )
+    state.set_meta(&"vrm_head_hiding_method", true)
+    state.set_additional_data(&"vrm/first_person_layers", 2)
+    state.set_meta(&"vrm_first_person_layers", true)
+    state.set_additional_data(&"vrm/third_person_layers", 4)
+    state.set_meta(&"vrm_third_person_layers", true)
+    state.set_additional_data(&"vrm/remove_end_bones", true)
+    state.set_meta(&"vrm_remove_end_bones", true)
+    state.set_meta(&"vrm_skeleton_name", "Skeleton3D")
+    state.set_additional_data(&"vrm/v1_rotate_180", false)
+    state.set_meta(&"vrm_v1_rotate_180", true)
+    state.set_additional_data(&"vrm/clear_bone_rotation", true)
+    state.set_meta(&"vrm_clear_bone_rotation", true)
+
+    var err = gltf.append_from_file(VRM_FILE, state, 8)
+    assert_eq(err, OK, "Import with clear_bone_rotation=true must succeed")
+    if err == OK:
+        var scene = gltf.generate_scene(state)
+        assert_not_null(scene, "Generated scene must not be null")
+        if scene:
+            var skeleton = _find_skeleton(scene)
+            assert_not_null(skeleton, "Skeleton must exist in imported scene")
+            if skeleton:
+                var non_identity_bones: Array[String] = []
+                for i in range(skeleton.get_bone_count()):
+                    var rest: Transform3D = skeleton.get_bone_rest(i)
+                    if not rest.basis.is_equal_approx(Basis.IDENTITY):
+                        non_identity_bones.append(
+                            "%s (idx %d): %s" % [skeleton.get_bone_name(i), i, str(rest.basis)]
+                        )
+                assert_eq(
+                    non_identity_bones.size(),
+                    0,
+                    (
+                        "All bone rest rotations must be identity, but %d bones are not:\n%s"
+                        % [non_identity_bones.size(), "\n".join(non_identity_bones)]
+                    )
+                )
             scene.free()
 
     for ext in extensions:

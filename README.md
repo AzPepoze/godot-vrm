@@ -192,51 +192,40 @@ In the debug images above:
 
 ## Import Options
 
-Available in the Import dock when selecting a `.vrm` file:
+Available in the Import dock when selecting a `.vrm` file (under **Advanced** mode):
 
-- **Head Hiding Method**: `ThirdPersonOnly` / `FirstPersonOnly` / `FirstWithShadow` / `Layers` / `LayersWithShadow` / `IgnoreHeadHiding`
-- **First/Third Person Layers**: Render layer masks for `Layers` mode
-- **Bone Rename**: See [Bone Rename Modes](#bone-rename-modes) below
-- **Skeleton Name**: Sets the skeleton node name (default `Skeleton3D`).
-     - Use `Skeleton3D` if:
-          - You are working with a Blender workflow (matches `.blend` import names).
-     - Use `GeneralSkeleton` if:
-          - You are working with standard Godot `BoneMap` profiles.
-- **Remove End Bones**: Strips empty end-bone nodes from the skeleton
+| Option | Default | Description |
+| ------ | :-----: | ----------- |
+| **Head Hiding Method** | `ThirdPersonOnly` | How first-person head meshes are handled: `ThirdPersonOnly`, `FirstPersonOnly`, `FirstWithShadow`, `Layers`, `LayersWithShadow`, `IgnoreHeadHiding` |
+| **First/Third Person Layers** | `2` / `4` | Render layer masks used when Head Hiding is set to `Layers` mode |
+| **Bone Rename** | `None` | How bones are renamed during import — see [Bone Rename Modes](#bone-rename-modes) |
+| **Skeleton Name** | `Skeleton3D` | Skeleton node name. Use `Skeleton3D` for Blender workflows, `GeneralSkeleton` for standard `BoneMap` profiles |
+| **Remove End Bones** | `true` | Strips empty `_end` marker nodes from the skeleton |
+| **V1 Rotate 180** | `true` | Rotates VRM 1.0 root node 180° around Y |
+| **Clear Bone Rotation** | `true` | Sets all bone rest rotations to identity `(0,0,0,1)` — useful when the T-pose has unwanted rotation from retargeting |
 
 ### Global Defaults
 
-> [!NOTE]
-> Import options are shown under the **Advanced** mode.
+Set defaults in **Project Settings → General → VRM → Import** instead of configuring per-file:
 
-Set default import options once in **Project Settings → General → VRM → Import** instead of configuring per-file:
-
-- `vrm/import/head_hiding_method` — Head hiding mode
-- `vrm/import/bone_rename` — Bone rename mode
-- `vrm/import/skeleton_name` — Skeleton node name
-- `vrm/import/remove_end_bones` — Remove end bones
+| Setting | Default | Description |
+| ------- | :-----: | ----------- |
+| `vrm/import/head_hiding_method` | `0` | Head hiding mode |
+| `vrm/import/bone_rename` | `0` | Bone rename mode |
+| `vrm/import/skeleton_name` | `Skeleton3D` | Skeleton node name |
+| `vrm/import/remove_end_bones` | `true` | Remove end bones |
+| `vrm/import/v1_rotate_180` | `true` | Rotate VRM 1.0 root 180° on Y |
+| `vrm/import/clear_bone_rotation` | `true` | Clear bone rest rotations to identity |
 
 In the import dialog, **Use Global Defaults** (enabled by default) reads from these project settings. Uncheck it to override settings for a specific file.
 
 ### Bone Rename Modes
 
-**None (Blender ready)**
-
-- Animate in Blender with the VRM addon
-- Import `.blend` files directly into Godot
-
-**Humanoid**
-
-- Standard Godot humanoid bone names (`Hips`, `Spine`, etc.)
-- Retarget animations across different avatars
-- Export from Godot and re-import via glTF
-- ⚠️ Works but not yet fully tested — may need extra setup
-
-**Symmetrize VRoid**
-
-- For VRoid Studio models
-- Symmetrize bones in Blender first
-- Blender menu: Armature → Object → VRM → Humanoid → Symmetrize VRoid Bone Names on X-Axis
+| Mode | Best for |
+| :--- | :------- |
+| **None (Blender ready)** | Animate in Blender with the VRM addon, import `.blend` files directly into Godot |
+| **Humanoid** | Standard Godot humanoid bone names (`Hips`, `Spine`, …). Retarget animations across avatars. ⚠️ Not yet fully tested |
+| **Symmetrize VRoid** | VRoid Studio models. Symmetrize bones in Blender first: Armature → Object → VRM → Humanoid → Symmetrize VRoid Bone Names on X-Axis |
 
 ### Works with Blender
 
@@ -250,11 +239,10 @@ For a smooth Blender ↔ Godot animation workflow:
 **Godot import settings for Blender workflow:**
 
 - **Bone Rename**: `None (Blender ready)` or `Symmetrize VRoid` (for VRoid models)
-- **Skeleton Name**:
-     - Use `Skeleton3D` (default) if:
-          - You want it to match the skeleton name inside `.blend` imports (optimized for Blender integration).
-     - Use `GeneralSkeleton` if:
-          - You need to target standard Godot `BoneMap` profiles.
+- **Skeleton Name**: `Skeleton3D` (matches `.blend` imports) or `GeneralSkeleton` (standard `BoneMap` profiles)
+
+> [!TIP]
+> For an easier rigging setup, check out **[vrm-control-rig](https://github.com/AzPepoze/vrm-control-rig)** — my Blender addon that auto-generates a control rig with IK, designed to work alongside this importer.
 
 ---
 

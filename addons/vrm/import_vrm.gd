@@ -30,12 +30,16 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
     var remove_end: bool = options.get(&"vrm/remove_end_bones", true) as bool
     var v1_rotate_180: bool = options.get(&"vrm/v1_rotate_180", true) as bool
 
+    var clear_bone_rotation: bool = options.get(&"vrm/clear_bone_rotation", true) as bool
     if not override_global:
         head_hiding = ProjectSettings.get_setting("vrm/import/head_hiding_method", head_hiding)
         bone_rename = ProjectSettings.get_setting("vrm/import/bone_rename", bone_rename)
         skeleton_name = ProjectSettings.get_setting("vrm/import/skeleton_name", skeleton_name)
         remove_end = ProjectSettings.get_setting("vrm/import/remove_end_bones", remove_end)
         v1_rotate_180 = ProjectSettings.get_setting("vrm/import/v1_rotate_180", v1_rotate_180)
+        clear_bone_rotation = ProjectSettings.get_setting(
+            "vrm/import/clear_bone_rotation", clear_bone_rotation
+        )
 
     state.set_additional_data(
         &"vrm/head_hiding_method", head_hiding as vrm_constants.HeadHidingSetting
@@ -55,10 +59,12 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
     state.set_meta(&"vrm_remove_end_bones", true)
     state.set_additional_data(&"vrm/v1_rotate_180", v1_rotate_180)
     state.set_meta(&"vrm_v1_rotate_180", true)
+    state.set_additional_data(&"vrm/clear_bone_rotation", clear_bone_rotation)
+    state.set_meta(&"vrm_clear_bone_rotation", true)
     state.set_meta(&"vrm_bone_rename", bone_rename)
     state.set_meta(&"vrm_skeleton_name", skeleton_name)
     # HANDLE_BINARY_EMBED_AS_BASISU crashes on some files in 4.0 and 4.1
-    state.handle_binary_image = GLTFState.HANDLE_BINARY_EMBED_AS_UNCOMPRESSED # GLTFState.HANDLE_BINARY_EXTRACT_TEXTURES
+    state.handle_binary_image = GLTFState.HANDLE_BINARY_EMBED_AS_UNCOMPRESSED  # GLTFState.HANDLE_BINARY_EXTRACT_TEXTURES
     VRMLogger.info("import_vrm.gd", "_import_scene: importing %s" % path)
     var err = gltf.append_from_file(path, state, 8)
     if err != OK:
