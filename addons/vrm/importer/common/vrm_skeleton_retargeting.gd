@@ -12,9 +12,8 @@ static func skeleton_rename(
     p_skeleton: Skeleton3D,
     p_bone_map: BoneMap,
     skeleton_name: String = "Skeleton3D",
-    
 ):
-    var bone_rename_mode: int = 1 # default to HUMANBONES (humanbones = 1)
+    var bone_rename_mode: int = 1  # default to HUMANBONES (humanbones = 1)
     if gstate.has_meta(&"vrm_bone_rename"):
         bone_rename_mode = gstate.get_meta(&"vrm_bone_rename") as int
     VRMBoneRenamer.rename_skeleton_bones(
@@ -27,7 +26,8 @@ static func skeleton_rotate(
     _p_base_scene: Node,
     src_skeleton: Skeleton3D,
     p_bone_map: BoneMap,
-    old_skeleton_global_rest: Array[Transform3D]
+    old_skeleton_global_rest: Array[Transform3D],
+    clear_bone_rotation: bool = false
 ) -> Array[Basis]:
     var is_renamed = true
     var profile = p_bone_map.profile
@@ -71,7 +71,9 @@ static func skeleton_rotate(
             if prof_bone_name != StringName():
                 prof_idx = profile.find_bone(prof_bone_name)
 
-            if prof_idx >= 0:
+            if clear_bone_rotation:
+                tgt_rot = Basis.IDENTITY
+            elif prof_idx >= 0:
                 tgt_rot = src_pg.inverse() * prof_skeleton.get_bone_global_rest(prof_idx).basis
 
         if src_skeleton.get_bone_parent(src_idx) >= 0:
@@ -107,7 +109,10 @@ static func perform_retarget(
     )
     skeleton_rename(gstate, root_node, skeleton, bone_map, skeleton_name)
     var old_skeleton_global_rest: Array[Transform3D]
-    var poses = skeleton_rotate(root_node, skeleton, bone_map, old_skeleton_global_rest)
+    var clear_bone_rotation: bool = gstate.get_additional_data(&"vrm/clear_bone_rotation")
+    var poses = skeleton_rotate(
+        root_node, skeleton, bone_map, old_skeleton_global_rest, clear_bone_rotation
+    )
     VRMMeshOrientation.apply_mesh_rotation(
         root_node, skeleton, old_skeleton_global_rest, global_transform_scale_local
     )

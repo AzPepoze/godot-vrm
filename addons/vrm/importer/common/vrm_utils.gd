@@ -50,10 +50,11 @@ static func skeleton_rotate(
     _p_base_scene: Node,
     src_skeleton: Skeleton3D,
     p_bone_map: BoneMap,
-    old_skeleton_global_rest: Array[Transform3D]
+    old_skeleton_global_rest: Array[Transform3D],
+    clear_bone_rotation: bool = false
 ) -> Array[Basis]:
     return VRMSkeletonRetargeting.skeleton_rotate(
-        _p_base_scene, src_skeleton, p_bone_map, old_skeleton_global_rest
+        _p_base_scene, src_skeleton, p_bone_map, old_skeleton_global_rest, clear_bone_rotation
     )
 
 
@@ -63,7 +64,6 @@ static func perform_retarget(
     skeleton: Skeleton3D,
     bone_map: BoneMap,
     skeleton_name: String = "Skeleton3D",
-    
 ) -> Array[Basis]:
     return VRMSkeletonRetargeting.perform_retarget(
         gstate, root_node, skeleton, bone_map, skeleton_name
@@ -119,19 +119,22 @@ static func apply_default_import_settings(gstate: GLTFState) -> void:
     # Set default additional_data values so get_additional_data()
     # doesn't trigger Godot 4.6 operator[] dict bug on missing keys.
     # These may be overridden later by the import dialog (import_vrm.gd).
-    
+
     var additional_data_defaults = {
-        &"vrm_head_hiding_method": [&"vrm/head_hiding_method", VRMConstants.HeadHidingSetting.ThirdPersonOnly],
+        &"vrm_head_hiding_method":
+        [&"vrm/head_hiding_method", VRMConstants.HeadHidingSetting.ThirdPersonOnly],
         &"vrm_first_person_layers": [&"vrm/first_person_layers", 2],
         &"vrm_third_person_layers": [&"vrm/third_person_layers", 4],
         &"vrm_remove_end_bones": [&"vrm/remove_end_bones", true],
         &"vrm_v1_rotate_180": [&"vrm/v1_rotate_180", true],
+        &"vrm_clear_bone_rotation": [&"vrm/clear_bone_rotation", true],
     }
-    
+
     for meta_key in additional_data_defaults:
         if not gstate.has_meta(meta_key):
-            gstate.set_additional_data(additional_data_defaults[meta_key][0], additional_data_defaults[meta_key][1])
-            
+            gstate.set_additional_data(
+                additional_data_defaults[meta_key][0], additional_data_defaults[meta_key][1]
+            )
+
     if not gstate.has_meta(&"vrm_skeleton_name"):
         gstate.set_meta(&"vrm_skeleton_name", "Skeleton3D")
-

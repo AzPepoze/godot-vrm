@@ -164,9 +164,9 @@ func _import_preflight(
 ) -> Error:
     if not extensions.has("VRMC_vrm"):
         return ERR_SKIP
-        
+
     vrm_utils.apply_default_import_settings(_state)
-    
+
     return OK
 
 
