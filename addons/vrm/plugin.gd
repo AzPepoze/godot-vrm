@@ -77,6 +77,12 @@ func register_import_settings() -> void:
             "hint": PROPERTY_HINT_NONE,
             "default": true,
         },
+        "vrm/import/blender_leg_fix":
+        {
+            "type": TYPE_BOOL,
+            "hint": PROPERTY_HINT_NONE,
+            "default": true,
+        },
     }
     for setting_name in import_settings:
         if not ProjectSettings.has_setting(setting_name):
