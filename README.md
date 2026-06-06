@@ -202,7 +202,7 @@ Available in the Import dock when selecting a `.vrm` file (under **Advanced** mo
 | **Skeleton Name** | `Skeleton3D` | Skeleton node name. Use `Skeleton3D` for Blender workflows, `GeneralSkeleton` for standard `BoneMap` profiles |
 | **Remove End Bones** | `true` | Strips empty `_end` marker nodes from the skeleton |
 | **V1 Rotate 180** | `true` | Rotates VRM 1.0 root node 180° around Y |
-| **Clear Bone Rotation** | `true` | Sets all bone rest rotations to identity `(0,0,0,1)` — useful when the T-pose has unwanted rotation from retargeting |
+| **Clear Bone Rotation** | `true` | Sets all bone rest rotations to `(0,0,0,1)` (x,y,z,w) — useful when the T-pose has unwanted rotation from retargeting |
 
 ### Global Defaults
 
@@ -215,7 +215,7 @@ Set defaults in **Project Settings → VRM → Import** (enable **Advanced** tog
 | `vrm/import/skeleton_name` | `Skeleton3D` | Skeleton node name |
 | `vrm/import/remove_end_bones` | `true` | Remove end bones |
 | `vrm/import/v1_rotate_180` | `true` | Rotate VRM 1.0 root 180° on Y |
-| `vrm/import/clear_bone_rotation` | `true` | Clear bone rest rotations to identity |
+| `vrm/import/clear_bone_rotation` | `true` | Clear bone rest rotations to `(0,0,0,1)` (x,y,z,w) |
 
 In the import dialog, **Override Global Defaults** (disabled by default) reads from these project settings. Enable it to override settings for a specific file.
 
