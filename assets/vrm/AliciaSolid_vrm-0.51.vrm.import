@@ -51,3 +51,4 @@ vrm/only_if_head_hiding_uses_layers/third_person_layers=4
 vrm/bone_rename=0
 vrm/skeleton_name="Skeleton3D"
 vrm/remove_end_bones=true
+vrm/v1_rotate_180=true
