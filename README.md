@@ -62,16 +62,24 @@
 
 ## What this fork mainly improves
 
-- **C++ Physics**: Spring bones and node constraints are rewritten in C++ (GDExtension) for massive performance gains.
-- **Wind Support**: Added directional and turbulent wind simulation for spring bones.
-- **Environment Collision**: Spring bones can now collide with Godot's physics bodies.
-- **Editor Gizmos**: Visualize spring bone colliders and radius directly in the editor.
-- **Group Multipliers**: Scale hit radius for specific spring bone groups (like Hair or Skirts) per-instance.
-- **Shared Settings**: Optionally share a single `VRMSettings` resource across multiple avatars to synchronize global wind, gravity, and collisions, or keep them completely unique per character.
+| Improvement | Description |
+|---|---|
+| **C++ Physics** | Spring bones and node constraints rewritten in C++ (GDExtension) for massive performance gains |
+| **Wind Support** | Directional and turbulent wind simulation for spring bones |
+| **Environment Collision** | Spring bones can collide with Godot's physics bodies (capsule queries) |
+| **Editor Gizmos** | Visualize spring bone colliders and radius directly in the 3D viewport |
+| **Group Multipliers** | Per-instance hit radius scaling for specific spring bone groups (e.g. Hair, Skirt) |
+| **Shared Settings** | Share a single `VRMSettings` resource across avatars to sync wind, gravity, and collisions — or keep them unique per character |
 
 ---
 
 ## Installation
+
+| Method | Steps | Best For |
+|---|---|---|
+| **[Godot Asset Library](https://godotengine.org/asset-library/asset/5222)** | Download and install directly from the AssetLib tab in the Godot editor | Quick setup, one-click install |
+| **Git Submodules** | See [submodule commands](#method-2-git-submodules) below | Git-based projects, easy updates |
+| **Manual Install** | See [manual steps](#method-3-manual-install) below | Offline setup, full control |
 
 ### Method 1: Godot Asset Library
 
@@ -79,36 +87,36 @@ Download and install directly via the [Godot Asset Library](https://godotengine.
 
 ### Method 2: Git Submodules
 
-If you use Git, you can add the specific branch for the addon as a submodule to map it cleanly to the `addons` folder.
+Map the addon branches cleanly to your `addons/` folder:
 
 ```bash
-# vrm
 git submodule add -b vrm https://github.com/AzPepoze/godot-vrm addons/vrm
-# mtoon
 git submodule add -b mtoon https://github.com/AzPepoze/godot-vrm addons/mtoon
 ```
 
 ### Method 3: Manual Install
 
-1. Download the latest `.zip` from the [Releases page](https://github.com/AzPepoze/godot-vrm/releases/latest).
-2. Copy `addons/vrm` into your project's `addons/` — **do not rename**
-3. Copy `addons/mtoon` into `addons/mtoon` — **do not rename**
-4. Enable both in **Project Settings → Plugins → VRM** and **mtoon**
+1. Download the latest `.zip` from the [Releases page](https://github.com/AzPepoze/godot-vrm/releases/latest)
+2. Copy `addons/vrm` into your project's `addons/vrm` — **do not rename**
+3. Copy `addons/mtoon` into your project's `addons/mtoon` — **do not rename**
+4. Enable both plugins in **Project Settings → Plugins**
 
 ---
 
 ## Updating
 
-If you installed via Git Submodules, you can update the addon by pulling the latest changes:
+| Method | How to Update |
+|---|---|
+| **Godot Asset Library** | Use the AssetLib tab in the editor to check for and install updates |
+| **Git Submodules** | See commands below |
+| **Manual Install** | Download the latest release and replace the `addons/vrm` and `addons/mtoon` folders |
+
+**Git Submodule update commands:**
 
 ```bash
-# vrm
 git submodule update --remote addons/vrm
-# mtoon
 git submodule update --remote addons/mtoon
 ```
-
-For manual installations, simply download the latest release and replace the files in your `addons` folder.
 
 ---
 
@@ -194,49 +202,38 @@ In the debug images above:
 
 Available in the Import dock when selecting a `.vrm` file:
 
-- **Head Hiding Method**: `ThirdPersonOnly` / `FirstPersonOnly` / `FirstWithShadow` / `Layers` / `LayersWithShadow` / `IgnoreHeadHiding`
-- **First/Third Person Layers**: Render layer masks for `Layers` mode
-- **Bone Rename**: See [Bone Rename Modes](#bone-rename-modes) below
-- **Skeleton Name**: Sets the skeleton node name (default `Skeleton3D`).
-     - Use `Skeleton3D` if:
-          - You are working with a Blender workflow (matches `.blend` import names).
-     - Use `GeneralSkeleton` if:
-          - You are working with standard Godot `BoneMap` profiles.
-- **Remove End Bones**: Strips empty end-bone nodes from the skeleton
+| Option | Description | Values |
+|---|---|---|
+| **Head Hiding Method** | Controls first/third-person head visibility | `ThirdPersonOnly`, `FirstPersonOnly`, `FirstWithShadow`, `Layers`, `LayersWithShadow`, `IgnoreHeadHiding` |
+| **First/Third Person Layers** | Render layer masks for `Layers` mode | Layer bitmask (default: first=2, third=4) |
+| **Bone Rename** | How skeleton bones are renamed on import | See [Bone Rename Modes](#bone-rename-modes) |
+| **Skeleton Name** | Skeleton node name after import | `Skeleton3D` (default, for Blender) or `GeneralSkeleton` (for BoneMap profiles) |
+| **Remove End Bones** | Strips empty end-bone nodes from the skeleton | `true` / `false` |
 
 ### Global Defaults
 
 > [!NOTE]
 > Import options are shown under the **Advanced** mode.
 
-Set default import options once in **Project Settings → General → VRM → Import** instead of configuring per-file:
+Set defaults once in **Project Settings → General → VRM → Import** instead of configuring per-file:
 
-- `vrm/import/head_hiding_method` — Head hiding mode
-- `vrm/import/bone_rename` — Bone rename mode
-- `vrm/import/skeleton_name` — Skeleton node name
-- `vrm/import/remove_end_bones` — Remove end bones
+| Setting | Purpose |
+|---|---|
+| `vrm/import/head_hiding_method` | Default head hiding mode |
+| `vrm/import/bone_rename` | Default bone rename mode |
+| `vrm/import/skeleton_name` | Default skeleton node name |
+| `vrm/import/remove_end_bones` | Default remove end bones |
+| `vrm/import/v1_rotate_180` | Rotate VRM 1.0 models 180° on Y axis |
 
-In the import dialog, **Use Global Defaults** (enabled by default) reads from these project settings. Uncheck it to override settings for a specific file.
+In the import dialog, **Override Global Defaults** (disabled by default) lets you override settings for a specific file.
 
 ### Bone Rename Modes
 
-**None (Blender ready)**
-
-- Animate in Blender with the VRM addon
-- Import `.blend` files directly into Godot
-
-**Humanoid**
-
-- Standard Godot humanoid bone names (`Hips`, `Spine`, etc.)
-- Retarget animations across different avatars
-- Export from Godot and re-import via glTF
-- ⚠️ Works but not yet fully tested — may need extra setup
-
-**Symmetrize VRoid**
-
-- For VRoid Studio models
-- Symmetrize bones in Blender first
-- Blender menu: Armature → Object → VRM → Humanoid → Symmetrize VRoid Bone Names on X-Axis
+| Mode | Description |
+|---|---|
+| **None** | Keep original VRM bone names as-is |
+| **Humanoid** | Convert to standard Godot humanoid names (`Hips`, `Spine`, etc.) |
+| **Symmetrize VRoid** | Mirror VRoid bone names on the X axis |
 
 ### Works with Blender
 
@@ -245,16 +242,20 @@ For a smooth Blender ↔ Godot animation workflow:
 1. Install the [VRM Add-on for Blender](https://vrm-addon-for-blender.info/en/)
 2. Import your `.vrm` into Blender with the addon
 3. Animate your model in Blender
-4. Export as `.blend` or `.glb` and import into Godot
+4. Export as `.blend` and import into Godot
+5. In the Import dock for the `.blend` file:
+     - Locate the VRM skeleton (may be called **Skeleton3D**)
+     - Go to **Skeleton → Retarget → Bone Map**
+     - Click **Add Bone Map** (create a new one)
+     - Set its profile to **SkeletonProfileHumanoid**
+     - Verify each bone is mapped correctly
 
-**Godot import settings for Blender workflow:**
+**Recommended import settings for Blender:**
 
-- **Bone Rename**: `None (Blender ready)` or `Symmetrize VRoid` (for VRoid models)
-- **Skeleton Name**:
-     - Use `Skeleton3D` (default) if:
-          - You want it to match the skeleton name inside `.blend` imports (optimized for Blender integration).
-     - Use `GeneralSkeleton` if:
-          - You need to target standard Godot `BoneMap` profiles.
+| Setting | Recommended Value | Why |
+|---|---|---|
+| **Bone Rename** | `Humanoid` | Works with the skeleton setup above; other modes (`None`, `Symmetrize VRoid`) are optional if you know what you're doing |
+| **Skeleton Name** | `Skeleton3D` | Matches skeleton names inside `.blend` imports |
 
 ---
 
