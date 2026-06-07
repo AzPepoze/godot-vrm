@@ -4,6 +4,12 @@
 /**        export-ignore
 /addons    !export-ignore
 /addons/** !export-ignore
+# Docs images are NOT tracked by LFS (needed for raw.githubusercontent.com display)
+docs/*.png !filter !diff !merge
+docs/*.jpg !filter !diff !merge
+docs/*.jpeg !filter !diff !merge
+docs/*.svg !filter !diff !merge
+docs/*.webp !filter !diff !merge
 *.jpeg filter=lfs diff=lfs merge=lfs -text
 *.bmp filter=lfs diff=lfs merge=lfs -text
 *.hdr filter=lfs diff=lfs merge=lfs -text
