@@ -242,7 +242,7 @@ For a smooth Blender ↔ Godot animation workflow:
 1. Install the [VRM Add-on for Blender](https://vrm-addon-for-blender.info/en/)
 2. Import your `.vrm` into Blender with the addon
 3. Animate your model in Blender
-4. Export as `.blend` and import into Godot
+4. Import your `.blend` file into Godot
 5. In the Import dock for the `.blend` file:
      - Locate the VRM skeleton (may be called **Skeleton3D**)
      - Go to **Skeleton → Retarget → Bone Map**
