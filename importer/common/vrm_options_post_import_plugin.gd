@@ -33,9 +33,9 @@ func _get_import_options(path: String):
         add_import_option_advanced(
             TYPE_INT,
             "vrm/bone_rename",
-            0,
+            1,
             PROPERTY_HINT_ENUM,
-            "None (Blender ready),Humanoid,Symmetrize VRoid Bone Names on X-Axis (Blender ready)"
+            "None,Humanoid,Symmetrize VRoid Bone Names on X-Axis"
         )
         add_import_option_advanced(
             TYPE_STRING,

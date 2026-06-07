@@ -46,8 +46,8 @@ func register_import_settings() -> void:
         "vrm/import/bone_rename": {
             "type": TYPE_INT,
             "hint": PROPERTY_HINT_ENUM,
-            "hint_string": "None (Blender ready),Humanoid,Symmetrize VRoid Bone Names on X-Axis (Blender ready)",
-            "default": 0,
+            "hint_string": "None,Humanoid,Symmetrize VRoid Bone Names on X-Axis",
+            "default": 1,
         },
         "vrm/import/skeleton_name": {
             "type": TYPE_STRING,
