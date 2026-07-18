@@ -13,6 +13,9 @@ export_presets.cfg
 .mono/
 data_*/
 
+# Blender backup files
+*.blend1
+
 # System/tool-specific ignores
 .DS_Store
 *~
