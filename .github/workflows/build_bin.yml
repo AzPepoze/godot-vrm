@@ -11,6 +11,7 @@ permissions:
 
 jobs:
      build:
+          if: github.actor != 'github-actions[bot]'
           name: Build (${{ matrix.platform }}, ${{ matrix.target }}, ${{ matrix.precision }})
           runs-on: ${{ matrix.os }}
           strategy:
@@ -27,6 +28,7 @@ jobs:
                            scons-args: use_mingw=yes
                          - platform: macos
                            os: macos-latest
+                           scons-args: arch=universal
 
           steps:
                - name: Checkout
@@ -77,6 +79,7 @@ jobs:
                       if-no-files-found: error
 
      update:
+          if: github.actor != 'github-actions[bot]'
           name: Commit and Update Branches
           needs: build
           runs-on: ubuntu-latest
@@ -109,7 +112,7 @@ jobs:
                       git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
                       
                       git add addons/vrm/bin/
-                      git commit -m "Auto-update compiled binaries [skip ci]" || echo "No changes"
+                      git commit -m "Auto-update compiled binaries" || echo "No changes"
                       git push origin main
                       
                       git subtree split -P addons/vrm -b vrm-split

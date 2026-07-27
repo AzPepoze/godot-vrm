@@ -27,6 +27,7 @@ jobs:
                            scons-args: use_mingw=yes
                          - platform: macos
                            os: macos-latest
+                           scons-args: arch=universal
 
           steps:
                - name: Checkout
@@ -102,14 +103,12 @@ jobs:
                  run: |
                       VERSION=${GITHUB_REF_NAME#v}
                       if [[ "$VERSION" != "workflow_dispatch" ]]; then
-                        sed -i "s/version=\".*\"/version=\"$VERSION\"/" addons/vrm/plugin.cfg
+                        sed -i "s/version=\".*\"/version=\"$VERSION\"/" addons/vrm/plugin.cfg addons/mtoon/plugin.cfg
                       fi
 
                - name: Package addon
                  run: |
-                      mkdir godot-vrm
-                      mv addons godot-vrm/
-                      zip -r godot-vrm-${{ github.ref_name }}.zip godot-vrm/ -x "*.import" -x "*.unwrap_cache"
+                      zip -r godot-vrm-${{ github.ref_name }}.zip addons/ -x "*.import" -x "*.unwrap_cache"
 
                - name: Update Release
                  uses: softprops/action-gh-release@v2
