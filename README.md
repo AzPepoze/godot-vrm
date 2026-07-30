@@ -225,7 +225,7 @@ Set defaults once in **Project Settings → General → VRM → Import** instead
 | `vrm/import/remove_end_bones` | Default remove end bones |
 | `vrm/import/v1_rotate_180` | Rotate VRM 1.0 models 180° on Y axis |
 
-In the import dialog, **Override Global Defaults** (disabled by default) lets you override settings for a specific file.
+In the import dialog, **Use Custom Import Settings** (disabled by default) lets you use settings from a specific file instead of the project defaults.
 
 ### Bone Rename Modes
 
