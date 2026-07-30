@@ -3,6 +3,14 @@ extends EditorSceneFormatImporter
 
 const VRMLogger = preload("./core/logger.gd")
 const gltf_document_extension_class = preload("./importer/v0/vrm_extension.gd")
+const vrmc_extension_classes = [
+    preload("./importer/v1/vrmc/vrmc_node_constraint.gd"),
+    preload("./importer/v1/vrmc/vrmc_spring_bone.gd"),
+    preload("./importer/v1/vrmc/vrmc_materials_mtoon.gd"),
+    preload("./importer/v1/vrmc/vrmc_materials_hdr_emissive_multiplier.gd"),
+    preload("./importer/v1/vrmc/vrmc_vrm.gd"),
+    preload("./importer/v1/vrmc/vrmc_vrm_animation.gd"),
+]
 const vrm_constants = preload("./core/vrm_constants.gd")
 
 const SAVE_DEBUG_GLTFSTATE_RES: bool = false
@@ -20,6 +28,11 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
     var gltf: GLTFDocument = GLTFDocument.new()
     var vrm_extension: GLTFDocumentExtension = gltf_document_extension_class.new()
     gltf.register_gltf_document_extension(vrm_extension, true)
+    var vrmc_extensions: Array[GLTFDocumentExtension] = []
+    for extension_class in vrmc_extension_classes:
+        var extension: GLTFDocumentExtension = extension_class.new()
+        vrmc_extensions.append(extension)
+        gltf.register_gltf_document_extension(extension, true)
     var state: GLTFState = GLTFState.new()
 
     var override_global: bool = options.get(&"vrm/override_global_defaults", false) as bool
@@ -67,7 +80,15 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
             "_import_scene: append_from_file failed with error %d for %s" % [err, path]
         )
         gltf.unregister_gltf_document_extension(vrm_extension)
+        for extension in vrmc_extensions:
+            gltf.unregister_gltf_document_extension(extension)
         return null
+
+    # The custom importer owns this GLTFDocument. Explicitly run MToon
+    # conversion because Godot 4.7 may skip this VRM 1.x callback.
+    var mtoon_extension = vrmc_extensions[2]
+    if mtoon_extension.has_method(&"_import_post"):
+        mtoon_extension._import_post(state, null)
 
     var generated_scene = gltf.generate_scene(state)
     VRMLogger.info("import_vrm.gd", "_import_scene: scene generated successfully for %s" % path)
@@ -77,4 +98,6 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
             state.take_over_path(path + ".res")
             ResourceSaver.save(state, path + ".res")
     gltf.unregister_gltf_document_extension(vrm_extension)
+    for extension in vrmc_extensions:
+        gltf.unregister_gltf_document_extension(extension)
     return generated_scene
