@@ -111,6 +111,22 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
                 "VRM 1.x post-processing failed with error %d for %s" % [vrm_v1_error, path]
             )
 
+    # Godot 4.7 may skip VRM extension scene callbacks for custom importers.
+    # Run spring-bone post-processing after the VRM callback so its skeleton
+    # path uses the final renamed node, such as GeneralSkeleton.
+    var spring_bone_extension = vrmc_extensions[1]
+    if (
+        generated_scene != null
+        and spring_bone_extension.has_method(&"_import_post")
+        and state.json.get("extensions", {}).has("VRMC_springBone")
+    ):
+        var spring_bone_error: Error = spring_bone_extension._import_post(state, generated_scene)
+        if spring_bone_error != OK:
+            VRMLogger.error(
+                "import_vrm.gd",
+                "VRM spring-bone post-processing failed with error %d for %s" % [spring_bone_error, path]
+            )
+
     VRMLogger.info("import_vrm.gd", "_import_scene: scene generated successfully for %s" % path)
 
     if SAVE_DEBUG_GLTFSTATE_RES and path != "":
