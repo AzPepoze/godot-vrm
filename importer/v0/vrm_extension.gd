@@ -151,7 +151,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
         "vrm_extension.gd", "BoneMap configured with %d bones" % human_bone_to_idx.size()
     )
 
-    var skeleton_name: String = gstate.get_meta(&"vrm_skeleton_name", "Skeleton3D") as String
+    var skeleton_name: String = gstate.get_meta(&"vrm_skeleton_name", "GeneralSkeleton") as String
 
 
     var pose_diffs: Array[Basis] = vrm_utils.perform_retarget(

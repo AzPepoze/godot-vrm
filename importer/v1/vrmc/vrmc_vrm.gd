@@ -202,7 +202,7 @@ func _import_post(gstate: GLTFState, node: Node) -> Error:
         gstate, human_bone_to_idx, false
     )
 
-    var skeleton_name: String = gstate.get_meta(&"vrm_skeleton_name", "Skeleton3D") as String
+    var skeleton_name: String = gstate.get_meta(&"vrm_skeleton_name", "GeneralSkeleton") as String
 
     var do_retarget = true
 

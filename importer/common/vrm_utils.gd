@@ -62,7 +62,7 @@ static func perform_retarget(
     root_node: Node,
     skeleton: Skeleton3D,
     bone_map: BoneMap,
-    skeleton_name: String = "Skeleton3D",
+    skeleton_name: String = "GeneralSkeleton",
     
 ) -> Array[Basis]:
     return VRMSkeletonRetargeting.perform_retarget(
@@ -133,5 +133,4 @@ static func apply_default_import_settings(gstate: GLTFState) -> void:
             gstate.set_additional_data(additional_data_defaults[meta_key][0], additional_data_defaults[meta_key][1])
             
     if not gstate.has_meta(&"vrm_skeleton_name"):
-        gstate.set_meta(&"vrm_skeleton_name", "Skeleton3D")
-
+        gstate.set_meta(&"vrm_skeleton_name", "GeneralSkeleton")
