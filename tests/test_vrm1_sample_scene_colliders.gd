@@ -18,8 +18,8 @@ func _instantiate_sample_scene() -> Node:
 
 
 func _find_avatar_sample(scene: Node) -> Node:
-    var avatar := scene.get_node_or_null("AvatarSample_M")
-    assert_not_null(avatar, "sample_scene.tscn should contain AvatarSample_M")
+    var avatar := scene.get_node_or_null("ImportZone/AvatarSample_M")
+    assert_not_null(avatar, "ImportZone should contain AvatarSample_M")
     return avatar
 
 
