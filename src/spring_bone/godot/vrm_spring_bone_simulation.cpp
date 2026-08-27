@@ -223,6 +223,9 @@ void VRMSpringBoneSimulation::_process_modification() {
 
   float delta = (float)get_process_delta_time();
   if (delta <= 0.0001f) {
+    if (Engine::get_singleton()->get_time_scale() <= 0.0001) {
+      return;
+    }
     delta = 0.016666f;
   }
 

@@ -3,7 +3,7 @@ extends Node3D
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	_play_wiggle("Godette_vrm_v4")
+	_play_wiggle("ImportZone/Godette_vrm_v4")
 	_play_wiggle("AliciaSolid_vrm-051")
 	_play_wiggle("AliciaSolid_vrm-052")
 
@@ -20,4 +20,3 @@ func _play_wiggle(path: String):
 		if anim:
 			anim.loop_mode = Animation.LOOP_LINEAR
 			anim_player.play("sample/wiggle4")
-
