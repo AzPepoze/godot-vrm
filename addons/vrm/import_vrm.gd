@@ -110,6 +110,12 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
     if needs_local_lifecycle_workaround and spring_bone_extension.has_method(&"_import_preflight"):
         import_spring_bones = spring_bone_extension._import_preflight(state, used_extensions) == OK
 
+    var import_vrm_v0 := false
+    if needs_local_lifecycle_workaround and vrm_extension.has_method(&"_import_preflight"):
+        import_vrm_v0 = vrm_extension._import_preflight(state, used_extensions) == OK
+    if import_vrm_v0 and vrm_extension.has_method(&"_import_post_parse"):
+        vrm_extension._import_post_parse(state)
+
     var generated_scene = gltf.generate_scene(state)
     VRMLogger.info("import_vrm.gd", "_import_scene: scene generated successfully for %s" % path)
 
@@ -117,6 +123,8 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
         vrm_v1_extension._import_post(state, generated_scene)
     if import_spring_bones and spring_bone_extension.has_method(&"_import_post"):
         spring_bone_extension._import_post(state, generated_scene)
+    if import_vrm_v0 and vrm_extension.has_method(&"_import_post"):
+        vrm_extension._import_post(state, generated_scene)
 
     if SAVE_DEBUG_GLTFSTATE_RES and path != "":
         if !ResourceLoader.exists(path + ".res"):
