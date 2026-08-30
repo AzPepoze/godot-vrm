@@ -13,3 +13,6 @@ windows.release.x86_64 = "res://addons/vrm/bin/libvrm_physics.windows.template_r
 
 macos.debug = "res://addons/vrm/bin/libvrm_physics.macos.template_debug.framework"
 macos.release = "res://addons/vrm/bin/libvrm_physics.macos.template_release.framework"
+
+android.debug.arm64 = "res://addons/vrm/bin/libvrm_physics.android.template_debug.arm64.so"
+android.release.arm64 = "res://addons/vrm/bin/libvrm_physics.android.template_release.arm64.so"

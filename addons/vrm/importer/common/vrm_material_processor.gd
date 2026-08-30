@@ -301,15 +301,15 @@ static func process_vrm_material_v0(
     elif blend_mode == 1:  # Cutout
         godot_shader_name += "_cutout"
         if cull_mode == 0:
-            godot_shader_name += "_cutout_cull_off"
+            godot_shader_name += "_cull_off"
     elif blend_mode == 2:  # Transparent
         godot_shader_name += "_trans"
         if cull_mode == 0:
-            godot_shader_name += "_trans_cull_off"
+            godot_shader_name += "_cull_off"
     elif blend_mode == 3:  # TransparentWithZWrite
         godot_shader_name += "_trans_zwrite"
         if cull_mode == 0:
-            godot_shader_name += "_trans_zwrite_cull_off"
+            godot_shader_name += "_cull_off"
 
     if outline_width_mode != 0:
         godot_outline_shader_name = mtoon_shader_base_path + "_outline"

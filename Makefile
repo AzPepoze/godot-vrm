@@ -1,4 +1,4 @@
-.PHONY: build build-release test clean format lint build-linux build-windows build-macos build-all build-release-all
+.PHONY: build build-release test clean format lint build-linux build-windows build-macos build-android build-all build-release-all
 
 build: build-linux
 
@@ -19,8 +19,14 @@ build-release-windows:
 build-macos:
 	-scons platform=macos target=template_debug -j$(shell nproc)
 
+build-android:
+	-scons platform=android target=template_debug arch=arm64 -j$(shell nproc)
+
 build-release-macos:
 	-scons platform=macos target=template_release -j$(shell nproc)
+
+build-release-android:
+	-scons platform=android target=template_release arch=arm64 -j$(shell nproc)
 
 build: build-linux build-windows build-macos
 
