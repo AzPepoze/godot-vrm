@@ -86,11 +86,37 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
             gltf.unregister_gltf_document_extension(extension)
         return null
 
-    # The custom importer owns this GLTFDocument. Explicitly run MToon
-    # conversion because Godot 4.7 may skip this VRM 1.x callback.
+    # Godot 4.7+ may skip lifecycle callbacks for extensions registered on this
+    # local GLTFDocument. Earlier releases invoke them themselves, so running
+    # them manually there would apply VRM post-import work twice.
+    var spring_bone_extension = vrmc_extensions[1]
     var mtoon_extension = vrmc_extensions[2]
+    var vrm_v1_extension = vrmc_extensions[4]
+    var used_extensions: PackedStringArray = PackedStringArray(state.json.get("extensionsUsed", []))
+
     if mtoon_extension.has_method(&"_import_post"):
         mtoon_extension._import_post(state, null)
+
+    var engine_version := Engine.get_version_info()
+    var needs_local_lifecycle_workaround: bool = (
+        engine_version.major == 4 and engine_version.minor >= 7
+    )
+
+    var import_vrm_v1 := false
+    if needs_local_lifecycle_workaround and vrm_v1_extension.has_method(&"_import_preflight"):
+        import_vrm_v1 = vrm_v1_extension._import_preflight(state, used_extensions) == OK
+    if import_vrm_v1 and vrm_v1_extension.has_method(&"_import_post_parse"):
+        vrm_v1_extension._import_post_parse(state)
+
+    var import_spring_bones := false
+    if needs_local_lifecycle_workaround and spring_bone_extension.has_method(&"_import_preflight"):
+        import_spring_bones = spring_bone_extension._import_preflight(state, used_extensions) == OK
+
+    var import_vrm_v0 := false
+    if needs_local_lifecycle_workaround and vrm_extension.has_method(&"_import_preflight"):
+        import_vrm_v0 = vrm_extension._import_preflight(state, used_extensions) == OK
+    if import_vrm_v0 and vrm_extension.has_method(&"_import_post_parse"):
+        vrm_extension._import_post_parse(state)
 
     var generated_scene = gltf.generate_scene(state)
 
@@ -128,6 +154,13 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
             )
 
     VRMLogger.info("import_vrm.gd", "_import_scene: scene generated successfully for %s" % path)
+
+    if import_vrm_v1 and vrm_v1_extension.has_method(&"_import_post"):
+        vrm_v1_extension._import_post(state, generated_scene)
+    if import_spring_bones and spring_bone_extension.has_method(&"_import_post"):
+        spring_bone_extension._import_post(state, generated_scene)
+    if import_vrm_v0 and vrm_extension.has_method(&"_import_post"):
+        vrm_extension._import_post(state, generated_scene)
 
     if SAVE_DEBUG_GLTFSTATE_RES and path != "":
         if !ResourceLoader.exists(path + ".res"):
