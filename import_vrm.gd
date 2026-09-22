@@ -35,7 +35,7 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
         gltf.register_gltf_document_extension(extension, true)
     var state: GLTFState = GLTFState.new()
 
-    var override_global: bool = options.get(&"vrm/override_global_defaults", false) as bool
+    var use_custom_settings: bool = options.get(&"vrm/use_custom_import_settings", false) as bool
 
     var head_hiding: int = options.get(&"vrm/head_hiding_method", 0) as int
     var bone_rename: int = options.get(&"vrm/bone_rename", 1) as int
@@ -43,7 +43,7 @@ func _import_scene(path: String, flags: int, options: Dictionary) -> Object:
     var remove_end: bool = options.get(&"vrm/remove_end_bones", true) as bool
     var v1_rotate_180: bool = options.get(&"vrm/v1_rotate_180", true) as bool
 
-    if not override_global:
+    if not use_custom_settings:
         head_hiding = ProjectSettings.get_setting("vrm/import/head_hiding_method", head_hiding)
         bone_rename = ProjectSettings.get_setting("vrm/import/bone_rename", bone_rename)
         skeleton_name = ProjectSettings.get_setting("vrm/import/skeleton_name", skeleton_name)
