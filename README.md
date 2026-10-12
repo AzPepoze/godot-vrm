@@ -94,6 +94,8 @@ git submodule add -b vrm https://github.com/AzPepoze/godot-vrm addons/vrm
 git submodule add -b mtoon https://github.com/AzPepoze/godot-vrm addons/mtoon
 ```
 
+The `vrm` and `mtoon` branches are updated automatically from `main`.
+
 ### Method 3: Manual Install
 
 1. Download the latest `.zip` from the [Releases page](https://github.com/AzPepoze/godot-vrm/releases/latest)
