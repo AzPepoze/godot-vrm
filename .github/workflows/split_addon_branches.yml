@@ -1,0 +1,28 @@
+name: Split addon branches
+
+on:
+     push:
+          branches:
+               - main
+     workflow_dispatch:
+
+permissions:
+     contents: write
+
+jobs:
+     split:
+          runs-on: ubuntu-latest
+          steps:
+               - name: Checkout
+                 uses: actions/checkout@v4
+                 with:
+                      fetch-depth: 0
+
+               - name: Push vrm and mtoon branches
+                 run: |
+                      git config user.name "github-actions[bot]"
+                      git config user.email "github-actions[bot]@users.noreply.github.com"
+                      for addon in vrm mtoon; do
+                           commit=$(git subtree split --prefix=addons/$addon HEAD 2>/dev/null)
+                           git push --force origin "$commit:refs/heads/$addon"
+                      done
